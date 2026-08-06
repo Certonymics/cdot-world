@@ -28,8 +28,9 @@ The network (three chains, interoperable by design):
    ~50 nodes on top of the C-Layer, private and accountable, native NASDAQ-like matching engine.
 
 Use cases: global payments and payroll, remittances, embedded finance, microtransactions,
-machine-to-machine commerce - every transaction settles instantly, every participant (human or
-agent) is identifiable and accountable, while real identities and transactions stay private.
+machine-to-machine commerce, on and off ramping, asset recovery (never lose your
+self custodied crypto), bank accounts - every transaction settles instantly, every participant (human or
+agent) is certified and accountable, while real identities and transactions stay private.
 
 Live network map data: https://map.c-layer.certonym.org/api/data
 Contact: info@cdot.world - Certonymity, 86-87 Campden Street, London W8 7EN
