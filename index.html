@@ -10,7 +10,7 @@
 <meta property="og:url" content="https://www.cdot.world/">
 <meta property="og:type" content="website">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"cDot","legalName":"Certonymity","url":"https://www.cdot.world/","email":"info@cdot.world","address":{"@type":"PostalAddress","streetAddress":"86-87 Campden Street","addressLocality":"London","postalCode":"W8 7EN"},"description":"cDot is purpose built infrastructure for the next era of money movement and identity at scale: a dedicated identity and asset recovery chain, a stablecoin and agentic payment chain (30,000 tx/s, 250 ms finality), and a trading chain, interoperating as one trusted network."}
+{"@context":"https://schema.org","@type":"Organization","name":"cDot","legalName":"Certonymity","url":"https://www.cdot.world/","email":"info@cdot.world","address":{"@type":"PostalAddress","streetAddress":"86-87 Campden Street","addressLocality":"London","postalCode":"W8 7EN"},"description":"cDot is purpose built infrastructure for the next era of money movement and identity at scale: a dedicated identity and asset recovery chain (15,000 tx/s highly parallel, WASM smart contracts, 20 s finality, permissionless, public and pseudonymous, designed for thousands of low hardware nodes worldwide), a stablecoin and agentic payment chain (30,000 tx/s, finality under 1 s, byzantine security 45%), and a trading chain (30,000 tx/s native multithreading, finality under 1 s, ~50 node permissioned overlay on the C-Layer, private and accountable, native NASDAQ-like matching engine), interoperating as one trusted network."}
 </script>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -345,7 +345,14 @@
       <div class="chain">
         <span class="num">1</span>
         <h3>Identity and asset recovery chain</h3>
-        <p>A dedicated identity chain for people, businesses, and AI agents. Privacy with accountability: cryptographic avatars of verified real identities.</p>
+        <p>A dedicated identity chain for people, businesses, and AI agents. Privacy with accountability: cryptographic avatars of verified real identities. Designed to run over thousands of low hardware, unreliable nodes around the world for maximum resilience and decentralization.</p>
+        <div class="specs">
+          <span>15,000 tx/s, highly parallel</span>
+          <span>WASM smart contracts</span>
+          <span>20 s finality</span>
+          <span>Permissionless</span>
+          <span>Public and pseudonymous</span>
+        </div>
       </div>
       <div class="chain">
         <span class="num">2</span>
@@ -353,14 +360,21 @@
         <p>Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on and off ramping. Autonomous agents transact within verifiable, revocable permissions granted by their principals.</p>
         <div class="specs">
           <span>30,000 tx/s</span>
-          <span>250 ms finality</span>
-          <span>Nakamoto coefficient 51%</span>
+          <span>Finality &lt; 1 s</span>
+          <span>Byzantine security 45%</span>
         </div>
       </div>
       <div class="chain">
         <span class="num">3</span>
         <h3>Trading chain</h3>
         <p>A high performance decentralized exchange.</p>
+        <div class="specs">
+          <span>30,000 tx/s, native multithreading</span>
+          <span>Finality &lt; 1 s</span>
+          <span>~50 node permissioned overlay on the C-Layer</span>
+          <span>Private and accountable</span>
+          <span>Native NASDAQ-like matching engine</span>
+        </div>
       </div>
     </div>
     <p class="interop">All <b>interoperable by design</b>.</p>

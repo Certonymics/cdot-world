@@ -16,11 +16,16 @@ on each side of a transaction - critical as AI agents transact on behalf of huma
 
 The network (three chains, interoperable by design):
 1. Identity and asset recovery chain - for people, businesses, and AI agents; privacy with
-   accountability via cryptographic avatars of verified real identities.
+   accountability via cryptographic avatars of verified real identities. 15,000 tx/s through a
+   highly parallel architecture, WASM smart contracts, 20 s finality, permissionless, public and
+   pseudonymous, designed to run over thousands of low hardware, unreliable nodes around the
+   world for maximum resilience and decentralization.
 2. Stablecoin and agentic payment chain - high-throughput, low-cost global settlement and
-   programmable money with native on and off ramping; 30,000 tx/s, 250 ms finality; autonomous
+   programmable money with native on and off ramping; 30,000 tx/s, finality under 1 s, byzantine security 45%; autonomous
    agents transact within verifiable, revocable permissions granted by their principals.
-3. Trading chain - a high performance decentralized exchange.
+3. Trading chain - a high performance decentralized exchange. 30,000 tx/s through native
+   multithreaded operations, finality under 1 s, a high performance permissioned overlay of
+   ~50 nodes on top of the C-Layer, private and accountable, native NASDAQ-like matching engine.
 
 Use cases: global payments and payroll, remittances, embedded finance, microtransactions,
 machine-to-machine commerce - every transaction settles instantly, every participant (human or
