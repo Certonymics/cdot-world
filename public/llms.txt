@@ -1,9 +1,11 @@
-# cDot (www.cdot.world)
+# cDot
 
-cDot is purpose built infrastructure for the next era of money movement and identity at scale,
-where verified identity, stablecoin payments, programmable money and autonomous accountable
-agents converge. Rather than forcing everything onto a single chain, cDot is a set of purpose
-built blockchains, each engineered for what it does best, interoperating as one trusted network.
+> Purpose built blockchain infrastructure for identity and money movement at scale, where
+> verified identity, stablecoin payments, programmable money and autonomous accountable agents
+> converge as one trusted network. Built by Certonymity Ltd (London, UK).
+
+Rather than forcing everything onto a single chain, cDot is a set of purpose built blockchains,
+each engineered for what it does best, interoperating as one trusted network.
 
 Mission: provide the settlement layer for value exchanged between people, businesses, and machines.
 
@@ -15,22 +17,36 @@ avatars of the user's real identity. Payments at scale need to know, verifiably,
 on each side of a transaction - critical as AI agents transact on behalf of humans and businesses.
 
 The network (three chains, interoperable by design):
+
 1. Identity and asset recovery chain - for people, businesses, and AI agents; privacy with
    accountability via cryptographic avatars of verified real identities. 15,000 tx/s through a
-   highly parallel architecture, WASM smart contracts, 20 s finality, permissionless, public and
+   highly parallel architecture, WASM smart contracts, 20s finality, permissionless, public and
    pseudonymous, designed to run over thousands of low hardware, unreliable nodes around the
    world for maximum resilience and decentralization.
 2. Stablecoin and agentic payment chain - high-throughput, low-cost global settlement and
-   programmable money with native on and off ramping; 30,000 tx/s, finality under 1 s, byzantine security 45%; autonomous
-   agents transact within verifiable, revocable permissions granted by their principals.
+   programmable money with native on and off ramping; 30,000 tx/s, finality <1s, byzantine
+   security 45%; autonomous agents transact within verifiable, revocable permissions granted
+   by their principals.
 3. Trading chain - a high performance decentralized exchange. 30,000 tx/s through native
-   multithreaded operations, finality under 1 s, a high performance permissioned overlay of
-   ~50 nodes on top of the C-Layer, private and accountable, native NASDAQ-like matching engine.
+   multithreaded operations, finality <1s, a high performance permissioned overlay of ~50
+   nodes on top of the C-Layer, private and accountable, native NASDAQ-like matching engine.
 
 Use cases: global payments and payroll, remittances, embedded finance, microtransactions,
-machine-to-machine commerce, on and off ramping, asset recovery (never lose your
-self custodied crypto), bank accounts - every transaction settles instantly, every participant (human or
-agent) is certified and accountable, while real identities and transactions stay private.
+machine-to-machine commerce, on and off ramping, asset recovery (never lose your self custodied
+crypto), bank accounts - every transaction settles instantly, every participant (human or agent)
+is certified and accountable, while real identities and transactions stay private.
 
-Live network map data: https://map.c-layer.certonym.org/api/data
-Contact: info@cdot.world - Certonymity, 86-87 Campden Street, London W8 7EN
+## Pages
+
+- [cDot](https://www.cdot.world/): the single landing page - mission, the problem, the three
+  chains and their specifications, use cases, and contact.
+
+## Data
+
+- [C-Layer node registry](https://map.c-layer.certonym.org/api/data): live JSON of the
+  community-run nodes plotted on the site's network map.
+
+## Contact
+
+- [info@certonymity.com](mailto:info@certonymity.com): general enquiries.
+- Certonymity Ltd, 86-87 Campden Street, London W8 7EN, United Kingdom.

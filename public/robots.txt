@@ -1,0 +1,43 @@
+# cdot.world
+#
+# Everything here is public marketing copy, so everything is crawlable.
+#
+# The AI crawlers below are listed explicitly even though "User-agent: *"
+# already permits them. This is deliberate documentation of intent: assistants
+# will describe cDot either from this page or from third-party guesses, and we
+# would rather they used our own words. Do not "tidy up" by disallowing them.
+#
+# Note: Google-Extended governs Gemini/Vertex training only. It has NO effect
+# on Google Search ranking or indexing - disallowing it does not remove you
+# from Search, and allowing it does not help you rank.
+
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Structured summary for language models: /llms.txt
+# No Sitemap directive - the site is a single page at the domain root, which
+# needs no sitemap to be discovered. Add one here if a second route appears.

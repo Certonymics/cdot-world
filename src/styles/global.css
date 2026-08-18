@@ -1,7 +1,6 @@
   
   *{margin:0;padding:0;box-sizing:border-box}
-  html{overflow-x:clip}
-  html{scroll-behavior:smooth}
+  html{overflow-x:clip;scroll-behavior:smooth}
   body{
     font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg-0);
@@ -27,7 +26,6 @@
   @media(max-width:640px){.brand svg.logomark{height:36px;width:87px}}
   .brand .tag{font-size:11px;font-weight:500;color:var(--brand);letter-spacing:.06em;line-height:1.2}
   @media(max-width:640px){.brand .tag{display:none}}
-  .brand .word b{color:var(--cyan);font-weight:650}
   .nav a.link{color:var(--ink-dim);text-decoration:none;font-size:14.5px;margin-left:26px;transition:color .2s}
   .nav a.link:hover{color:var(--ink)}
   @media(max-width:640px){.nav a.link{margin-left:14px;font-size:13px}}
@@ -42,15 +40,12 @@
   }
   .hero .wrap{position:relative;z-index:2;width:100%;padding-top:172px;padding-bottom:80px}
   @media(max-width:640px){.hero .wrap{padding-top:128px;padding-bottom:56px}}
-  .herologo{height:150px;width:150px;display:block;margin-bottom:30px;filter:drop-shadow(0 0 34px rgba(86,106,253,.4))}
-  @media(max-width:640px){.herologo{height:110px;width:110px}}
   .watermark{
     position:absolute;top:50%;right:-12%;z-index:1;
     height:118%;width:auto;max-width:none;
     transform:translateY(-50%);
     opacity:.09;pointer-events:none;
   }
-  .watermark.right{right:-12%}
   .watermark img{height:100%;width:auto;max-width:none;aspect-ratio:283/338;display:block}
   @media(max-width:860px){
     .watermark{right:-18%;height:108%;opacity:.1}
@@ -60,11 +55,6 @@
   }
   @media(max-width:400px){
     .watermark{right:-28%;height:90%}
-  }
-  .kicker{
-    display:inline-block;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--cyan);border:1px solid var(--line);border-radius:999px;
-    padding:7px 14px;background:rgba(128,189,254,.06);margin-bottom:26px;
   }
   h1{
     font-family:"Darker Grotesque",Inter,sans-serif;
@@ -88,7 +78,7 @@
     transition:transform .15s,box-shadow .15s;
   }
   .btn-primary{
-    color:#fff;background:var(--brand);
+    color:#fff;background:var(--brand-strong);
     box-shadow:0 6px 30px rgba(86,106,253,.35);
   }
   .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 38px rgba(86,106,253,.45)}
@@ -130,31 +120,31 @@
     color:#04122b;background:linear-gradient(120deg,var(--cyan),var(--blue));
     margin-bottom:18px;
   }
-  .chain h3{font-size:19.5px;font-weight:650;margin-bottom:10px}
+  .chain h3{font-size:19.5px;font-weight:700;margin-bottom:10px}
   .chain p{color:var(--ink-dim);font-size:15.5px}
   .chain .specs{
     display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;
   }
   .chain .specs span{
     border:1px solid var(--line);border-radius:8px;padding:5px 10px;
-    font-size:12.5px;font-weight:600;color:var(--cyan);background:rgba(128,189,254,.06);
+    font-family:var(--font-mono);
+    font-size:11.8px;font-weight:500;letter-spacing:-.01em;
+    font-variant-numeric:tabular-nums;
+    color:var(--cyan);background:rgba(128,189,254,.06);
     white-space:nowrap;
   }
-  .interop{
-    margin-top:26px;text-align:center;color:var(--ink-faint);font-size:14.5px;
-    letter-spacing:.04em;
-  }
-  .interop b{color:var(--cyan);font-weight:600}
 
   /* Live C-Layer map (native, dark) */
   .maplive{margin-top:56px}
-  .maplive .cap{color:var(--ink-dim);font-size:16px;margin-bottom:18px;max-width:720px}
   .mapcard{
     position:relative;border:1px solid rgba(128,189,254,.28);border-radius:18px;overflow:hidden;
     background:linear-gradient(160deg,rgba(128,189,254,.06),rgba(4,11,24,.4) 60%);
     box-shadow:0 20px 60px rgba(0,10,30,.5), 0 0 40px rgba(86,106,253,.12);
   }
-  .mapvp{position:relative;height:460px;overflow:hidden;cursor:grab;touch-action:none}
+  /* pan-y, not none: vertical page scroll must survive a swipe over the map, or
+     a mobile reader gets stuck on it. Two-finger gestures are handled in JS. */
+  .mapvp{position:relative;height:460px;overflow:hidden;cursor:grab;touch-action:pan-y}
+  .mapvp:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
   .mapvp.drag{cursor:grabbing}
   @media(max-width:640px){.mapvp{height:300px}}
   /* Land canvas sits under the node layer and is NOT transformed - it is redrawn
@@ -231,9 +221,15 @@
     color:var(--ink-faint);margin-top:10px;
   }
   .np-label:first-of-type{margin-top:0}
-  .np-value{font-size:13.5px;color:var(--ink);margin-top:2px;word-break:break-all}
+  .np-value{
+    font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums;
+    color:var(--ink);margin-top:2px;word-break:break-all;
+  }
   .mapcount{margin-top:16px;color:var(--ink-dim);font-size:15px}
-  .mapcount b{color:var(--cyan);font-weight:650}
+  .mapcount b{
+    font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+    color:var(--cyan);font-weight:600;
+  }
 
   /* Use cases */
   .uses{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px;max-width:820px}
@@ -271,7 +267,6 @@
     background:linear-gradient(160deg,var(--card),transparent 60%);height:fit-content;
     margin-top:calc(13.5px * 1.4 + 7px);
   }
-  .addr h3{font-size:17px;font-weight:650;margin-bottom:14px}
   .addr p{color:var(--ink-dim);font-size:15.5px;line-height:1.7;margin-bottom:16px}
   .addr p:last-child{margin-bottom:0}
   .addr a{color:var(--cyan);text-decoration:none}
@@ -281,6 +276,23 @@
   /* Footer */
   footer{border-top:1px solid var(--line);padding:38px 0;background:var(--bg-0)}
   .foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-  .foot .word{font-weight:650;font-size:17px}
-  .foot .word b{color:var(--cyan);font-weight:650}
   .foot p{color:var(--ink-faint);font-size:13.5px}
+
+  /* Respect a reduced-motion preference: the node and badge pings are infinite
+     animations, and there can be one per node. */
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+      scroll-behavior:auto !important;
+    }
+    .mapnode::before,.mapbadge .dot::before{animation:none;opacity:0}
+    .chain:hover,.btn-primary:hover{transform:none}
+  }
+
+  /* 404 */
+  .notfound{min-height:70vh;display:flex;align-items:center;padding-top:140px}
+  .notfound h1{font-size:clamp(32px,7vw,56px)}
+  @media(max-width:640px){.notfound{padding-top:110px}}

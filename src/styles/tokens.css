@@ -16,8 +16,15 @@
     --ink-dim:rgba(234,243,255,.72);
     --ink-faint:rgba(234,243,255,.5);
     --brand:#566AFD;   /* primary-500 - brand blue, matches logo + sibling repos */
+    /* primary-600. For white text on a brand-coloured fill only: #fff on
+       --brand is 4.31:1, which fails WCAG AA (4.5:1). This is 5.36:1. Do not
+       use it in place of --brand for logo-matching surfaces. */
+    --brand-strong:#4A5AE8;
     --blue:#6B9EFD;    /* primary-400 */
     --cyan:#80BDFE;    /* primary-300 - accent text on dark */
+    /* Geist Mono, for figures and technical values. Variable, so any weight in
+       100-900 is available from one file. */
+    --font-mono:"Geist Mono Variable","Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     --line:rgba(128,189,254,.16);
     --card:rgba(128,189,254,.05);
   }

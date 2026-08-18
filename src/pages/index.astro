@@ -106,7 +106,10 @@ const ogDescription =
             <canvas id="minicv"></canvas>
             <div class="minirect" id="minirect"></div>
           </div>
-          <div class="maphint" id="maphint">Scroll or pinch to zoom - drag to pan</div>
+          <!-- Text is set by the map script, which knows the platform modifier.
+               Kept out of the markup so JS-disabled visitors are not told the
+               map is interactive when it isn't. -->
+          <div class="maphint" id="maphint" hidden></div>
           <div class="mapzoom" data-nopan>
             <button id="mz-in" aria-label="Zoom in">+</button>
             <button id="mz-out" aria-label="Zoom out">&minus;</button>
@@ -239,7 +242,10 @@ const ogDescription =
          request, and Apps Script does not answer the OPTIONS probe, so the whole
          submission fails before it starts. Sent as text/plain it is a "simple
          request" and goes straight through; doPost reads the raw body regardless. */
+      /* Without a timeout a stalled connection leaves the button disabled on
+         "Sending…" forever, with no way to retry. */
       const response = await fetch(CONTACT_FORM_URL, {
+        signal: AbortSignal.timeout(15000),
         method: 'POST',
         body: JSON.stringify({
           email: document.getElementById('cf-email').value.trim(),
@@ -276,6 +282,8 @@ const ogDescription =
   const LAT_MAX=75, LAT_MIN=-58;
   const LAND_COLOR='rgba(147,197,253,.55)';   /* #93C5FD, softened for the dark card */
   const MIN_SCALE=1, MAX_SCALE=8, BTN_STEP=1.7;
+  const IS_APPLE=/Mac|iPhone|iPad|iPod/.test(navigator.platform||'');
+  const MODIFIER_HINT=(IS_APPLE?'⌘':'Ctrl')+' + scroll to zoom — drag to pan';
 
   const vp=document.getElementById('mapvp');
   if(!vp) return;
@@ -377,7 +385,27 @@ const ogDescription =
     paintLand(); syncMini();
   }
 
-  function touched(){ if(!interacted){ interacted=true; hint.style.display='none'; } }
+  function touched(){ if(!interacted){ interacted=true; hint.hidden=true; } }
+
+  /* Keyboard: arrows pan, +/- zoom, 0 resets. Without this the map is
+     mouse/touch only. */
+  vp.tabIndex=0;
+  vp.setAttribute('role','application');
+  vp.setAttribute('aria-label','C-Layer node map. Arrow keys pan, plus and minus zoom, 0 resets.');
+  vp.addEventListener('keydown',e=>{
+    const step=40;
+    switch(e.key){
+      case 'ArrowLeft':  view.x+=step; break;
+      case 'ArrowRight': view.x-=step; break;
+      case 'ArrowUp':    view.y+=step; break;
+      case 'ArrowDown':  view.y-=step; break;
+      case '+': case '=': zoomTo(view.s*BTN_STEP); e.preventDefault(); return;
+      case '-': case '_': zoomTo(view.s/BTN_STEP); e.preventDefault(); return;
+      case '0': view.s=1;view.x=0;view.y=0; touched(); apply(); e.preventDefault(); return;
+      default: return;
+    }
+    e.preventDefault(); touched(); clampPan(); apply();
+  });
 
   function zoomTo(next,cx,cy){
     const rect=vp.getBoundingClientRect();
@@ -449,18 +477,24 @@ const ogDescription =
     el._ip=n.ip;
     /* Ignore the click that ends a drag. */
     el.addEventListener('click',()=>{ if(moved>5) return; showPanel(n); });
+    /* A node focused while zoomed in can sit outside the viewport, so bring it
+       into view - otherwise the focus ring is drawn somewhere nobody can see. */
+    el.addEventListener('focus',()=>{
+      if(view.s>1.01) panToWorld(p.x/100,p.y/100);
+    });
     layer.appendChild(el);
   }
 
   /* Live data. Same two-step as c.Email: registry for the node list, then ipinfo
      per unique IP to place it. */
-  const controller=new AbortController();
-  const signal=controller.signal;
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   const fallback='One network, run by the cDot community around the world.';
   (async()=>{
     try{
-      const res=await fetch(REGISTRY_ORIGIN+'/api/data?limit=200',{signal});
+      /* Timeout matters as much as error handling here: if the registry hangs
+         rather than failing, the count line would read "Connecting…" forever. */
+      const res=await fetch(REGISTRY_ORIGIN+'/api/data?limit=200',
+                            {signal:AbortSignal.timeout(8000)});
       if(!res.ok) throw new Error('Failed: '+res.status);
       const j=await res.json();
       const data=Array.isArray(j)?j:(j.data||[]);
@@ -472,17 +506,15 @@ const ogDescription =
         if(d.client_ip&&v) ipToVersion.set(d.client_ip,v);
       });
 
-      const ips=[...new Set(data.map(d=>d.client_ip).filter(Boolean))].slice(0,30);
+      const allIps=[...new Set(data.map(d=>d.client_ip).filter(Boolean))];
+      const CAP=30;
+      const ips=allIps.slice(0,CAP);   /* geolocating every node would be slow */
       for(let i=0;i<ips.length;i++){
-        if(signal.aborted) return;
         const ip=ips[i];
         try{
           /* Per-request timeout so one unresolvable IP cannot stall the rest. */
-          const t=new AbortController();
-          const timer=setTimeout(()=>t.abort(),5000);
           const r=await fetch(REGISTRY_ORIGIN+'/ipinfo/json/'+ip+'?fields=status,country,city,lat,lon',
-                              {signal:signal.aborted?signal:t.signal});
-          clearTimeout(timer);
+                              {signal:AbortSignal.timeout(5000)});
           if(r.ok){
             const g=await r.json();
             if(g.status==='success'&&g.lat!=null&&g.lon!=null){
@@ -491,7 +523,12 @@ const ogDescription =
                        city:g.city||'Unknown',country:g.country||'Unknown'};
               nodes.push(n); addNode(n);
               const cs=new Set(nodes.map(x=>x.country)).size;
-              countEl.innerHTML='<b>'+nodes.length+'</b> nodes online across <b>'+cs+'</b> countries.';
+              /* Say "of N" when the registry reports more than we plot, rather
+                 than implying the network is only ever 30 nodes. */
+              const shown=allIps.length>CAP
+                ? '<b>'+nodes.length+'</b> of <b>'+allIps.length+'</b> nodes shown'
+                : '<b>'+nodes.length+'</b> nodes online';
+              countEl.innerHTML=shown+' across <b>'+cs+'</b> countries.';
             }
           }
           if(i<ips.length-1) await wait(100);
@@ -503,12 +540,26 @@ const ogDescription =
     }
   })();
 
-  /* Wheel toward the pointer. Non-passive so preventDefault works. */
+  /* Wheel zoom requires ctrl/cmd (the Google Maps convention). Without it the
+     map would swallow every scroll that crossed it and the page could not be
+     scrolled past - on a full-width map mid-page that traps the reader. Pinch
+     on a trackpad arrives as a wheel event with ctrlKey set, so pinch still
+     zooms with no modifier held. */
   vp.addEventListener('wheel',e=>{
     if(noPan(e)) return;
+    if(!e.ctrlKey&&!e.metaKey){ hintModifier(); return; }   /* let the page scroll */
     e.preventDefault();
     zoomTo(view.s*Math.exp(-e.deltaY*0.0015),e.clientX,e.clientY);
   },{passive:false});
+
+  /* Tell people how to zoom the first time they scroll over the map. */
+  let hintTimer=0;
+  function hintModifier(){
+    hint.textContent=MODIFIER_HINT;
+    hint.style.display='';
+    clearTimeout(hintTimer);
+    hintTimer=setTimeout(()=>{ if(interacted) hint.style.display='none'; },1800);
+  }
 
   /* Mouse drag to pan. */
   vp.addEventListener('mousedown',e=>{
@@ -530,31 +581,30 @@ const ogDescription =
     addEventListener('mousemove',move); addEventListener('mouseup',up);
   });
 
-  /* Touch: one finger pans, two fingers pinch-zoom. */
-  let pan1=null, pinch=null;
+  /* Touch: TWO fingers pinch-zoom and pan. One finger is left alone so the page
+     can always be scrolled by swiping over the map - with touch-action:pan-y in
+     CSS, a mobile reader can never get stuck on it. */
+  let pan2=null, pinch=null;
   const dist=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  const mid=(a,b)=>({x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2});
   vp.addEventListener('touchstart',e=>{
     if(noPan(e)) return;
-    if(e.touches.length===1){ pan1={x:e.touches[0].clientX,y:e.touches[0].clientY}; pinch=null; }
-    else if(e.touches.length>=2){ pinch={d:dist(e.touches[0],e.touches[1]),s:view.s}; pan1=null; }
-  },{passive:false});
+    if(e.touches.length>=2){
+      pinch={d:dist(e.touches[0],e.touches[1]),s:view.s};
+      pan2=mid(e.touches[0],e.touches[1]);
+    }else{ pinch=null; pan2=null; }
+  },{passive:true});
   vp.addEventListener('touchmove',e=>{
     if(noPan(e)) return;
-    if(e.touches.length>=2&&pinch){
-      e.preventDefault();
-      const a=e.touches[0], b=e.touches[1];
-      zoomTo(pinch.s*(dist(a,b)/pinch.d),(a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2);
-    }else if(e.touches.length===1&&pan1){
-      e.preventDefault();
-      const t=e.touches[0];
-      view.x+=t.clientX-pan1.x; view.y+=t.clientY-pan1.y;
-      pan1={x:t.clientX,y:t.clientY};
-      touched(); clampPan(); apply();
-    }
+    if(e.touches.length<2||!pinch) return;   /* one finger: page scrolls */
+    e.preventDefault();
+    const a=e.touches[0], b=e.touches[1], m=mid(a,b);
+    if(pan2){ view.x+=m.x-pan2.x; view.y+=m.y-pan2.y; }
+    pan2=m;
+    zoomTo(pinch.s*(dist(a,b)/pinch.d),m.x,m.y);
   },{passive:false});
   vp.addEventListener('touchend',e=>{
-    if(e.touches.length===0){ pan1=null; pinch=null; }
-    else if(e.touches.length===1){ pan1={x:e.touches[0].clientX,y:e.touches[0].clientY}; pinch=null; }
+    if(e.touches.length<2){ pinch=null; pan2=null; }
   });
 
   vp.addEventListener('dblclick',e=>{ if(noPan(e)) return; zoomTo(view.s*1.8,e.clientX,e.clientY); });

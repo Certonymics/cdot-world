@@ -91,6 +91,32 @@ from `/assets/`, not a CDN.
 The map script stays `is:inline`: it is a self-contained IIFE that reads DOM
 ids directly, and inlining keeps it out of Astro's module graph.
 
+**Wheel zoom requires ctrl/cmd, and touch pans on two fingers only.** Without
+that the map swallows every scroll crossing it and the page cannot be scrolled
+past - on mobile, with `touch-action:none`, a reader could get stuck on it
+entirely. `.mapvp` uses `touch-action:pan-y` so vertical page scroll always
+survives. Don't "fix" the map by making it zoom on a bare wheel event.
+
+The map is keyboard operable: `#mapvp` is focusable, arrows pan, `+`/`-` zoom,
+`0` resets. Focusing a node while zoomed in re-centres it, since a focus ring
+drawn outside the viewport is invisible.
+
+## Contact form
+
+The form POSTs to a Google Apps Script web app whose source is versioned at
+`scripts/contact-form.gs`; that file's header comment carries the full setup and
+redeploy procedure. It is a **separate deployment from c.Email's** identical-looking
+form, with its own script and spreadsheet, so editing one cannot break the other.
+
+The `/exec` URL in `index.astro` is public by design - the script only appends
+rows and has no `doGet`, so holding the URL grants no read access.
+
+Two things that bite: any edit to the `.gs` needs *Deploy > Manage deployments >
+new version* or the live endpoint keeps running the old code; and the mail scope
+must be granted by running `testEmail` in the editor once, which a web request
+cannot trigger itself. Skip it and enquiries save to the sheet while nobody is
+notified.
+
 ## External dependencies
 
 The site is self-hosted apart from one first-party API call:
@@ -101,13 +127,27 @@ The site is self-hosted apart from one first-party API call:
 | `www.cdot.world` | Own canonical / `og:url` | No |
 | `www.w3.org`, `schema.org` | XML namespace + JSON-LD `@context` identifiers | No — never requested |
 
+| `script.google.com` | Contact-form endpoint (own Apps Script deployment) | Yes — on submit only |
+
 No font CDN, no analytics, no tag manager, no third-party scripts or
-stylesheets. Fonts are self-hosted via `@fontsource`.
+stylesheets. Fonts are self-hosted via `@fontsource`: Inter (400/500/600/700),
+Darker Grotesque (700) for display headings, and Geist Mono (variable, one file
+for the whole 100-900 axis) for figures and technical values.
 
 ## Known gaps
 
 - **No `og:image`.** Link previews (Slack, LinkedIn, X, iMessage) render as a
-  bare text stub. Needs a 1200×630 image.
-- **Contact form uses `mailto:`.** It hands off to the visitor's mail client,
-  which silently fails for anyone without one configured, and the enquiry is
-  lost with no error shown. Wants a real endpoint.
+  bare text stub. Needs a 1200x630 image at `public/assets/og.png`, then the
+  `og:image` / `twitter:card` tags in `Layout.astro`. This is the largest
+  remaining gap - a landing page is mostly distributed by people pasting the URL.
+- **The earth texture loads eagerly.** `public/assets/earth-texture.jpg` is
+  492 KB and fetched on page load, though the map sits well below the fold -
+  about 73% of first-load weight for something not yet visible. Wrap the
+  `loadTexture` IIFE in an `IntersectionObserver` on `#mapvp`.
+- **Structured data is thin.** The `Organization` JSON-LD in `Layout.astro` has
+  no `logo` or `sameAs`, so search engines cannot reconcile the entity against
+  social profiles or a Companies House record. Needs a raster logo (>=112x112)
+  and the profile URLs.
+- **cDot is modelled as the organisation.** The JSON-LD describes Certonymity
+  Ltd; cDot itself is a product and arguably wants its own `Product` or
+  `WebSite` node rather than living in the org's `description`.
