@@ -1,9 +1,5 @@
 # cdot.world
 
-Marketing site for cDot — the public, live-facing site covering what is
-actually shipped. (The broader product vision lives in the separate
-`Cdot site (main)` repo.)
-
 Built with [Astro](https://astro.build). Ships **zero client-side framework
 code**: the only JavaScript on the page is the contact-form handler and the
 C-Layer network map.
