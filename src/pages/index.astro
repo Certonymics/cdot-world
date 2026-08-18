@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const title = "cDot - The settlement layer for people, businesses, and machines";
+const title = "cDot: Secure identity and payments";
 const description =
   "cDot is purpose built infrastructure for the next era of money movement at scale: verified identity, stablecoin payments, programmable money and autonomous accountable agents, interoperating as one trusted network.";
 const ogTitle = "cDot - The infrastructure for identity and money movement at scale";
@@ -16,9 +16,8 @@ const ogDescription =
     <img src="/assets/Calque_1.svg" alt="" width="283" height="338" decoding="async">
   </div>
   <div class="wrap">
-    <span class="kicker">One trusted network</span>
-    <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale.</h1>
-    <p class="sub">Purpose built blockchains infrastructure where verified identity, stablecoin payments, programmable money and autonomous accountable agents converge, operating as one trusted network.</p>
+    <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale</h1>
+    <p class="sub">cDot is where verified identity, stablecoin payments, programmable money and autonomous agents converge, operating as one trusted network.</p>
     <div class="hero-ctas">
       <a class="btn btn-primary" href="#mission">Discover cDot</a>
       <a class="btn btn-ghost" href="#network">The network</a>
@@ -38,7 +37,7 @@ const ogDescription =
 
 <section id="problem">
   <div class="wrap">
-    <p class="eyebrow">The problem we're solving</p>
+    <p class="eyebrow">The problem</p>
     <h2>Stablecoins enable instant, borderless, programmable transactions. Today's blockchain infrastructure isn't designed for them.</h2>
     <p class="lead">Existing systems are either fully general or optimized for trading, and none treat identity as a first-class primitive.</p>
     <p class="lead">Managing identity by only proving you are a human reaches its limit when it comes to payments and regulation. cDot introduces privacy with accountability: cryptographic avatars of the user's real identity.</p>
@@ -54,7 +53,8 @@ const ogDescription =
 <section id="network">
   <div class="wrap">
     <p class="eyebrow">The network</p>
-    <h2>No single general-purpose chain can serve these needs well at once. cDot closes the gap with infrastructure designed from first principles.</h2>
+    <h2>One network, three specialised chains.</h2>
+    <p class="lead">No single general-purpose chain can serve these needs well at once. cDot closes the gap with infrastructure designed from first principles: three specialised chains, all interoperable by design.</p>
     <div class="chains">
       <div class="chain">
         <span class="num">1</span>
@@ -63,7 +63,7 @@ const ogDescription =
         <div class="specs">
           <span>15,000 tx/s, highly parallel</span>
           <span>WASM smart contracts</span>
-          <span>20 s finality</span>
+          <span>20s finality</span>
           <span>Permissionless</span>
           <span>Public and pseudonymous</span>
         </div>
@@ -74,7 +74,7 @@ const ogDescription =
         <p>Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on and off ramping. Autonomous agents transact within verifiable, revocable permissions granted by their principals.</p>
         <div class="specs">
           <span>30,000 tx/s</span>
-          <span>Finality &lt; 1 s</span>
+          <span>Finality &lt;1s</span>
           <span>Byzantine security 45%</span>
         </div>
       </div>
@@ -84,26 +84,40 @@ const ogDescription =
         <p>A high performance decentralized exchange.</p>
         <div class="specs">
           <span>30,000 tx/s, native multithreading</span>
-          <span>Finality &lt; 1 s</span>
-          <span>~50 node permissioned overlay on the C-Layer</span>
+          <span>Finality &lt;1s</span>
+          <span>~50 node-permissioned overlay on the C-Layer</span>
           <span>Private and accountable</span>
           <span>Native NASDAQ-like matching engine</span>
         </div>
       </div>
     </div>
-    <p class="interop">All <b>interoperable by design</b>.</p>
-
     <div class="maplive">
-      <p class="cap">One network, run by the cDot community around the world.</p>
       <div class="mapcard">
         <div class="mapvp" id="mapvp">
-          <div class="maplayer" id="maplayer"><canvas id="landcv"></canvas></div>
+          <!-- Constant-size dotted-land texture. Deliberately OUTSIDE #maplayer so
+               it is never CSS-scaled: it is redrawn for the current view instead,
+               which is what stops the dots growing and blurring as you zoom. -->
+          <canvas class="landcv" id="landcv" aria-hidden="true"></canvas>
+          <!-- Only the nodes are transformed. -->
+          <div class="maplayer" id="maplayer"></div>
           <div class="mapbadge"><span class="dot"></span>Real-time</div>
+          <!-- Minimap navigator: appears once you zoom in. -->
+          <div class="minimap" id="minimap" data-nopan hidden aria-label="Map navigator - drag to pan">
+            <canvas id="minicv"></canvas>
+            <div class="minirect" id="minirect"></div>
+          </div>
           <div class="maphint" id="maphint">Scroll or pinch to zoom - drag to pan</div>
-          <div class="mapzoom">
+          <div class="mapzoom" data-nopan>
             <button id="mz-in" aria-label="Zoom in">+</button>
             <button id="mz-out" aria-label="Zoom out">&minus;</button>
             <button id="mz-fit" aria-label="Reset zoom">&#x26F6;</button>
+          </div>
+          <!-- Node details, shown when a node is selected. -->
+          <div class="nodepanel" id="nodepanel" data-nopan hidden>
+            <button class="np-close" id="np-close" aria-label="Clear selection">&times;</button>
+            <p class="np-label">Location</p><p class="np-value" id="np-loc"></p>
+            <p class="np-label">IP address</p><p class="np-value" id="np-ip"></p>
+            <p class="np-label">Version</p><p class="np-value" id="np-ver"></p>
           </div>
         </div>
       </div>
@@ -117,8 +131,8 @@ const ogDescription =
 
 <section id="uses">
   <div class="wrap">
-    <p class="eyebrow">Built for the real world</p>
-    <h2>Infrastructure for real-world use cases.</h2>
+    <p class="eyebrow">Use cases</p>
+    <h2>Infrastructure for the real world.</h2>
     <div class="uses">
       <span class="use">Global payments and payroll</span>
       <span class="use">Remittances</span>
@@ -138,166 +152,436 @@ const ogDescription =
 <section id="contact">
   <div class="wrap">
     <p class="eyebrow">Contact</p>
-    <h2>Get in touch.</h2>
+    <h2>Get in touch for questions, partnerships, or anything else.</h2>
+    <form id="contactForm">
     <div class="contact-grid">
-      <form id="contactForm">
-        <div class="field">
-          <label for="cf-name">Name</label>
-          <input id="cf-name" type="text" autocomplete="name" required>
+        <div class="contact-fields">
+          <div class="field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" type="email" name="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="cf-msg">Message</label>
+            <textarea id="cf-msg" name="message" maxlength="5000" required></textarea>
+          </div>
+          <!-- Honeypot: hidden from people, filled in by bots. -->
+          <input class="cf-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <!-- Replaces the fields above on success; also carries error text. -->
+          <p class="cf-status" id="cf-status" role="status" aria-live="polite" hidden></p>
         </div>
-        <div class="field">
-          <label for="cf-email">Email</label>
-          <input id="cf-email" type="email" autocomplete="email" required>
-        </div>
-        <div class="field">
-          <label for="cf-msg">Message</label>
-          <textarea id="cf-msg" required></textarea>
-        </div>
-        <button class="btn btn-primary" type="submit">Send message</button>
-      </form>
       <div class="addr">
-        <h3 style="color:var(--cyan)">c<b>Dot</b></h3>
-        <p><a href="mailto:info@cdot.world">info@cdot.world</a></p>
-        <p class="label">Address</p>
-        <p>Certonymity<br>86-87 Campden Street<br>London W8 7EN</p>
+        <p>cDot — built by Certonymity</p>
+        <p><a href="mailto:info@certonymity.com">info@certonymity.com</a></p>
+        <p>Certonymity Ltd<br>86-87 Campden Street<br>London<br>W8 7EN</p>
       </div>
     </div>
+    <button class="btn btn-primary" type="submit" style="margin-top:18px">Send message</button>
+    </form>
   </div>
 </section>
 
 
-<!-- Contact form: hands off to the visitor's mail client. See README - this
-     should move to a real endpoint. -->
+<!-- Contact form. POSTs to the Google Apps Script in scripts/contact-form.gs,
+     which records the enquiry in a sheet and emails the team. That script is a
+     separate deployment from the c.Email one - see its header comment. -->
 <script is:inline>
-document.getElementById('contactForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const name = document.getElementById('cf-name').value.trim();
-  const email = document.getElementById('cf-email').value.trim();
-  const msg = document.getElementById('cf-msg').value.trim();
-  const subject = encodeURIComponent('Contact from ' + name + ' via cdot.world');
-  const body = encodeURIComponent(msg + '\n\n' + name + '\n' + email);
-  window.location.href = 'mailto:info@cdot.world?subject=' + subject + '&body=' + body;
-});
+(function(){
+  /* Public by design - see the header comment in scripts/contact-form.gs.
+     Replace with the /exec URL of the deployed cDot contact-form script. */
+  const CONTACT_FORM_URL =
+    'https://script.google.com/macros/s/AKfycbzkT4I_iMLiBBKRZeKdSEU2ohJVpfOFd4UA-tk2ss4p2YddFDbvU1OFPnjHcr0RaOHdUA/exec';
+
+  const form = document.getElementById('contactForm');
+  const statusEl = document.getElementById('cf-status');
+  const button = form.querySelector('button[type="submit"]');
+  const fields = form.querySelectorAll('.contact-fields .field, .cf-honeypot');
+  let sending = false;
+
+  function show(message, isError){
+    statusEl.hidden = false;
+    statusEl.textContent = message;
+    statusEl.classList.toggle('is-error', !!isError);
+  }
+
+  /* On success the fields and the button go away entirely, so there is no live
+     Send button sitting under a thank-you message inviting a second submission. */
+  function succeed(message){
+    fields.forEach(function(el){ el.hidden = true; });
+    button.hidden = true;
+    show(message, false);
+  }
+
+  function fail(message){
+    show(message || 'Something went wrong. Please try again, or email us directly at info@certonymity.com.', true);
+    sending = false;
+    button.disabled = false;
+    button.textContent = 'Send message';
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (sending) return;
+
+    /* Better to say so than to POST into the void and report success. */
+    if (!CONTACT_FORM_URL) {
+      return fail('This form is not connected yet. Please email us directly at info@certonymity.com.');
+    }
+
+    /* Sending state lives on the button only. Putting it in the status line too
+       would shift the layout mid-submit, since the status sits in the field column. */
+    sending = true;
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    statusEl.hidden = true;
+
+    try {
+      /* No Content-Type header on purpose. Setting one makes this a preflighted
+         request, and Apps Script does not answer the OPTIONS probe, so the whole
+         submission fails before it starts. Sent as text/plain it is a "simple
+         request" and goes straight through; doPost reads the raw body regardless. */
+      const response = await fetch(CONTACT_FORM_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          email: document.getElementById('cf-email').value.trim(),
+          message: document.getElementById('cf-msg').value.trim(),
+          website: form.querySelector('[name="website"]').value
+        })
+      });
+      const result = await response.json().catch(function(){ return null; });
+      /* Only confirm what the server actually confirmed. */
+      if (!response.ok || !result || !result.ok) return fail(result && result.error);
+
+      succeed('Thanks — your message is on its way. We’ll reply to the address you gave us.');
+    } catch (err) {
+      fail();
+    }
+  });
+})();
 </script>
 
-<!-- Live C-Layer map. landdots.js defines LAND_COLS/LAND_ROWS/LAND_DOTS as
-     globals, so both of these must stay is:inline (classic scripts, not
-     bundled modules) or the globals will not be visible. -->
-<script is:inline src="/assets/landdots.js"></script>
+<!-- Live C-Layer map. Vanilla port of the c.Email NetworkMapCore component
+     (c.email-website/src/components/NetworkMapCore.jsx), kept behaviourally
+     identical but restyled dark and rewritten without React/Tailwind, which
+     this site does not use. Keep the two in step when either changes. -->
 <script is:inline>
-/* Live C-Layer map - native port of the cDot network map (same equirectangular
-   projection and live data as the app: map.c-layer.certonym.org), dark theme.
-   Continents come precomputed from assets/landdots.js (generated from the
-   equirectangular earth texture, same LAT crop), like the app's landDots.ts. */
 (function(){
-  const HOST='https://map.c-layer.certonym.org';
+  /* The node registry serves both endpoints with Access-Control-Allow-Origin: *,
+     so the browser calls it directly - no proxy to deploy and keep alive. */
+  const REGISTRY_ORIGIN='https://map.c-layer.certonym.org';
+
+  /* True equirectangular (plate carree). The dotted continents are sampled from
+     the equirectangular earth texture and the nodes are projected with the
+     identical formula, so a dot always sits on the land it belongs to. The
+     latitude band is cropped to drop the empty polar oceans. */
   const LAT_MAX=75, LAT_MIN=-58;
+  const LAND_COLOR='rgba(147,197,253,.55)';   /* #93C5FD, softened for the dark card */
+  const MIN_SCALE=1, MAX_SCALE=8, BTN_STEP=1.7;
+
   const vp=document.getElementById('mapvp');
+  if(!vp) return;
   const layer=document.getElementById('maplayer');
   const cv=document.getElementById('landcv');
+  const mini=document.getElementById('minimap');
+  const minicv=document.getElementById('minicv');
+  const minirect=document.getElementById('minirect');
   const countEl=document.getElementById('mapcount');
   const hint=document.getElementById('maphint');
-  if(!vp) return;
+  const panel=document.getElementById('nodepanel');
 
   const view={s:1,x:0,y:0};
-  const clampS=s=>Math.min(8,Math.max(1,s));
+  let tex=null, size={w:0,h:0}, nodes=[], selected=null, raf=0, moved=0, interacted=false;
+
+  const clampS=s=>Math.min(MAX_SCALE,Math.max(MIN_SCALE,s));
+  const project=(lat,lng)=>({
+    x:Math.max(0,Math.min(100,((lng+180)/360)*100)),
+    y:Math.max(0,Math.min(100,((LAT_MAX-lat)/(LAT_MAX-LAT_MIN))*100))
+  });
+  /* Keep the content covering the viewport so the map can never be dragged into
+     empty space. transform-origin is top-left, so visible world-u = -x/(W*s). */
   function clampPan(){
-    const W=vp.clientWidth,H=vp.clientHeight;
+    const W=size.w||vp.clientWidth, H=size.h||vp.clientHeight;
     view.x=Math.min(0,Math.max(W*(1-view.s),view.x));
     view.y=Math.min(0,Math.max(H*(1-view.s),view.y));
   }
-  function apply(){
-    layer.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;
-    for(const el of nodeEls){
-      el.style.transform=`scale(${1/view.s})`;
-    }
-  }
+  const noPan=e=>e.target.closest&&e.target.closest('[data-nopan]');
 
-  /* Land dots: precomputed grid (assets/landdots.js), drawn at the current size. */
-  function drawLand(){
-    const W=vp.clientWidth,H=vp.clientHeight,DPR=Math.min(2,devicePixelRatio||1);
-    cv.width=W*DPR;cv.height=H*DPR;
-    const ctx=cv.getContext('2d');ctx.setTransform(DPR,0,0,DPR,0,0);
-    if(typeof LAND_DOTS==='undefined')return;
-    const r=Math.max(.9,W/1000);
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='rgba(147,197,253,.55)';
+  /* Draw the dotted land for the current view. Each screen dot maps to the
+     geographic point under it, sampled against the texture. Dots are a fixed
+     SCREEN size (gap, r) - that is what keeps them a constant texture at every
+     zoom level. One Path2D, one fill, for speed. */
+  function drawDotField(ctx,w,h,v,gap,r){
+    const {data,TW,TH}=tex;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle=LAND_COLOR;
     ctx.beginPath();
-    for(let i=0;i<LAND_DOTS.length;i+=2){
-      const x=(LAND_DOTS[i]/LAND_COLS)*W, y=(LAND_DOTS[i+1]/LAND_ROWS)*H;
-      ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,Math.PI*2);
+    for(let sy=0;sy<=h;sy+=gap){
+      const vv=(sy-v.y)/(h*v.s);
+      if(vv<0||vv>1) continue;
+      const lat=LAT_MAX-vv*(LAT_MAX-LAT_MIN);
+      const ty=Math.min(TH-1,Math.max(0,Math.round(((90-lat)/180)*TH)));
+      for(let sx=0;sx<=w;sx+=gap){
+        const uu=(sx-v.x)/(w*v.s);
+        if(uu<0||uu>1) continue;
+        const lng=uu*360-180;
+        const tx=Math.min(TW-1,Math.max(0,Math.round(((lng+180)/360)*TW)));
+        const i=(ty*TW+tx)*4, rr=data[i], gg=data[i+1], bb=data[i+2];
+        const isOcean=bb>rr&&bb>=gg&&bb-Math.max(rr,gg)>=8;
+        if(!isOcean){ ctx.moveTo(sx+r,sy); ctx.arc(sx,sy,r,0,Math.PI*2); }
+      }
     }
     ctx.fill();
   }
-  drawLand();
-  addEventListener('resize',()=>{drawLand();clampPan();apply()});
 
-  /* Live nodes */
-  const nodeEls=[];
-  const project=(lat,lng)=>({x:((lng+180)/360)*100,y:((LAT_MAX-lat)/(LAT_MAX-LAT_MIN))*100});
-  function addNode(n){
-    const p=project(n.lat,n.lng);
-    const el=document.createElement('div');
-    el.className='mapnode';
-    el.style.left=p.x+'%';el.style.top=p.y+'%';
-    el.title=n.city+', '+n.country;
-    layer.appendChild(el);nodeEls.push(el);
-    el.style.transform=`scale(${1/view.s})`;
+  function paintLand(){
+    if(!tex||!size.w||!size.h) return;
+    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const bw=Math.round(size.w*dpr), bh=Math.round(size.h*dpr);
+    if(cv.width!==bw) cv.width=bw;
+    if(cv.height!==bh) cv.height=bh;
+    const ctx=cv.getContext('2d');
+    const gap=Math.max(3,Math.round(size.w/230));
+    const r=Math.max(.75,size.w/1000);
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(()=>{
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      drawDotField(ctx,size.w,size.h,view,gap,r);
+    });
   }
-  const wait=ms=>new Promise(r=>setTimeout(r,ms));
-  (async()=>{
-    try{
-      const res=await fetch(HOST+'/api/data?limit=200');
-      const j=await res.json();
-      const data=Array.isArray(j)?j:(j.data||[]);
-      const ips=[...new Set(data.map(d=>d.client_ip).filter(Boolean))].slice(0,30);
-      const found=[];
-      for(let i=0;i<ips.length;i++){
-        try{
-          const r=await fetch(HOST+'/ipinfo/json/'+ips[i]+'?fields=status,country,city,lat,lon');
-          if(r.ok){
-            const g=await r.json();
-            if(g.status==='success'&&g.lat!=null&&g.lon!=null){
-              found.push(g);addNode({lat:g.lat,lng:g.lon,city:g.city||'Unknown',country:g.country||'Unknown'});
-              const cs=new Set(found.map(f=>f.country)).size;
-              countEl.innerHTML='<b>'+found.length+'</b> nodes online across <b>'+cs+'</b> countries.';
-            }
-          }
-          if(i<ips.length-1) await wait(100);
-        }catch(e){}
-      }
-      if(!found.length) countEl.textContent='One network, run by the cDot community around the world.';
-    }catch(e){
-      countEl.textContent='One network, run by the cDot community around the world.';
-    }
-  })();
 
-  /* Zoom + pan (wheel toward pointer, drag, pinch, buttons) */
-  function zoomAt(next,cx,cy){
+  function paintMini(){
+    if(!tex) return;
+    const W=minicv.clientWidth||168, H=minicv.clientHeight||Math.round(W*(LAT_MAX-LAT_MIN)/360);
+    const dpr=Math.min(2,window.devicePixelRatio||1);
+    minicv.width=Math.round(W*dpr); minicv.height=Math.round(H*dpr);
+    const ctx=minicv.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    drawDotField(ctx,W,H,{s:1,x:0,y:0},Math.max(2,W/85),Math.max(.6,W/240));
+  }
+
+  /* Minimap rectangle tracks the viewport; it only shows once zoomed in. */
+  function syncMini(){
+    const zoomed=view.s>1.01;
+    mini.hidden=!zoomed;
+    if(!zoomed||!size.w) return;
+    const W=mini.clientWidth, H=mini.clientHeight;
+    minirect.style.left=((-view.x/(size.w*view.s))*W)+'px';
+    minirect.style.top=((-view.y/(size.h*view.s))*H)+'px';
+    minirect.style.width=(W/view.s)+'px';
+    minirect.style.height=(H/view.s)+'px';
+  }
+
+  function apply(){
+    layer.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;
+    /* Markers counter-scale so they stay a constant size. */
+    for(const el of layer.children) el.style.transform=`scale(${1/view.s})`;
+    paintLand(); syncMini();
+  }
+
+  function touched(){ if(!interacted){ interacted=true; hint.style.display='none'; } }
+
+  function zoomTo(next,cx,cy){
     const rect=vp.getBoundingClientRect();
     const px=(cx==null?rect.width/2:cx-rect.left), py=(cy==null?rect.height/2:cy-rect.top);
     const s=clampS(next);
     const wx=(px-view.x)/view.s, wy=(py-view.y)/view.s;
-    view.x=px-wx*s;view.y=py-wy*s;view.s=s;
-    clampPan();apply();hint.style.display='none';
+    view.x=px-wx*s; view.y=py-wy*s; view.s=s;
+    touched(); clampPan(); apply();
   }
-  vp.addEventListener('wheel',e=>{e.preventDefault();zoomAt(view.s*Math.exp(-e.deltaY*0.0015),e.clientX,e.clientY)},{passive:false});
-  let drag=null;
-  vp.addEventListener('pointerdown',e=>{
-    if(e.button!==0&&e.pointerType==='mouse')return;
-    drag={x:e.clientX,y:e.clientY};vp.classList.add('drag');vp.setPointerCapture(e.pointerId);
+
+  /* Pan so the world point (uc, vc) sits at the viewport centre - the minimap. */
+  function panToWorld(uc,vc){
+    view.x=size.w/2-uc*size.w*view.s;
+    view.y=size.h/2-vc*size.h*view.s;
+    touched(); clampPan(); apply();
+  }
+
+  /* Sample the earth texture once, for both the main field and the minimap. */
+  (function loadTexture(){
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>{
+      const TW=img.naturalWidth, TH=img.naturalHeight;
+      const c=document.createElement('canvas');
+      c.width=TW; c.height=TH;
+      const sctx=c.getContext('2d',{willReadFrequently:true});
+      sctx.drawImage(img,0,0);
+      try{
+        tex={data:sctx.getImageData(0,0,TW,TH).data,TW:TW,TH:TH};
+        paintLand(); paintMini();
+      }catch(e){ /* cross-origin read blocked */ }
+    };
+    img.src='/assets/earth-texture.jpg';
+  })();
+
+  /* Track the rendered size of the map area. */
+  const measure=()=>{
+    const r=vp.getBoundingClientRect();
+    size={w:r.width,h:r.height};
+    clampPan(); apply(); paintMini();
+  };
+  measure();
+  if(window.ResizeObserver) new ResizeObserver(measure).observe(vp);
+  else addEventListener('resize',measure);
+
+  /* Node markers + selection */
+  function showPanel(n){
+    selected=n;
+    document.getElementById('np-loc').textContent=n.city+', '+n.country;
+    document.getElementById('np-ip').textContent=n.ip;
+    document.getElementById('np-ver').textContent=n.version;
+    panel.hidden=false;
+    for(const el of layer.children) el.classList.toggle('is-active',el._ip===n.ip);
+  }
+  function clearPanel(){
+    selected=null; panel.hidden=true;
+    for(const el of layer.children) el.classList.remove('is-active');
+  }
+  document.getElementById('np-close').onclick=clearPanel;
+
+  function addNode(n){
+    const p=project(n.lat,n.lng);
+    const el=document.createElement('button');
+    el.type='button';
+    el.className='mapnode';
+    el.style.left=p.x+'%'; el.style.top=p.y+'%';
+    el.style.transform=`scale(${1/view.s})`;
+    el.setAttribute('aria-label','Node in '+n.city+', '+n.country);
+    el._ip=n.ip;
+    /* Ignore the click that ends a drag. */
+    el.addEventListener('click',()=>{ if(moved>5) return; showPanel(n); });
+    layer.appendChild(el);
+  }
+
+  /* Live data. Same two-step as c.Email: registry for the node list, then ipinfo
+     per unique IP to place it. */
+  const controller=new AbortController();
+  const signal=controller.signal;
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const fallback='One network, run by the cDot community around the world.';
+  (async()=>{
+    try{
+      const res=await fetch(REGISTRY_ORIGIN+'/api/data?limit=200',{signal});
+      if(!res.ok) throw new Error('Failed: '+res.status);
+      const j=await res.json();
+      const data=Array.isArray(j)?j:(j.data||[]);
+      if(!data.length){ countEl.textContent=fallback; return; }
+
+      const ipToVersion=new Map();
+      data.forEach(d=>{
+        const v=(d.json_data&&d.json_data.version)||d.version;
+        if(d.client_ip&&v) ipToVersion.set(d.client_ip,v);
+      });
+
+      const ips=[...new Set(data.map(d=>d.client_ip).filter(Boolean))].slice(0,30);
+      for(let i=0;i<ips.length;i++){
+        if(signal.aborted) return;
+        const ip=ips[i];
+        try{
+          /* Per-request timeout so one unresolvable IP cannot stall the rest. */
+          const t=new AbortController();
+          const timer=setTimeout(()=>t.abort(),5000);
+          const r=await fetch(REGISTRY_ORIGIN+'/ipinfo/json/'+ip+'?fields=status,country,city,lat,lon',
+                              {signal:signal.aborted?signal:t.signal});
+          clearTimeout(timer);
+          if(r.ok){
+            const g=await r.json();
+            if(g.status==='success'&&g.lat!=null&&g.lon!=null){
+              const n={lat:parseFloat(g.lat),lng:parseFloat(g.lon),ip:ip,
+                       version:ipToVersion.get(ip)||'Unknown',
+                       city:g.city||'Unknown',country:g.country||'Unknown'};
+              nodes.push(n); addNode(n);
+              const cs=new Set(nodes.map(x=>x.country)).size;
+              countEl.innerHTML='<b>'+nodes.length+'</b> nodes online across <b>'+cs+'</b> countries.';
+            }
+          }
+          if(i<ips.length-1) await wait(100);
+        }catch(e){ /* skip unresolved node */ }
+      }
+      if(!nodes.length) countEl.textContent=fallback;
+    }catch(e){
+      if(e.name!=='AbortError') countEl.textContent=fallback;
+    }
+  })();
+
+  /* Wheel toward the pointer. Non-passive so preventDefault works. */
+  vp.addEventListener('wheel',e=>{
+    if(noPan(e)) return;
+    e.preventDefault();
+    zoomTo(view.s*Math.exp(-e.deltaY*0.0015),e.clientX,e.clientY);
+  },{passive:false});
+
+  /* Mouse drag to pan. */
+  vp.addEventListener('mousedown',e=>{
+    if(e.button!==0||noPan(e)) return;
+    moved=0;
+    let last={x:e.clientX,y:e.clientY};
+    vp.classList.add('drag');
+    const move=ev=>{
+      const dx=ev.clientX-last.x, dy=ev.clientY-last.y;
+      last={x:ev.clientX,y:ev.clientY};
+      moved+=Math.abs(dx)+Math.abs(dy);
+      view.x+=dx; view.y+=dy;
+      touched(); clampPan(); apply();
+    };
+    const up=()=>{
+      vp.classList.remove('drag');
+      removeEventListener('mousemove',move); removeEventListener('mouseup',up);
+    };
+    addEventListener('mousemove',move); addEventListener('mouseup',up);
   });
-  vp.addEventListener('pointermove',e=>{
-    if(!drag)return;
-    view.x+=e.clientX-drag.x;view.y+=e.clientY-drag.y;
-    drag={x:e.clientX,y:e.clientY};
-    clampPan();apply();hint.style.display='none';
+
+  /* Touch: one finger pans, two fingers pinch-zoom. */
+  let pan1=null, pinch=null;
+  const dist=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  vp.addEventListener('touchstart',e=>{
+    if(noPan(e)) return;
+    if(e.touches.length===1){ pan1={x:e.touches[0].clientX,y:e.touches[0].clientY}; pinch=null; }
+    else if(e.touches.length>=2){ pinch={d:dist(e.touches[0],e.touches[1]),s:view.s}; pan1=null; }
+  },{passive:false});
+  vp.addEventListener('touchmove',e=>{
+    if(noPan(e)) return;
+    if(e.touches.length>=2&&pinch){
+      e.preventDefault();
+      const a=e.touches[0], b=e.touches[1];
+      zoomTo(pinch.s*(dist(a,b)/pinch.d),(a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2);
+    }else if(e.touches.length===1&&pan1){
+      e.preventDefault();
+      const t=e.touches[0];
+      view.x+=t.clientX-pan1.x; view.y+=t.clientY-pan1.y;
+      pan1={x:t.clientX,y:t.clientY};
+      touched(); clampPan(); apply();
+    }
+  },{passive:false});
+  vp.addEventListener('touchend',e=>{
+    if(e.touches.length===0){ pan1=null; pinch=null; }
+    else if(e.touches.length===1){ pan1={x:e.touches[0].clientX,y:e.touches[0].clientY}; pinch=null; }
   });
-  vp.addEventListener('pointerup',()=>{drag=null;vp.classList.remove('drag')});
-  vp.addEventListener('dblclick',e=>zoomAt(view.s*1.8,e.clientX,e.clientY));
-  document.getElementById('mz-in').onclick=()=>zoomAt(view.s*1.6);
-  document.getElementById('mz-out').onclick=()=>zoomAt(view.s/1.6);
-  document.getElementById('mz-fit').onclick=()=>{view.s=1;view.x=0;view.y=0;apply()};
+
+  vp.addEventListener('dblclick',e=>{ if(noPan(e)) return; zoomTo(view.s*1.8,e.clientX,e.clientY); });
+  vp.addEventListener('dragstart',e=>e.preventDefault());
+
+  /* Minimap: drag or click the rectangle to pan the main map. */
+  function miniJump(clientX,clientY){
+    const r=minicv.getBoundingClientRect();
+    panToWorld(
+      Math.min(1,Math.max(0,(clientX-r.left)/r.width)),
+      Math.min(1,Math.max(0,(clientY-r.top)/r.height))
+    );
+  }
+  mini.addEventListener('mousedown',e=>{
+    e.preventDefault();
+    miniJump(e.clientX,e.clientY);
+    const move=ev=>miniJump(ev.clientX,ev.clientY);
+    const up=()=>{ removeEventListener('mousemove',move); removeEventListener('mouseup',up); };
+    addEventListener('mousemove',move); addEventListener('mouseup',up);
+  });
+  const miniTouch=e=>{ const t=e.touches[0]; if(t) miniJump(t.clientX,t.clientY); };
+  mini.addEventListener('touchstart',miniTouch,{passive:true});
+  mini.addEventListener('touchmove',miniTouch,{passive:true});
+
+  document.getElementById('mz-in').onclick=()=>zoomTo(view.s*BTN_STEP);
+  document.getElementById('mz-out').onclick=()=>zoomTo(view.s/BTN_STEP);
+  document.getElementById('mz-fit').onclick=()=>{ view.s=1;view.x=0;view.y=0; touched(); apply(); };
 })();
 </script>
 

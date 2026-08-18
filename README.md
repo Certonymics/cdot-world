@@ -37,7 +37,7 @@ src/
     tokens.css                BRAND TOKENS — see below
     global.css                everything else
 public/
-  assets/                     logos, favicon, landdots.js (map data)
+  assets/                     logos, favicon, earth-texture.jpg (map)
   llms.txt
 ```
 
@@ -69,13 +69,27 @@ on where it lives.
 Fonts match the siblings: **Inter** for body, **Darker Grotesque** for display
 headings, self-hosted via `@fontsource` (no third-party font CDN).
 
-## Gotcha: the map scripts must stay `is:inline`
+## The C-Layer map
 
-`public/assets/landdots.js` defines `LAND_COLS` / `LAND_ROWS` / `LAND_DOTS` as
-globals of a *classic* script. The map code in `index.astro` reads those
-globals. Astro bundles `<script>` as ES modules by default, which would scope
-them and break the map — so both the `landdots.js` tag and the map script
-carry `is:inline`. Don't remove it.
+`index.astro` carries a vanilla port of the c.Email `NetworkMapCore` component
+(`c.email-website/src/components/NetworkMapCore.jsx`) — same projection, same
+sampling, same interactions, restyled dark and written without React/Tailwind,
+which this site does not use. **Keep the two in step when either changes.**
+
+The continents are sampled at runtime from `public/assets/earth-texture.jpg`
+and the dot field is re-drawn for the current view, so the dots stay a constant
+screen size instead of scaling and blurring. That is why the land `<canvas>`
+sits *outside* `#maplayer`: only the node markers are CSS-transformed.
+
+The texture is downscaled to 2048x1024 (492 KB) from c.Email's 4096x2048
+(1.4 MB). The dot grid samples ~230 columns, so 2048 is still oversampled at
+maximum zoom; going below ~1024 would start to look blocky when zoomed in.
+
+`getImageData` on the texture requires it to be same-origin — keep it served
+from `/assets/`, not a CDN.
+
+The map script stays `is:inline`: it is a self-contained IIFE that reads DOM
+ids directly, and inlining keeps it out of Astro's module graph.
 
 ## External dependencies
 
