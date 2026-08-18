@@ -28,8 +28,7 @@ The network (three chains, interoperable by design):
    security 45%; autonomous agents transact within verifiable, revocable permissions granted
    by their principals.
 3. T-Layer - trading chain: a high performance decentralized exchange. 30,000 tx/s through native
-   multithreaded operations, finality <1s, a high performance permissioned overlay of ~50
-   nodes on top of the C-Layer, private and accountable, native NASDAQ-like matching engine.
+   multithreaded operations, finality <1s, a node-permissioned overlay on the C-layer, private and accountable, native NASDAQ-like matching engine.
 
 Use cases: global payments and payroll, remittances, embedded finance, microtransactions,
 machine-to-machine commerce, on and off ramping, asset recovery (never lose your self custodied
