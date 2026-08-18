@@ -86,7 +86,16 @@ The texture is downscaled to 2048x1024 (492 KB) from c.Email's 4096x2048
 maximum zoom; going below ~1024 would start to look blocky when zoomed in.
 
 `getImageData` on the texture requires it to be same-origin — keep it served
-from `/assets/`, not a CDN.
+from `/assets/`, not a CDN. The read is wrapped so a future CDN move warns to
+the console instead of leaving a silently blank map.
+
+The texture fetch is deferred by an `IntersectionObserver` on `#mapvp`
+(`rootMargin: 200px`), because it is ~480 KB and would otherwise compete for
+bandwidth with the CSS and fonts the hero needs. Observing fires immediately if
+the map is already in view, so `/#network` deep links still work. The RGBA
+buffer is reduced to a 1-byte-per-pixel land mask and dropped — retaining the
+full `ImageData` would hold 8 MB for the life of the page, and the ocean test
+moves out of the repaint loop as a side effect.
 
 The map script stays `is:inline`: it is a self-contained IIFE that reads DOM
 ids directly, and inlining keeps it out of Astro's module graph.
@@ -158,10 +167,6 @@ for the whole 100-900 axis) for figures and technical values.
 - **No `sameAs` in the JSON-LD.** There are no external profiles yet. Add
   LinkedIn / X / GitHub / Companies House URLs when they exist - this is how a
   search engine reconciles "cDot" with a real registered entity.
-- **The earth texture loads eagerly.** `public/assets/earth-texture.jpg` is
-  492 KB and fetched on page load, though the map sits well below the fold -
-  about 73% of first-load weight for something not yet visible. Wrap the
-  `loadTexture` IIFE in an `IntersectionObserver` on `#mapvp`.
 - **cDot is modelled as the organisation.** The JSON-LD describes Certonymity
   Ltd; cDot itself is a product and arguably wants its own `Product` or
   `WebSite` node rather than living in the org's `description`.

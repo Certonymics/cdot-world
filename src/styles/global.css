@@ -249,6 +249,8 @@
   /* Hidden from people and from assistive tech; bots fill it in anyway. */
   .cf-honeypot{display:none}
   .cf-status{margin-top:14px;font-size:15.5px;line-height:1.7;color:var(--cyan)}
+  .cf-status:empty{margin-top:0}
+  .cf-status:focus{outline:none}
   /* Success replaces the fields, so it should not sit at the very top edge. */
   .cf-status:not(.is-error){margin-top:0;align-self:flex-start}
   .cf-status.is-error{color:#ff9b9b;font-size:14.5px}
