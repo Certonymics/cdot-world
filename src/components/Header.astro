@@ -7,11 +7,35 @@ const tagline = "Secure identity and payments";
       <svg class="logomark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
       <span class="tag">{tagline}</span>
     </a>
-    <nav>
+    <nav id="main-nav">
       <a class="link" href="#mission">Mission</a>
       <a class="link" href="#network">Network</a>
       <a class="link" href="#uses">Use cases</a>
       <a class="link" href="#contact">Contact</a>
     </nav>
+    <button class="burger" id="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+
+<script is:inline>
+(function(){
+  var btn = document.getElementById('burger-btn');
+  var nav = document.getElementById('main-nav');
+  if (!btn || !nav) return;
+  btn.addEventListener('click', function(){
+    var open = nav.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.classList.toggle('is-open', open);
+  });
+  /* Close on nav link tap so the menu doesn't hang open on mobile. */
+  nav.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      nav.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.classList.remove('is-open');
+    });
+  });
+})();
+</script>

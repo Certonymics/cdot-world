@@ -25,23 +25,33 @@
   .brand svg.logomark{height:50px;width:121px;display:block;flex-shrink:0}
   @media(max-width:640px){.brand svg.logomark{height:36px;width:87px}}
   .brand .tag{font-size:11px;font-weight:500;color:var(--brand);letter-spacing:.06em;line-height:1.2}
-  @media(max-width:640px){.brand .tag{display:none}}
   .nav a.link{color:var(--ink-dim);text-decoration:none;font-size:14.5px;margin-left:26px;transition:color .2s}
   .nav a.link:hover{color:var(--ink)}
-  @media(max-width:640px){.nav a.link{margin-left:14px;font-size:13px}}
-  /* Tighter spacing so the single desktop-style row survives on a 375px phone:
-     four links plus the logo need 307px against 339px available there. */
-  @media(max-width:480px){.nav a.link{margin-left:10px;font-size:12.5px}}
-  /* No hamburger. Below ~360px the row needs more width than exists (315px
-     against 284px at 320px wide), so the nav drops to its own line under the
-     logo and spreads across the full width - every link stays reachable, which
-     beats the previous behaviour of hiding all five outright. */
-  @media(max-width:359px){
-    /* padding-block only - the `padding` shorthand would zero out the 18px
-       horizontal padding .wrap supplies, pushing the links to the screen edge. */
-    .nav{flex-direction:column;align-items:flex-start;height:auto;gap:8px;padding-block:12px}
-    .nav nav{display:flex;width:100%;justify-content:space-between}
-    .nav a.link{margin-left:0;font-size:12.5px}
+  /* Burger button — hidden on desktop */
+  .burger{display:none;flex-direction:column;justify-content:space-between;width:22px;height:16px;
+    background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
+  .burger span{display:block;height:2px;border-radius:2px;background:var(--ink-dim);
+    transition:transform .25s,opacity .25s}
+  .burger.is-open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .burger.is-open span:nth-child(2){opacity:0}
+  .burger.is-open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  @media(max-width:640px){
+    /* Logo + tagline side by side */
+    .brand{flex-direction:row;align-items:center;gap:10px}
+    .brand .tag{font-size:10px;letter-spacing:.04em;line-height:1.3;max-width:120px}
+    /* Burger visible, nav links hidden by default */
+    .burger{display:flex}
+    .nav nav{
+      display:none;
+      position:fixed;top:72px;left:0;right:0;z-index:19;
+      flex-direction:column;
+      background:rgba(4,11,24,.97);
+      border-bottom:1px solid var(--line);
+      padding:8px 0 16px;
+    }
+    .nav nav.is-open{display:flex}
+    .nav a.link{margin-left:0;font-size:14.5px;padding:12px 24px}
+    .nav a.link:hover{background:rgba(255,255,255,.04)}
   }
   h1,h2,.sub,.lead{overflow-wrap:break-word}
 
