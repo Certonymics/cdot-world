@@ -1,0 +1,63 @@
+---
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
+import "@fontsource/darker-grotesque/600.css";
+import "@fontsource/darker-grotesque/700.css";
+import "../styles/tokens.css";
+import "../styles/global.css";
+import LogoSymbol from "../components/LogoSymbol.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+}
+const { title, description, ogTitle, ogDescription } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "cDot",
+  legalName: "Certonymity",
+  url: "https://www.cdot.world/",
+  email: "info@cdot.world",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "86-87 Campden Street",
+    addressLocality: "London",
+    postalCode: "W8 7EN",
+  },
+  description:
+    "cDot is purpose built infrastructure for the next era of money movement and identity at scale: a dedicated identity and asset recovery chain (15,000 tx/s highly parallel, WASM smart contracts, 20 s finality, permissionless, public and pseudonymous, designed for thousands of low hardware nodes worldwide), a stablecoin and agentic payment chain (30,000 tx/s, finality under 1 s, byzantine security 45%), and a trading chain (30,000 tx/s native multithreading, finality under 1 s, ~50 node permissioned overlay on the C-Layer, private and accountable, native NASDAQ-like matching engine), interoperating as one trusted network.",
+};
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:title" content={ogTitle ?? title} />
+<meta property="og:description" content={ogDescription ?? description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:type" content="website" />
+<script type="application/ld+json" is:inline set:html={JSON.stringify(orgSchema)} />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+</head>
+<body>
+<LogoSymbol />
+<Header />
+<slot />
+<Footer />
+</body>
+</html>

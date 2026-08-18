@@ -1,0 +1,304 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const title = "cDot - The settlement layer for people, businesses, and machines";
+const description =
+  "cDot is purpose built infrastructure for the next era of money movement at scale: verified identity, stablecoin payments, programmable money and autonomous accountable agents, interoperating as one trusted network.";
+const ogTitle = "cDot - The infrastructure for identity and money movement at scale";
+const ogDescription =
+  "Purpose built blockchains infrastructure where verified identity, stablecoin payments, programmable money and autonomous accountable agents converge, operating as one trusted network.";
+---
+
+<Layout title={title} description={description} ogTitle={ogTitle} ogDescription={ogDescription}>
+
+<div class="hero">
+  <div class="watermark right" aria-hidden="true">
+    <img src="/assets/Calque_1.svg" alt="" width="283" height="338" decoding="async">
+  </div>
+  <div class="wrap">
+    <span class="kicker">One trusted network</span>
+    <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale.</h1>
+    <p class="sub">Purpose built blockchains infrastructure where verified identity, stablecoin payments, programmable money and autonomous accountable agents converge, operating as one trusted network.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#mission">Discover cDot</a>
+      <a class="btn btn-ghost" href="#network">The network</a>
+    </div>
+  </div>
+</div>
+
+<section id="mission">
+  <div class="wrap">
+    <p class="eyebrow">Mission</p>
+    <h2>The settlement layer for value exchanged between people, businesses, and machines.</h2>
+    <p class="lead">Rather than forcing everything onto a single chain, cDot is a family of purpose built blockchains, each engineered for what it does best: identity, stablecoin settlement, and agentic transactions, interoperating as one trusted network.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="problem">
+  <div class="wrap">
+    <p class="eyebrow">The problem we're solving</p>
+    <h2>Stablecoins enable instant, borderless, programmable transactions. Today's blockchain infrastructure isn't designed for them.</h2>
+    <p class="lead">Existing systems are either fully general or optimized for trading, and none treat identity as a first-class primitive.</p>
+    <p class="lead">Managing identity by only proving you are a human reaches its limit when it comes to payments and regulation. cDot introduces privacy with accountability: cryptographic avatars of the user's real identity.</p>
+    <p class="lead">This gap becomes critical as AI agents begin transacting on behalf of humans and businesses: without native identity and authorization, agents cannot be held accountable, and their payments cannot be trusted or audited.</p>
+    <div class="pull">
+      <p>Payments at scale don't just need speed and low cost; they need to know, verifiably, who or what is on each side of a transaction.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="network">
+  <div class="wrap">
+    <p class="eyebrow">The network</p>
+    <h2>No single general-purpose chain can serve these needs well at once. cDot closes the gap with infrastructure designed from first principles.</h2>
+    <div class="chains">
+      <div class="chain">
+        <span class="num">1</span>
+        <h3>Identity and asset recovery chain</h3>
+        <p>A dedicated identity chain for people, businesses, and AI agents. Privacy with accountability: cryptographic avatars of verified real identities. Designed to run over thousands of low hardware, unreliable nodes around the world for maximum resilience and decentralization.</p>
+        <div class="specs">
+          <span>15,000 tx/s, highly parallel</span>
+          <span>WASM smart contracts</span>
+          <span>20 s finality</span>
+          <span>Permissionless</span>
+          <span>Public and pseudonymous</span>
+        </div>
+      </div>
+      <div class="chain">
+        <span class="num">2</span>
+        <h3>Stablecoin and agentic payment chain</h3>
+        <p>Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on and off ramping. Autonomous agents transact within verifiable, revocable permissions granted by their principals.</p>
+        <div class="specs">
+          <span>30,000 tx/s</span>
+          <span>Finality &lt; 1 s</span>
+          <span>Byzantine security 45%</span>
+        </div>
+      </div>
+      <div class="chain">
+        <span class="num">3</span>
+        <h3>Trading chain</h3>
+        <p>A high performance decentralized exchange.</p>
+        <div class="specs">
+          <span>30,000 tx/s, native multithreading</span>
+          <span>Finality &lt; 1 s</span>
+          <span>~50 node permissioned overlay on the C-Layer</span>
+          <span>Private and accountable</span>
+          <span>Native NASDAQ-like matching engine</span>
+        </div>
+      </div>
+    </div>
+    <p class="interop">All <b>interoperable by design</b>.</p>
+
+    <div class="maplive">
+      <p class="cap">One network, run by the cDot community around the world.</p>
+      <div class="mapcard">
+        <div class="mapvp" id="mapvp">
+          <div class="maplayer" id="maplayer"><canvas id="landcv"></canvas></div>
+          <div class="mapbadge"><span class="dot"></span>Real-time</div>
+          <div class="maphint" id="maphint">Scroll or pinch to zoom - drag to pan</div>
+          <div class="mapzoom">
+            <button id="mz-in" aria-label="Zoom in">+</button>
+            <button id="mz-out" aria-label="Zoom out">&minus;</button>
+            <button id="mz-fit" aria-label="Reset zoom">&#x26F6;</button>
+          </div>
+        </div>
+      </div>
+      <p class="mapcount" id="mapcount">Connecting to the C-Layer&hellip;</p>
+      <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="uses">
+  <div class="wrap">
+    <p class="eyebrow">Built for the real world</p>
+    <h2>Infrastructure for real-world use cases.</h2>
+    <div class="uses">
+      <span class="use">Global payments and payroll</span>
+      <span class="use">Remittances</span>
+      <span class="use">Embedded finance</span>
+      <span class="use">Microtransactions</span>
+      <span class="use">Machine-to-machine commerce</span>
+      <span class="use">On and off ramping</span>
+      <span class="use" title="Never lose your self custodied crypto">Asset recovery</span>
+      <span class="use">Bank accounts</span>
+    </div>
+    <p class="uses-note">Where every transaction settles instantly and every participant, <b>human or agent, is certified and accountable</b>, while real identities and transactions <b>stay private</b>.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="contact">
+  <div class="wrap">
+    <p class="eyebrow">Contact</p>
+    <h2>Get in touch.</h2>
+    <div class="contact-grid">
+      <form id="contactForm">
+        <div class="field">
+          <label for="cf-name">Name</label>
+          <input id="cf-name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="cf-email">Email</label>
+          <input id="cf-email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="cf-msg">Message</label>
+          <textarea id="cf-msg" required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Send message</button>
+      </form>
+      <div class="addr">
+        <h3 style="color:var(--cyan)">c<b>Dot</b></h3>
+        <p><a href="mailto:info@cdot.world">info@cdot.world</a></p>
+        <p class="label">Address</p>
+        <p>Certonymity<br>86-87 Campden Street<br>London W8 7EN</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Contact form: hands off to the visitor's mail client. See README - this
+     should move to a real endpoint. -->
+<script is:inline>
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = document.getElementById('cf-name').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  const msg = document.getElementById('cf-msg').value.trim();
+  const subject = encodeURIComponent('Contact from ' + name + ' via cdot.world');
+  const body = encodeURIComponent(msg + '\n\n' + name + '\n' + email);
+  window.location.href = 'mailto:info@cdot.world?subject=' + subject + '&body=' + body;
+});
+</script>
+
+<!-- Live C-Layer map. landdots.js defines LAND_COLS/LAND_ROWS/LAND_DOTS as
+     globals, so both of these must stay is:inline (classic scripts, not
+     bundled modules) or the globals will not be visible. -->
+<script is:inline src="/assets/landdots.js"></script>
+<script is:inline>
+/* Live C-Layer map - native port of the cDot network map (same equirectangular
+   projection and live data as the app: map.c-layer.certonym.org), dark theme.
+   Continents come precomputed from assets/landdots.js (generated from the
+   equirectangular earth texture, same LAT crop), like the app's landDots.ts. */
+(function(){
+  const HOST='https://map.c-layer.certonym.org';
+  const LAT_MAX=75, LAT_MIN=-58;
+  const vp=document.getElementById('mapvp');
+  const layer=document.getElementById('maplayer');
+  const cv=document.getElementById('landcv');
+  const countEl=document.getElementById('mapcount');
+  const hint=document.getElementById('maphint');
+  if(!vp) return;
+
+  const view={s:1,x:0,y:0};
+  const clampS=s=>Math.min(8,Math.max(1,s));
+  function clampPan(){
+    const W=vp.clientWidth,H=vp.clientHeight;
+    view.x=Math.min(0,Math.max(W*(1-view.s),view.x));
+    view.y=Math.min(0,Math.max(H*(1-view.s),view.y));
+  }
+  function apply(){
+    layer.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;
+    for(const el of nodeEls){
+      el.style.transform=`scale(${1/view.s})`;
+    }
+  }
+
+  /* Land dots: precomputed grid (assets/landdots.js), drawn at the current size. */
+  function drawLand(){
+    const W=vp.clientWidth,H=vp.clientHeight,DPR=Math.min(2,devicePixelRatio||1);
+    cv.width=W*DPR;cv.height=H*DPR;
+    const ctx=cv.getContext('2d');ctx.setTransform(DPR,0,0,DPR,0,0);
+    if(typeof LAND_DOTS==='undefined')return;
+    const r=Math.max(.9,W/1000);
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(147,197,253,.55)';
+    ctx.beginPath();
+    for(let i=0;i<LAND_DOTS.length;i+=2){
+      const x=(LAND_DOTS[i]/LAND_COLS)*W, y=(LAND_DOTS[i+1]/LAND_ROWS)*H;
+      ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,Math.PI*2);
+    }
+    ctx.fill();
+  }
+  drawLand();
+  addEventListener('resize',()=>{drawLand();clampPan();apply()});
+
+  /* Live nodes */
+  const nodeEls=[];
+  const project=(lat,lng)=>({x:((lng+180)/360)*100,y:((LAT_MAX-lat)/(LAT_MAX-LAT_MIN))*100});
+  function addNode(n){
+    const p=project(n.lat,n.lng);
+    const el=document.createElement('div');
+    el.className='mapnode';
+    el.style.left=p.x+'%';el.style.top=p.y+'%';
+    el.title=n.city+', '+n.country;
+    layer.appendChild(el);nodeEls.push(el);
+    el.style.transform=`scale(${1/view.s})`;
+  }
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  (async()=>{
+    try{
+      const res=await fetch(HOST+'/api/data?limit=200');
+      const j=await res.json();
+      const data=Array.isArray(j)?j:(j.data||[]);
+      const ips=[...new Set(data.map(d=>d.client_ip).filter(Boolean))].slice(0,30);
+      const found=[];
+      for(let i=0;i<ips.length;i++){
+        try{
+          const r=await fetch(HOST+'/ipinfo/json/'+ips[i]+'?fields=status,country,city,lat,lon');
+          if(r.ok){
+            const g=await r.json();
+            if(g.status==='success'&&g.lat!=null&&g.lon!=null){
+              found.push(g);addNode({lat:g.lat,lng:g.lon,city:g.city||'Unknown',country:g.country||'Unknown'});
+              const cs=new Set(found.map(f=>f.country)).size;
+              countEl.innerHTML='<b>'+found.length+'</b> nodes online across <b>'+cs+'</b> countries.';
+            }
+          }
+          if(i<ips.length-1) await wait(100);
+        }catch(e){}
+      }
+      if(!found.length) countEl.textContent='One network, run by the cDot community around the world.';
+    }catch(e){
+      countEl.textContent='One network, run by the cDot community around the world.';
+    }
+  })();
+
+  /* Zoom + pan (wheel toward pointer, drag, pinch, buttons) */
+  function zoomAt(next,cx,cy){
+    const rect=vp.getBoundingClientRect();
+    const px=(cx==null?rect.width/2:cx-rect.left), py=(cy==null?rect.height/2:cy-rect.top);
+    const s=clampS(next);
+    const wx=(px-view.x)/view.s, wy=(py-view.y)/view.s;
+    view.x=px-wx*s;view.y=py-wy*s;view.s=s;
+    clampPan();apply();hint.style.display='none';
+  }
+  vp.addEventListener('wheel',e=>{e.preventDefault();zoomAt(view.s*Math.exp(-e.deltaY*0.0015),e.clientX,e.clientY)},{passive:false});
+  let drag=null;
+  vp.addEventListener('pointerdown',e=>{
+    if(e.button!==0&&e.pointerType==='mouse')return;
+    drag={x:e.clientX,y:e.clientY};vp.classList.add('drag');vp.setPointerCapture(e.pointerId);
+  });
+  vp.addEventListener('pointermove',e=>{
+    if(!drag)return;
+    view.x+=e.clientX-drag.x;view.y+=e.clientY-drag.y;
+    drag={x:e.clientX,y:e.clientY};
+    clampPan();apply();hint.style.display='none';
+  });
+  vp.addEventListener('pointerup',()=>{drag=null;vp.classList.remove('drag')});
+  vp.addEventListener('dblclick',e=>zoomAt(view.s*1.8,e.clientX,e.clientY));
+  document.getElementById('mz-in').onclick=()=>zoomAt(view.s*1.6);
+  document.getElementById('mz-out').onclick=()=>zoomAt(view.s/1.6);
+  document.getElementById('mz-fit').onclick=()=>{view.s=1;view.x=0;view.y=0;apply()};
+})();
+</script>
+
+</Layout>
