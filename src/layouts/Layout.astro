@@ -20,25 +20,117 @@ interface Props {
 const { title, description, ogTitle, ogDescription } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
-const orgSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Certonymity Ltd",
-  legalName: "Certonymity Ltd",
-  alternateName: "Certonymity",
-  url: "https://www.cdot.world/",
-  logo: "https://www.cdot.world/assets/logo-512.png",
-  email: "info@certonymity.com",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "86-87 Campden Street",
-    addressLocality: "London",
-    postalCode: "W8 7EN",
-    addressCountry: "GB",
+/* Structured data. A @graph rather than a single Organization node: the three
+   chains are the substance of the product, and as discrete SoftwareApplication
+   entities their specifications become extractable facts (a numeric
+   `throughput` PropertyValue) instead of prose buried in one description
+   string. Keep the figures here in step with the spec chips in index.astro and
+   with public/llms.txt. */
+const ORG_ID = "https://www.cdot.world/#certonymity";
+const CDOT_ID = "https://www.cdot.world/#cdot";
+
+/* PropertyValue is schema.org's escape hatch for domain-specific measurements
+   that have no dedicated property. Numeric `value` + `unitText` keeps the
+   figure machine-comparable; `unitText` alone would force string parsing. */
+const spec = (name, value, unitText) =>
+  unitText
+    ? { "@type": "PropertyValue", name, value, unitText }
+    : { "@type": "PropertyValue", name, value };
+
+const layer = (id, name, alternateName, category, description, specs) => ({
+  "@type": "SoftwareApplication",
+  "@id": `https://www.cdot.world/#${id}`,
+  name,
+  alternateName,
+  applicationCategory: category,
+  operatingSystem: "Any",
+  isPartOf: { "@id": CDOT_ID },
+  provider: { "@id": ORG_ID },
+  description,
+  additionalProperty: specs,
+});
+
+const graph = [
+  {
+    "@type": "Organization",
+    "@id": ORG_ID,
+    name: "Certonymity Ltd",
+    legalName: "Certonymity Ltd",
+    alternateName: "Certonymity",
+    url: "https://www.cdot.world/",
+    logo: "https://www.cdot.world/assets/logo-512.png",
+    email: "info@certonymity.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "86-87 Campden Street",
+      addressLocality: "London",
+      postalCode: "W8 7EN",
+      addressCountry: "GB",
+    },
+    description:
+      "Certonymity Ltd builds cDot, purpose built blockchain infrastructure for verified identity and money movement at scale.",
   },
-  description:
-    "cDot is purpose built infrastructure for the next era of money movement and identity at scale: a dedicated identity and asset recovery chain (15,000 tx/s highly parallel, WASM smart contracts, 20 s finality, permissionless, public and pseudonymous, designed for thousands of low hardware nodes worldwide), a stablecoin and agentic payment chain (30,000 tx/s, finality under 1 s, byzantine security 45%), and a trading chain (30,000 tx/s native multithreading, finality under 1 s, ~50 node permissioned overlay on the C-Layer, private and accountable, native NASDAQ-like matching engine), interoperating as one trusted network.",
-};
+  {
+    "@type": "SoftwareApplication",
+    "@id": CDOT_ID,
+    name: "cDot",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Any",
+    provider: { "@id": ORG_ID },
+    url: "https://www.cdot.world/",
+    description:
+      "cDot is where verified identity, stablecoin payments, programmable money and autonomous agents converge, operating as one trusted network. Rather than forcing everything onto a single chain, cDot is three purpose built blockchains, each engineered for what it does best and interoperable by design.",
+    hasPart: [
+      { "@id": "https://www.cdot.world/#c-layer" },
+      { "@id": "https://www.cdot.world/#p-layer" },
+      { "@id": "https://www.cdot.world/#t-layer" },
+    ],
+  },
+  layer(
+    "c-layer",
+    "C-Layer",
+    "cDot identity and asset recovery chain",
+    "SecurityApplication",
+    "A dedicated identity chain for people, businesses, and AI agents. Privacy with accountability: cryptographic avatars of verified real identities. Designed to run over thousands of low hardware, unreliable nodes around the world for maximum resilience and decentralization.",
+    [
+      spec("Throughput", 15000, "tx/s"),
+      spec("Finality", 20, "s"),
+      spec("Smart contracts", "WASM"),
+      spec("Architecture", "Highly parallel"),
+      spec("Access", "Permissionless"),
+      spec("Visibility", "Public and pseudonymous"),
+    ],
+  ),
+  layer(
+    "p-layer",
+    "P-Layer",
+    "cDot stablecoin and agentic payment chain",
+    "FinanceApplication",
+    "Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on and off ramping. Autonomous agents transact within verifiable, revocable permissions granted by their principals.",
+    [
+      spec("Throughput", 30000, "tx/s"),
+      spec("Finality", "<1", "s"),
+      spec("Byzantine security", "45%"),
+    ],
+  ),
+  layer(
+    "t-layer",
+    "T-Layer",
+    "cDot trading chain",
+    "FinanceApplication",
+    "A high performance decentralized exchange, running as a permissioned overlay on the C-Layer.",
+    [
+      spec("Throughput", 30000, "tx/s"),
+      spec("Finality", "<1", "s"),
+      spec("Architecture", "Native multithreading"),
+      spec("Nodes", "~50 node-permissioned overlay on the C-Layer"),
+      spec("Visibility", "Private and accountable"),
+      spec("Matching engine", "Native NASDAQ-like"),
+    ],
+  ),
+];
+
+const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 ---
 
 <!doctype html>

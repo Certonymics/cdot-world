@@ -114,11 +114,9 @@
   @media(max-width:640px){.chain{padding:24px 20px}}
   .chain:hover{border-color:rgba(128,189,254,.4);transform:translateY(-3px)}
   @media(max-width:640px){.chain:hover{transform:none}}
-  .chain .num{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:34px;height:34px;border-radius:10px;font-weight:700;font-size:15px;
-    color:#04122b;background:linear-gradient(120deg,var(--cyan),var(--blue));
-    margin-bottom:18px;
+  .chain-id{
+    display:block;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:12px;
   }
   .chain h3{font-size:19.5px;font-weight:700;margin-bottom:10px}
   .chain p{color:var(--ink-dim);font-size:15.5px}
