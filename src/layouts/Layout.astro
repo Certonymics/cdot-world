@@ -27,6 +27,7 @@ const orgSchema = {
   legalName: "Certonymity Ltd",
   alternateName: "Certonymity",
   url: "https://www.cdot.world/",
+  logo: "https://www.cdot.world/assets/logo-512.png",
   email: "info@certonymity.com",
   address: {
     "@type": "PostalAddress",
@@ -57,6 +58,13 @@ const orgSchema = {
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="cDot" />
 <meta property="og:locale" content="en_GB" />
+<meta property="og:image" content={new URL('/assets/og.png', Astro.site).href} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="cDot - secure identity and payments" />
+<!-- The only twitter:* tag worth setting: X falls back to the og:* tags for
+     title, description and image, but needs this to use the large card. -->
+<meta name="twitter:card" content="summary_large_image" />
 <script type="application/ld+json" is:inline set:html={JSON.stringify(orgSchema)} />
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 <!-- .ico fallback for Safari <15 and crawlers that request /favicon.ico -->

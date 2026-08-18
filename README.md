@@ -117,6 +117,21 @@ must be granted by running `testEmail` in the editor once, which a web request
 cannot trigger itself. Skip it and enquiries save to the sheet while nobody is
 notified.
 
+## Crawler policy
+
+`public/robots.txt` deliberately splits two things people conflate: retrieval
+and training. Search/citation agents (`OAI-SearchBot`, `ChatGPT-User`,
+`Claude-SearchBot`, `Claude-User`, `PerplexityBot`) are **allowed**, so
+assistants can read the page and link back to it. Training crawlers and opt-out
+tokens (`GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended`,
+`Applebot-Extended`, `Meta-ExternalAgent`, `Bytespider`) are **disallowed**.
+
+Two things to keep straight if you edit it. `Google-Extended` and
+`Applebot-Extended` are not crawlers and have no effect on Google or Apple
+search ranking - Googlebot and Applebot are separate and still allowed. And
+robots.txt is a request, not enforcement: it states intent and well-behaved
+operators honour it, but nothing stops a scraper.
+
 ## External dependencies
 
 The site is self-hosted apart from one first-party API call:
@@ -136,18 +151,17 @@ for the whole 100-900 axis) for figures and technical values.
 
 ## Known gaps
 
-- **No `og:image`.** Link previews (Slack, LinkedIn, X, iMessage) render as a
-  bare text stub. Needs a 1200x630 image at `public/assets/og.png`, then the
-  `og:image` / `twitter:card` tags in `Layout.astro`. This is the largest
-  remaining gap - a landing page is mostly distributed by people pasting the URL.
+- **`og.png` is generated, not designed.** `public/assets/og.png` was composed
+  from the logo SVG with cairosvg (see git history) so link previews work now.
+  It is deliberately plain - logo, tagline, strapline on the brand gradient. A
+  designed replacement is welcome; keep it 1200x630 and the tags will pick it up.
+- **No `sameAs` in the JSON-LD.** There are no external profiles yet. Add
+  LinkedIn / X / GitHub / Companies House URLs when they exist - this is how a
+  search engine reconciles "cDot" with a real registered entity.
 - **The earth texture loads eagerly.** `public/assets/earth-texture.jpg` is
   492 KB and fetched on page load, though the map sits well below the fold -
   about 73% of first-load weight for something not yet visible. Wrap the
   `loadTexture` IIFE in an `IntersectionObserver` on `#mapvp`.
-- **Structured data is thin.** The `Organization` JSON-LD in `Layout.astro` has
-  no `logo` or `sameAs`, so search engines cannot reconcile the entity against
-  social profiles or a Companies House record. Needs a raster logo (>=112x112)
-  and the profile URLs.
 - **cDot is modelled as the organisation.** The JSON-LD describes Certonymity
   Ltd; cDot itself is a product and arguably wants its own `Product` or
   `WebSite` node rather than living in the org's `description`.
