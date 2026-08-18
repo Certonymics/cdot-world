@@ -4,8 +4,9 @@
    cma. Brand blue is #566AFD (Tailwind primary-500 in the sibling repos) and
    is the same value as the fill in the logo SVG.
 
-   THIS FILE IS THE BRAND SOURCE OF TRUTH FOR THIS REPO. If a value changes
-   here it needs changing in the sibling repos' tailwind.config.js too.
+   DERIVED FILE. The canonical definition is brand/palette.json - edit that
+   first, then run `npm run brand:check` to confirm this file and the three
+   sibling repos still agree.
 --------------------------------------------------------------------------- */
 :root{
     --bg-0:#040b18;
@@ -20,7 +21,3 @@
     --line:rgba(128,189,254,.16);
     --card:rgba(128,189,254,.05);
   }
-
-/* Sibling palette steps kept for reference / future use:
-   primary  50 #EBF5FF   100 #D6EBFF  200 #B3D7FF  300 #80BDFE  400 #6B9EFD
-            500 #566AFD  600 #4A5AE8  700 #3E4AD3  800 #323ABE  900 #262AA9  */

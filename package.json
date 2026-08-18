@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "brand:check": "node scripts/check-brand.mjs"
   },
   "dependencies": {
     "@fontsource/darker-grotesque": "^5.2.8",
