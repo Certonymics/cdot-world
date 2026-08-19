@@ -246,17 +246,12 @@
   /* Repaint both canvases when the theme changes. The dots are baked pixels, so
      unlike everything else on the page they do not follow the cascade - without
      this the continents keep the previous theme's colour until the next resize.
-     Two triggers, because the theme has two sources: data-theme for an explicit
-     choice, and the OS preference when none is stored. */
+     data-theme is the only trigger needed: dark is unconditional and light is
+     opt-in through the toggle, so the OS preference never changes the palette. */
   function repaintForTheme(){ paintLand(); paintMini(); }
   if(window.MutationObserver){
     new MutationObserver(repaintForTheme).observe(document.documentElement,
       {attributes:true,attributeFilter:['data-theme']});
-  }
-  if(window.matchMedia){
-    const scheme=matchMedia('(prefers-color-scheme: dark)');
-    if(scheme.addEventListener) scheme.addEventListener('change',repaintForTheme);
-    else if(scheme.addListener) scheme.addListener(repaintForTheme);
   }
 
   /* Node markers + selection */

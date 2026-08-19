@@ -78,15 +78,8 @@ const tagline = "Secure identity and payments";
     label();
   });
 
-  /* Follow the OS while no explicit choice is stored, so the page changes
-     under someone who flips their system theme with the tab already open. */
-  if (window.matchMedia) {
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    var onChange = function(){ if (!T.stored()) { T.paint(); label(); } };
-    if (mq.addEventListener) mq.addEventListener('change', onChange);
-    else if (mq.addListener) mq.addListener(onChange);
-  }
-
+  /* No prefers-color-scheme listener: dark is unconditional and light is opt-in,
+     so flipping the OS theme is not something this page should react to. */
   label();
 })();
 </script>

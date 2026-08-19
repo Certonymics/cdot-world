@@ -49,15 +49,9 @@
   /* The sun circle reads better filled at this size. */
   .theme-toggle .i-sun circle{fill:currentColor;stroke:none}
   .theme-toggle .i-moon path{fill:currentColor;stroke:none}
-  /* Three states, so each icon needs saying twice. Default (dark) shows the
-     sun, because the button offers the OTHER theme. The prefers-color-scheme
-     rule covers "following the OS", and the [data-theme] rule lets an explicit
-     choice win over it in both directions. */
+  /* The button offers the theme you are NOT in, so dark shows the sun. Only two
+     states to express now that dark is unconditional and light is opt-in. */
   .theme-toggle .i-moon{display:none}
-  @media (prefers-color-scheme:light){
-    :root:not([data-theme="dark"]) .theme-toggle .i-sun{display:none}
-    :root:not([data-theme="dark"]) .theme-toggle .i-moon{display:block}
-  }
   :root[data-theme="light"] .theme-toggle .i-sun{display:none}
   :root[data-theme="light"] .theme-toggle .i-moon{display:block}
   @media(max-width:640px){.theme-toggle{margin-left:0;width:32px;height:32px}}

@@ -166,16 +166,20 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
   navigation. Moving it below the stylesheet, deferring it, or making it a
   module all reintroduce that flash.
 
-  It only ever writes the attribute for an EXPLICIT choice. With nothing stored
-  the attribute is absent and the prefers-color-scheme block in tokens.css
-  decides, so the OS setting keeps working - including for visitors with
-  JavaScript disabled, who get their system preference rather than whatever we
-  guessed.
+  DARK IS THE UNCONDITIONAL DEFAULT. The site does not follow
+  prefers-color-scheme: light is the more common OS default, especially on
+  Windows and managed machines, so honouring it meant most first-time visitors
+  never saw the design the site was built around. Light is opt-in via the
+  toggle, and the attribute is written only for that explicit choice - with
+  nothing stored there is no attribute and the base :root palette (dark) applies,
+  which is also what JavaScript-disabled visitors get.
 -->
 <script is:inline>
 (function(){
   var KEY = 'cdot-theme';
-  var DARK_BG = '#040b18', LIGHT_BG = '#FAFBFD';   /* keep in step with --bg-0 */
+  /* Duplicates --bg-0 from tokens.css, because the address-bar colour is a meta
+     tag and cannot read a custom property. Change both together. */
+  var DARK_BG = '#040b18', LIGHT_BG = '#FFFFFF';
 
   function stored(){
     try {
@@ -184,13 +188,8 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
     } catch (e) { return null; }   /* private mode / storage disabled */
   }
 
-  function systemPref(){
-    return window.matchMedia &&
-           window.matchMedia('(prefers-color-scheme: light)').matches
-      ? 'light' : 'dark';
-  }
-
-  function effective(){ return stored() || systemPref(); }
+  /* No prefers-color-scheme fallback: unset means dark, always. */
+  function effective(){ return stored() || 'dark'; }
 
   function paint(){
     var s = stored();

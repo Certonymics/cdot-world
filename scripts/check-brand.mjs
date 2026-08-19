@@ -79,18 +79,17 @@ for (const { name, path } of palette.consumers) {
 }
 
 /* ---------------------------------------------------------------------------
-   Light-theme parity.
+   Single light block.
 
-   tokens.css states the light palette TWICE - once inside
-   @media (prefers-color-scheme:light) for visitors who have expressed no
-   preference, and once on :root[data-theme="light"] so the in-page toggle can
-   override the OS in either direction. CSS gives no way to share one
-   declaration list between a media-query context and a bare selector without
-   making the theme JS-dependent, so the duplication is structural.
+   Dark is unconditional and light is opt-in via :root[data-theme="light"], so
+   the palette is stated ONCE. It used to be stated twice - the second copy
+   existed only to serve prefers-color-scheme - and the two drifted within
+   minutes of being written with nothing to catch it: the OS path and the toggle
+   path simply rendered different colours.
 
-   It is also a live trap: the two blocks drifted within minutes of being
-   written, and nothing failed - the OS path and the toggle path simply rendered
-   different colours. This makes that silent divergence loud instead.
+   Re-adding a prefers-color-scheme block would reintroduce that, so this fails
+   if one appears. If following the OS is ever wanted again, the duplication has
+   to come back with a parity check alongside it.
 --------------------------------------------------------------------------- */
 {
   const tokensPath = "src/styles/tokens.css";
@@ -98,41 +97,63 @@ for (const { name, path } of palette.consumers) {
   try {
     css = readFileSync(resolve(root, tokensPath), "utf8");
   } catch {
-    console.log(`  -- ${tokensPath} not readable, light-theme parity skipped`);
+    console.log(`  -- ${tokensPath} not readable, light-theme check skipped`);
   }
 
   if (css) {
-    const mediaBlock = css.match(
-      /@media \(prefers-color-scheme:light\)\{\s*:root:not\(\[data-theme="dark"\]\)\{([\s\S]*?)\n  \}\n\}/,
-    );
-    const attrBlock = css.match(/:root\[data-theme="light"\]\{([\s\S]*?)\n  \}/);
+    const problems = [];
+    const stripped = css.replace(/\/\*[\s\S]*?\*\//g, "");
 
-    const decls = (txt) =>
-      [...txt.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)]
-        .reduce((m, [, k, v]) => m.set(k, v.replace(/\s+/g, " ").trim()), new Map());
+    const lightBlocks = stripped.match(/:root\[data-theme="light"\]\s*\{/g) || [];
+    if (lightBlocks.length !== 1) {
+      problems.push(`expected exactly 1 :root[data-theme="light"] block, found ${lightBlocks.length}`);
+    }
+    if (/@media[^{]*prefers-color-scheme/.test(stripped)) {
+      problems.push(
+        "a prefers-color-scheme block is back - that restates the palette and " +
+        "the two copies drift silently. Add a parity check if this is intended.",
+      );
+    }
 
-    if (!mediaBlock || !attrBlock) {
+    /* The address-bar colour is a <meta> tag, so it cannot read a custom
+       property: Layout.astro hardcodes both backgrounds. That duplication has
+       already drifted once - the light constant kept an older --bg-0 after the
+       palette was realigned, leaving the browser chrome a different white from
+       the page. */
+    const layoutPath = "src/layouts/Layout.astro";
+    let layout = null;
+    try {
+      layout = readFileSync(resolve(root, layoutPath), "utf8");
+    } catch {
+      problems.push(`${layoutPath} not readable, theme-color constants unchecked`);
+    }
+    if (layout) {
+      const consts = layout.match(
+        /var DARK_BG\s*=\s*'([^']+)'\s*,\s*LIGHT_BG\s*=\s*'([^']+)'/,
+      );
+      const rootBg = stripped.match(/:root\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/);
+      const lightBg = stripped.match(
+        /:root\[data-theme="light"\]\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/,
+      );
+      if (!consts) {
+        problems.push(`could not find DARK_BG/LIGHT_BG in ${layoutPath}`);
+      } else if (rootBg && lightBg) {
+        const norm = (h) => h.trim().toLowerCase();
+        if (norm(consts[1]) !== norm(rootBg[1])) {
+          problems.push(`DARK_BG ${consts[1]} != dark --bg-0 ${rootBg[1].trim()}`);
+        }
+        if (norm(consts[2]) !== norm(lightBg[1])) {
+          problems.push(`LIGHT_BG ${consts[2]} != light --bg-0 ${lightBg[1].trim()}`);
+        }
+      }
+    }
+
+    if (problems.length) {
       failures++;
-      console.log(`  X  light-theme parity  (${tokensPath})`);
-      console.log("     - could not locate both light blocks; has the structure changed?");
+      console.log(`  X  light theme  (${tokensPath})`);
+      for (const pr of problems) console.log(`     - ${pr}`);
     } else {
-      const a = decls(mediaBlock[1]);
-      const b = decls(attrBlock[1]);
-      const problems = [];
-      for (const [k, v] of a) {
-        if (!b.has(k)) problems.push(`${k} missing from :root[data-theme="light"]`);
-        else if (b.get(k) !== v) problems.push(`${k} differs: media "${v}" vs attr "${b.get(k)}"`);
-      }
-      for (const k of b.keys()) {
-        if (!a.has(k)) problems.push(`${k} missing from the prefers-color-scheme block`);
-      }
-      if (problems.length) {
-        failures++;
-        console.log(`  X  light-theme parity  (${tokensPath})`);
-        for (const pr of problems) console.log(`     - ${pr}`);
-      } else {
-        console.log(`  OK light-theme parity (${a.size} tokens match in both blocks)`);
-      }
+      console.log("  OK light theme (single opt-in block; theme-color matches --bg-0)");
     }
   }
 }

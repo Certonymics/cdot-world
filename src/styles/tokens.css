@@ -25,11 +25,18 @@
       of these resolve to `none` in light mode: a luminous halo is a dark-mode
       device and on white it reads as a printing fault, not a glow.
 
-   3. Light values are defined in TWO places that must stay in step - a
-      prefers-color-scheme block for visitors who have expressed no preference,
-      and a [data-theme] block so the in-page toggle can override the OS in
-      either direction. Never give a colour its only definition inside one of
-      them.
+   3. DARK IS UNCONDITIONAL. Light applies only from :root[data-theme="light"],
+      which the toggle sets and stores. The site deliberately does NOT follow
+      prefers-color-scheme: light is the more common OS default, especially on
+      Windows and managed machines, so honouring it meant most visitors never
+      saw the design the site was built around. Light is now opt-in.
+
+      This also removes a hazard. Following the OS required stating the whole
+      palette twice - once in a media block, once on the attribute - because CSS
+      cannot share one declaration list between a media context and a bare
+      selector. Those two copies drifted within minutes of being written and
+      nothing failed; the OS path and the toggle path simply rendered different
+      colours. One block cannot disagree with itself.
 
    The accent ramp is NOT shared between themes and cannot be. --cyan #80BDFE
    is 9.97:1 on the dark background and 1.87:1 on the light one - unreadable.
@@ -105,72 +112,20 @@
 
 /* ---------------------------------------------------------------------------
    LIGHT THEME
-   Kept in a single custom property list applied from two selectors below, so
-   the OS preference and the explicit toggle cannot drift apart.
+   Opt-in only, via the header toggle. Nothing here applies unless
+   data-theme="light" is on the root element.
 
-   Contrast, measured against --bg-0 #FAFBFD:
-     --ink      #0B1524  17.68:1
-     --ink-dim           7.51:1
-     --cyan     #2A3894   9.70:1   accent text: eyebrows, chain ids, chips
-     --blue     #3346C9   7.09:1   in-prose links
-     --brand    #566AFD   4.16:1   FILLS AND THE LOGO ONLY - never body text
-     --danger   #B3261E   6.31:1
+   Values follow 'Cdot site (main)', which was built light from the start; the
+   comments below cite how often each appears in its components. Contrast is
+   measured against --bg-0 #FFFFFF:
+     --ink        #000000  21.00:1  text-black
+     --ink-dim             8.52:1  text-black/70
+     --ink-faint           5.32:1  between its /50 and /60 steps - see below
+     --cyan       #4A5AE8   5.36:1  primary-600: eyebrows, chain ids, chips
+     --blue       #3E4AD3   6.72:1  primary-700: in-prose links
+     --brand      #566AFD   4.31:1  primary-500. FILLS AND THE LOGO ONLY.
+     --danger     #B3261E   6.31:1
 --------------------------------------------------------------------------- */
-@media (prefers-color-scheme:light){
-  :root:not([data-theme="dark"]){
-    --veil-rgb:255,255,255;
-    /* primary-500's channels. Every alpha-composed fill here (chips, inputs,
-       hovers, the ghost-button and map-card borders) resolves to a tint of the
-       brand, which is how the main site builds them - bg-primary-500/10 and
-       friends. */
-    --accent-rgb:86,106,253;
-    --node-ring-rgb:255,255,255;
-    --shadow-rgb:0,0,0;
-
-    /* bg-white, secondary-50, primary-50. */
-    --bg-0:#FFFFFF;
-    --bg-1:#F8FBFF;
-    --bg-2:#EBF5FF;
-
-    /* Pure black, as the main site uses (text-black, 166 occurrences) - not a
-       tinted near-black. At 21:1 it also buys headroom for the dimmed steps. */
-    --ink:#000000;
-    --ink-dim:rgba(0,0,0,.7);
-    /* The main site's own text-black/50 is 3.98:1 and would fail AA at the
-       13px our footer uses, so this sits between its /50 and /60 steps. */
-    --ink-faint:rgba(0,0,0,.58);
-    --danger:#B3261E;
-
-    /* primary-700 and primary-600, the main site's two accent-text steps
-       (39 and 49 occurrences). primary-500 is deliberately NOT used as text:
-       at 4.31:1 on white it fails AA, which is why the reference reserves it
-       for fills and large gradient headings. */
-    --blue:#3E4AD3;
-    --cyan:#4A5AE8;
-    --brand-text:#4A5AE8;
-
-    /* No bloom. A halo on white reads as a printing fault. The hero keeps its
-       colour shift and loses only the glow. Shadows are neutral black at low
-       alpha rather than brand-tinted, so elevation reads as shadow. */
-    --glow-text:none;
-    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.14);
-    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.2);
-    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.1);
-    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.3);
-    --glow-node-active:0 0 0 3px rgba(var(--brand-rgb),.28),
-                       0 1px 5px rgba(var(--shadow-rgb),.35);
-    --hover-veil:rgba(0,0,0,.045);
-    /* Brand-tinted continents. Pale blue would disappear on the light card. */
-    --map-land:rgba(74,90,232,.4);
-
-    /* Solid, not alpha-composed: primary-100 is the main site's hairline
-       (border-primary-100, 64 occurrences) and primary-50 its card wash. A
-       pale blue at .16 alpha over white would be invisible. */
-    --line:#D6EBFF;
-    --card:rgba(235,245,255,.65);
-  }
-}
-
 :root[data-theme="light"]{
     --veil-rgb:255,255,255;
     /* primary-500's channels. Every alpha-composed fill here (chips, inputs,
