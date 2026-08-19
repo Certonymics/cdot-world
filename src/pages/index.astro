@@ -1,0 +1,280 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const title = "cDot: Secure identity and payments";
+const description =
+  "cDot is where verified identity, stablecoin payments, programmable money and autonomous agents converge, operating as one trusted network.";
+const ogTitle = "cDot - The infrastructure for identity and money movement at scale";
+const ogDescription =
+  "Purpose built blockchains infrastructure where verified identity, stablecoin payments, programmable money and autonomous accountable agents converge, operating as one trusted network.";
+---
+
+<Layout title={title} description={description} ogTitle={ogTitle} ogDescription={ogDescription}>
+
+<div class="hero">
+  <div class="watermark" aria-hidden="true">
+    <img src="/assets/Calque_1.svg" alt="" width="283" height="338" decoding="async">
+  </div>
+  <div class="wrap">
+    <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale</h1>
+    <p class="sub">cDot is the network designed for private payments, verified identity, programmable money, and autonomous agents.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#mission">Discover cDot</a>
+      <a class="btn btn-ghost" href="#network">The network</a>
+    </div>
+  </div>
+</div>
+
+<section id="mission">
+  <div class="wrap">
+    <p class="eyebrow">Mission</p>
+    <h2>The settlement layer for value exchanged between people, businesses, and machines.</h2>
+    <p class="lead">cDot is the blockchain network built for secure, private, and instant payments. Designed from first principles, cDot uses cryptographic avatars of verified real identities to keep transactions both private and safe, with invisible on- and off-ramping allowing anyone to benefit from the speed and low cost of stablecoins.</p>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap">
+<h2>Stablecoins enable instant, borderless, programmable transactions. Today's blockchains aren't designed for them.</h2>
+    <p class="lead">Existing systems are either fully general or optimized for trading, and none treat identity as a first-class primitive.</p>
+    <p class="lead">As an alternative to traditional finance's invasive identity checks, cryptographic proof-of-human alone hits a ceiling when it comes to payments and regulation.</p>
+    <p class="lead">This gap becomes critical when AI agents transact on behalf of humans and businesses. Without native identity, agents cannot be held accountable, and their payments cannot be trusted or audited.</p>
+    <p class="lead">Created by the team behind <a href="https://c.email/">c.Email</a>, cDot uses cryptographic avatars of verified real identities to provide anonymity by default and accountability when necessary.</p>
+    <div class="pull">
+      <p>Payments at scale don't just need speed and low cost — they must be able to verify who or what is on each side of a transaction. No single general-purpose chain can serve both of these purposes.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="network">
+  <div class="wrap">
+    <p class="eyebrow">Network</p>
+    <h2>One network, three specialised chains.</h2>
+    <p class="lead">Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains, each engineered for what it does best: identity, stablecoin settlement, and trading, interoperating as one trusted network.</p>
+    <div class="chains">
+      <div class="chain">
+        <span class="chain-id">C-Layer</span>
+        <h3>Identity and asset recovery chain</h3>
+        <p>A purpose-built identity chain for people, businesses, and agents. Cryptographic avatars of verified real identities provide privacy with accountability. Run by nodes around the world for maximum resilience and decentralisation.</p>
+        <div class="specs">
+          <span>15,000 tx/s, highly parallel</span>
+          <span>WASM smart contracts</span>
+          <span>20s finality</span>
+          <span>Permissionless</span>
+          <span>Public and pseudonymous</span>
+        </div>
+      </div>
+      <div class="chain">
+        <span class="chain-id">P-Layer</span>
+        <h3>Stablecoin and agentic payment chain</h3>
+        <p>Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on- and off-ramping. Agentic transactions supported with verifiable, revocable permissions granted by their principals.</p>
+        <div class="specs">
+          <span>30,000 tx/s</span>
+          <span>Finality &lt;1s</span>
+          <span>Byzantine security 45%</span>
+        </div>
+      </div>
+      <div class="chain">
+        <span class="chain-id">T-Layer</span>
+        <h3>Trading chain</h3>
+        <p>A high-performance decentralized exchange, offering stablecoin swaps and perpetual futures in a predictable execution environment.</p>
+        <div class="specs">
+          <span>30,000 tx/s, native multithreading</span>
+          <span>Finality &lt;1s</span>
+          <span>Node-permissioned overlay on C-layer</span>
+          <span>Private and accountable</span>
+          <span>Native NASDAQ-like matching engine</span>
+        </div>
+      </div>
+    </div>
+    <div class="maplive">
+      <div class="mapcard">
+        <div class="mapvp" id="mapvp">
+          <!-- Constant-size dotted-land texture. Deliberately OUTSIDE #maplayer so
+               it is never CSS-scaled: it is redrawn for the current view instead,
+               which is what stops the dots growing and blurring as you zoom. -->
+          <canvas class="landcv" id="landcv" aria-hidden="true"></canvas>
+          <!-- Only the nodes are transformed. -->
+          <div class="maplayer" id="maplayer"></div>
+          <div class="mapbadge"><span class="dot"></span>Real-time</div>
+          <!-- Minimap navigator: appears once you zoom in. -->
+          <div class="minimap" id="minimap" data-nopan hidden aria-label="Map navigator - drag to pan">
+            <canvas id="minicv"></canvas>
+            <div class="minirect" id="minirect"></div>
+          </div>
+          <!-- Text is set by the map script, which knows the platform modifier.
+               Kept out of the markup so JS-disabled visitors are not told the
+               map is interactive when it isn't. -->
+          <div class="maphint" id="maphint" hidden></div>
+          <div class="mapzoom" data-nopan>
+            <button id="mz-in" aria-label="Zoom in">+</button>
+            <button id="mz-out" aria-label="Zoom out">&minus;</button>
+            <button id="mz-fit" aria-label="Reset zoom">&#x26F6;</button>
+          </div>
+          <!-- Node details, shown when a node is selected. -->
+          <div class="nodepanel" id="nodepanel" data-nopan hidden>
+            <button class="np-close" id="np-close" aria-label="Clear selection">&times;</button>
+            <p class="np-label">Location</p><p class="np-value" id="np-loc"></p>
+            <p class="np-label">IP address</p><p class="np-value" id="np-ip"></p>
+            <p class="np-label">Version</p><p class="np-value" id="np-ver"></p>
+          </div>
+        </div>
+      </div>
+      <p class="mapcount" id="mapcount">Connecting to the C-Layer&hellip;</p>
+      <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="uses">
+  <div class="wrap">
+    <p class="eyebrow">Use cases</p>
+    <h2>Secure payments for the real world.</h2>
+    <div class="uses">
+      <span class="use">Global payments and payroll</span>
+      <span class="use">Remittances</span>
+      <span class="use">Embedded finance</span>
+      <span class="use">Microtransactions</span>
+      <span class="use">Machine-to-machine commerce</span>
+      <span class="use">On- and off-ramping</span>
+      <span class="use" title="Never lose your self custodied crypto">Asset recovery</span>
+      <span class="use">Bank accounts</span>
+    </div>
+    <p class="uses-note">Secure design and invisible cryptography means every transaction settles <b>instantly</b>, every participant — human or agent — is <b>verified and accountable</b>, while every real-world identity and transaction stays <b>private</b>.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="contact">
+  <div class="wrap">
+    <p class="eyebrow">Contact</p>
+    <h2>Want to know more? Get in touch.</h2>
+    <form id="contactForm">
+    <div class="contact-grid">
+        <div class="contact-fields">
+          <div class="field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" type="email" name="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="cf-msg">Message</label>
+            <textarea id="cf-msg" name="message" maxlength="5000" required></textarea>
+          </div>
+          <!-- Honeypot: hidden from people, filled in by bots. -->
+          <input class="cf-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <!-- Replaces the fields above on success; also carries error text. -->
+          <p class="cf-status" id="cf-status" role="status" aria-live="polite" tabindex="-1"></p>
+        </div>
+      <noscript>
+        <p class="cf-status is-error">This form needs JavaScript. Please email
+        <a href="mailto:info@certonymity.com">info@certonymity.com</a> instead.</p>
+      </noscript>
+      <div class="addr">
+        <p>cDot — built by Certonymity</p>
+        <p><a href="mailto:info@certonymity.com">info@certonymity.com</a></p>
+        <p>Certonymity Ltd<br>86-87 Campden Street<br>London<br>W8 7EN</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit" style="margin-top:18px">Send message</button>
+    </form>
+  </div>
+</section>
+
+
+<!-- Contact form. POSTs to the Google Apps Script in scripts/contact-form.gs,
+     which records the enquiry in a sheet and emails the team. That script is a
+     separate deployment from the c.Email one - see its header comment. -->
+<script is:inline>
+(function(){
+  /* Public by design - see the header comment in scripts/contact-form.gs.
+     Replace with the /exec URL of the deployed cDot contact-form script. */
+  const CONTACT_FORM_URL =
+    'https://script.google.com/macros/s/AKfycbzkT4I_iMLiBBKRZeKdSEU2ohJVpfOFd4UA-tk2ss4p2YddFDbvU1OFPnjHcr0RaOHdUA/exec';
+
+  const form = document.getElementById('contactForm');
+  const statusEl = document.getElementById('cf-status');
+  const button = form.querySelector('button[type="submit"]');
+  const fields = form.querySelectorAll('.contact-fields .field, .cf-honeypot');
+  let sending = false;
+
+  /* The status line stays in the DOM and is emptied rather than hidden: a
+     display:none live region is not monitored, so un-hiding and filling it in
+     one task announces unreliably. */
+  function show(message, isError){
+    statusEl.textContent = message;
+    statusEl.classList.toggle('is-error', !!isError);
+    /* Errors move focus, so a screen-reader user is not left waiting for an
+       announcement that may not arrive. */
+    if(isError) statusEl.focus();
+  }
+
+  /* On success the fields and the button go away entirely, so there is no live
+     Send button sitting under a thank-you message inviting a second submission. */
+  function succeed(message){
+    fields.forEach(function(el){ el.hidden = true; });
+    button.hidden = true;
+    show(message, false);
+  }
+
+  function fail(message){
+    show(message || 'Something went wrong. Please try again, or email us directly at info@certonymity.com.', true);
+    sending = false;
+    button.disabled = false;
+    button.textContent = 'Send message';
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (sending) return;
+
+    /* Better to say so than to POST into the void and report success. */
+    if (!CONTACT_FORM_URL) {
+      return fail('This form is not connected yet. Please email us directly at info@certonymity.com.');
+    }
+
+    /* Sending state lives on the button only. Putting it in the status line too
+       would shift the layout mid-submit, since the status sits in the field column. */
+    sending = true;
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    statusEl.textContent = '';
+
+    try {
+      /* No Content-Type header on purpose. Setting one makes this a preflighted
+         request, and Apps Script does not answer the OPTIONS probe, so the whole
+         submission fails before it starts. Sent as text/plain it is a "simple
+         request" and goes straight through; doPost reads the raw body regardless. */
+      /* Without a timeout a stalled connection leaves the button disabled on
+         "Sending…" forever, with no way to retry. */
+      const response = await fetch(CONTACT_FORM_URL, {
+        signal: AbortSignal.timeout(15000),
+        method: 'POST',
+        body: JSON.stringify({
+          email: document.getElementById('cf-email').value.trim(),
+          message: document.getElementById('cf-msg').value.trim(),
+          website: form.querySelector('[name="website"]').value
+        })
+      });
+      const result = await response.json().catch(function(){ return null; });
+      /* Only confirm what the server actually confirmed. */
+      if (!response.ok || !result || !result.ok) return fail(result && result.error);
+
+      succeed('Thanks — your message is on its way. We’ll reply to the address you gave us.');
+    } catch (err) {
+      fail();
+    }
+  });
+})();
+</script>
+
+<!-- Live C-Layer map - implementation and rationale in public/assets/map.js.
+     Served from public/ rather than inlined to keep the page's prose dominant
+     in its markup; `defer` so the elements it queries have parsed. -->
+<script src="/assets/map.js" defer></script>
+
+</Layout>

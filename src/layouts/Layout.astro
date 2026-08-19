@@ -1,0 +1,169 @@
+---
+import "@fontsource-variable/geist";
+import "@fontsource-variable/host-grotesk";
+import "@fontsource-variable/geist-mono";
+import "../styles/tokens.css";
+import "../styles/global.css";
+import LogoSymbol from "../components/LogoSymbol.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+}
+const { title, description, ogTitle, ogDescription } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+/* Structured data. A @graph rather than a single Organization node: the three
+   chains are the substance of the product, and as discrete SoftwareApplication
+   entities their specifications become extractable facts (a numeric
+   `throughput` PropertyValue) instead of prose buried in one description
+   string. Keep the figures here in step with the spec chips in index.astro and
+   with public/llms.txt. */
+const ORG_ID = "https://cdot.world/#certonymity";
+const CDOT_ID = "https://cdot.world/#cdot";
+
+/* PropertyValue is schema.org's escape hatch for domain-specific measurements
+   that have no dedicated property. Numeric `value` + `unitText` keeps the
+   figure machine-comparable; `unitText` alone would force string parsing. */
+const spec = (name, value, unitText) =>
+  unitText
+    ? { "@type": "PropertyValue", name, value, unitText }
+    : { "@type": "PropertyValue", name, value };
+
+const layer = (id, name, alternateName, category, description, specs) => ({
+  "@type": "SoftwareApplication",
+  "@id": `https://cdot.world/#${id}`,
+  name,
+  alternateName,
+  applicationCategory: category,
+  operatingSystem: "Any",
+  isPartOf: { "@id": CDOT_ID },
+  provider: { "@id": ORG_ID },
+  description,
+  additionalProperty: specs,
+});
+
+const graph = [
+  {
+    "@type": "Organization",
+    "@id": ORG_ID,
+    name: "Certonymity Ltd",
+    legalName: "Certonymity Ltd",
+    alternateName: "Certonymity",
+    url: "https://cdot.world/",
+    logo: "https://cdot.world/assets/logo-512.png",
+    email: "info@certonymity.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "86-87 Campden Street",
+      addressLocality: "London",
+      postalCode: "W8 7EN",
+      addressCountry: "GB",
+    },
+    description:
+      "Certonymity Ltd builds cDot, purpose built blockchain infrastructure for verified identity and money movement at scale.",
+  },
+  {
+    "@type": "SoftwareApplication",
+    "@id": CDOT_ID,
+    name: "cDot",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Any",
+    provider: { "@id": ORG_ID },
+    url: "https://cdot.world/",
+    description:
+      "cDot is the blockchain network built for secure, private, and instant payments. Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains, each engineered for what it does best: identity, stablecoin settlement, and trading, interoperating as one trusted network.",
+    hasPart: [
+      { "@id": "https://cdot.world/#c-layer" },
+      { "@id": "https://cdot.world/#p-layer" },
+      { "@id": "https://cdot.world/#t-layer" },
+    ],
+  },
+  layer(
+    "c-layer",
+    "C-Layer",
+    "cDot identity and asset recovery chain",
+    "SecurityApplication",
+    "A purpose-built identity chain for people, businesses, and agents. Cryptographic avatars of verified real identities provide privacy with accountability. Run by nodes around the world for maximum resilience and decentralisation.",
+    [
+      spec("Throughput", 15000, "tx/s"),
+      spec("Finality", 20, "s"),
+      spec("Smart contracts", "WASM"),
+      spec("Architecture", "Highly parallel"),
+      spec("Access", "Permissionless"),
+      spec("Visibility", "Public and pseudonymous"),
+    ],
+  ),
+  layer(
+    "p-layer",
+    "P-Layer",
+    "cDot stablecoin and agentic payment chain",
+    "FinanceApplication",
+    "Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on- and off-ramping. Agentic transactions supported with verifiable, revocable permissions granted by their principals.",
+    [
+      spec("Throughput", 30000, "tx/s"),
+      spec("Finality", "<1", "s"),
+      spec("Byzantine security", "45%"),
+    ],
+  ),
+  layer(
+    "t-layer",
+    "T-Layer",
+    "cDot trading chain",
+    "FinanceApplication",
+    "A high-performance decentralized exchange, offering stablecoin swaps and perpetual futures in a predictable execution environment.",
+    [
+      spec("Throughput", 30000, "tx/s"),
+      spec("Finality", "<1", "s"),
+      spec("Architecture", "Native multithreading"),
+      spec("Nodes", "Node-permissioned overlay on C-layer"),
+      spec("Visibility", "Private and accountable"),
+      spec("Matching engine", "Native NASDAQ-like"),
+    ],
+  ),
+];
+
+const orgSchema = { "@context": "https://schema.org", "@graph": graph };
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Matches --bg-0, so mobile browser chrome does not paint light against the
+     dark page. -->
+<meta name="theme-color" content="#040b18" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:title" content={ogTitle ?? title} />
+<meta property="og:description" content={ogDescription ?? description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="cDot" />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:image" content={new URL('/assets/og.png', Astro.site).href} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="cDot - secure identity and payments" />
+<!-- The only twitter:* tag worth setting: X falls back to the og:* tags for
+     title, description and image, but needs this to use the large card. -->
+<meta name="twitter:card" content="summary_large_image" />
+<script type="application/ld+json" is:inline set:html={JSON.stringify(orgSchema)} />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<!-- .ico fallback for Safari <15 and crawlers that request /favicon.ico -->
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+</head>
+<body>
+<LogoSymbol />
+<Header />
+<main id="main"><slot /></main>
+<Footer />
+</body>
+</html>

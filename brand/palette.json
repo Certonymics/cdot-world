@@ -1,0 +1,37 @@
+{
+  "$comment": "CANONICAL cDot brand definition. Single source of truth. src/styles/tokens.css derives from this, and `npm run brand:check` verifies the sibling repos still agree. If you change a value here, run the check and update whatever it flags.",
+  "brand": {
+    "blue": "#566AFD",
+    "note": "Tailwind primary-500 in the sibling repos, and the fill colour inside the logo SVG. Never write this as #556AFD - that transposition is a known typo."
+  },
+  "primary": {
+    "50":  "#EBF5FF",
+    "100": "#D6EBFF",
+    "200": "#B3D7FF",
+    "300": "#80BDFE",
+    "400": "#6B9EFD",
+    "500": "#566AFD",
+    "600": "#4A5AE8",
+    "700": "#3E4AD3",
+    "800": "#323ABE",
+    "900": "#262AA9"
+  },
+  "secondary": {
+    "50":  "#F8FBFF",
+    "100": "#EBF5FF",
+    "200": "#D6EBFF",
+    "300": "#C2E1FF",
+    "400": "#ADD7FF",
+    "500": "#99CDFF"
+  },
+  "fonts": {
+    "sans": "Inter",
+    "display": "Darker Grotesque"
+  },
+  "consumers": [
+    { "name": "cdot-world (this repo)", "path": "src/styles/tokens.css" },
+    { "name": "Cdot site (main)",       "path": "../Cdot site (main)/tailwind.config.js" },
+    { "name": "c.email-website",        "path": "../c.email-website/tailwind.config.js" },
+    { "name": "cma desktop/ui",         "path": "../cma/desktop/ui/tailwind.config.js" }
+  ]
+}
