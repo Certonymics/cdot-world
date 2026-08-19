@@ -119,77 +119,107 @@
 @media (prefers-color-scheme:light){
   :root:not([data-theme="dark"]){
     --veil-rgb:255,255,255;
-    --accent-rgb:42,56,148;
+    /* primary-500's channels. Every alpha-composed fill here (chips, inputs,
+       hovers, the ghost-button and map-card borders) resolves to a tint of the
+       brand, which is how the main site builds them - bg-primary-500/10 and
+       friends. */
+    --accent-rgb:86,106,253;
     --node-ring-rgb:255,255,255;
-    --shadow-rgb:22,38,74;
+    --shadow-rgb:0,0,0;
 
-    --bg-0:#FAFBFD;
-    --bg-1:#F1F5FB;
-    --bg-2:#E4EDF9;
+    /* bg-white, secondary-50, primary-50. */
+    --bg-0:#FFFFFF;
+    --bg-1:#F8FBFF;
+    --bg-2:#EBF5FF;
 
-    --ink:#0B1524;
-    --ink-dim:rgba(11,21,36,.72);
-    /* .62 not .5: a dark ink at 50% over white is 3.45:1, which fails AA at
-       the 13px the footer uses. The dark theme's .5 is fine (4.87:1) because
-       a pale ink over near-black loses far less contrast to alpha. */
-    --ink-faint:rgba(11,21,36,.62);
+    /* Pure black, as the main site uses (text-black, 166 occurrences) - not a
+       tinted near-black. At 21:1 it also buys headroom for the dimmed steps. */
+    --ink:#000000;
+    --ink-dim:rgba(0,0,0,.7);
+    /* The main site's own text-black/50 is 3.98:1 and would fail AA at the
+       13px our footer uses, so this sits between its /50 and /60 steps. */
+    --ink-faint:rgba(0,0,0,.58);
     --danger:#B3261E;
 
-    --blue:#3346C9;
-    --cyan:#2A3894;
-    --brand-text:#3346C9;
+    /* primary-700 and primary-600, the main site's two accent-text steps
+       (39 and 49 occurrences). primary-500 is deliberately NOT used as text:
+       at 4.31:1 on white it fails AA, which is why the reference reserves it
+       for fills and large gradient headings. */
+    --blue:#3E4AD3;
+    --cyan:#4A5AE8;
+    --brand-text:#4A5AE8;
 
     /* No bloom. A halo on white reads as a printing fault. The hero keeps its
-       colour shift and loses only the glow. */
+       colour shift and loses only the glow. Shadows are neutral black at low
+       alpha rather than brand-tinted, so elevation reads as shadow. */
     --glow-text:none;
-    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.18);
-    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.24);
-    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.14);
-    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.35);
+    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.14);
+    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.2);
+    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.1);
+    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.3);
     --glow-node-active:0 0 0 3px rgba(var(--brand-rgb),.28),
-                       0 1px 5px rgba(var(--shadow-rgb),.4);
-    --hover-veil:rgba(11,21,36,.045);
-    --map-land:rgba(56,80,150,.42);
+                       0 1px 5px rgba(var(--shadow-rgb),.35);
+    --hover-veil:rgba(0,0,0,.045);
+    /* Brand-tinted continents. Pale blue would disappear on the light card. */
+    --map-land:rgba(74,90,232,.4);
 
-    /* Hairlines need more alpha here: a dark line at .16 over white is far
-       fainter than a pale line at .16 over near-black. */
-    --line:rgba(var(--accent-rgb),.22);
-    --card:rgba(var(--accent-rgb),.045);
+    /* Solid, not alpha-composed: primary-100 is the main site's hairline
+       (border-primary-100, 64 occurrences) and primary-50 its card wash. A
+       pale blue at .16 alpha over white would be invisible. */
+    --line:#D6EBFF;
+    --card:rgba(235,245,255,.65);
   }
 }
 
 :root[data-theme="light"]{
     --veil-rgb:255,255,255;
-    --accent-rgb:42,56,148;
+    /* primary-500's channels. Every alpha-composed fill here (chips, inputs,
+       hovers, the ghost-button and map-card borders) resolves to a tint of the
+       brand, which is how the main site builds them - bg-primary-500/10 and
+       friends. */
+    --accent-rgb:86,106,253;
     --node-ring-rgb:255,255,255;
-    --shadow-rgb:22,38,74;
+    --shadow-rgb:0,0,0;
 
-    --bg-0:#FAFBFD;
-    --bg-1:#F1F5FB;
-    --bg-2:#E4EDF9;
+    /* bg-white, secondary-50, primary-50. */
+    --bg-0:#FFFFFF;
+    --bg-1:#F8FBFF;
+    --bg-2:#EBF5FF;
 
-    --ink:#0B1524;
-    --ink-dim:rgba(11,21,36,.72);
-    /* .62 not .5: a dark ink at 50% over white is 3.45:1, which fails AA at
-       the 13px the footer uses. The dark theme's .5 is fine (4.87:1) because
-       a pale ink over near-black loses far less contrast to alpha. */
-    --ink-faint:rgba(11,21,36,.62);
+    /* Pure black, as the main site uses (text-black, 166 occurrences) - not a
+       tinted near-black. At 21:1 it also buys headroom for the dimmed steps. */
+    --ink:#000000;
+    --ink-dim:rgba(0,0,0,.7);
+    /* The main site's own text-black/50 is 3.98:1 and would fail AA at the
+       13px our footer uses, so this sits between its /50 and /60 steps. */
+    --ink-faint:rgba(0,0,0,.58);
     --danger:#B3261E;
 
-    --blue:#3346C9;
-    --cyan:#2A3894;
-    --brand-text:#3346C9;
+    /* primary-700 and primary-600, the main site's two accent-text steps
+       (39 and 49 occurrences). primary-500 is deliberately NOT used as text:
+       at 4.31:1 on white it fails AA, which is why the reference reserves it
+       for fills and large gradient headings. */
+    --blue:#3E4AD3;
+    --cyan:#4A5AE8;
+    --brand-text:#4A5AE8;
 
+    /* No bloom. A halo on white reads as a printing fault. The hero keeps its
+       colour shift and loses only the glow. Shadows are neutral black at low
+       alpha rather than brand-tinted, so elevation reads as shadow. */
     --glow-text:none;
-    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.18);
-    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.24);
-    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.14);
-    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.35);
+    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.14);
+    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.2);
+    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.1);
+    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.3);
     --glow-node-active:0 0 0 3px rgba(var(--brand-rgb),.28),
-                       0 1px 5px rgba(var(--shadow-rgb),.4);
-    --hover-veil:rgba(11,21,36,.045);
-    --map-land:rgba(56,80,150,.42);
+                       0 1px 5px rgba(var(--shadow-rgb),.35);
+    --hover-veil:rgba(0,0,0,.045);
+    /* Brand-tinted continents. Pale blue would disappear on the light card. */
+    --map-land:rgba(74,90,232,.4);
 
-    --line:rgba(var(--accent-rgb),.22);
-    --card:rgba(var(--accent-rgb),.045);
+    /* Solid, not alpha-composed: primary-100 is the main site's hairline
+       (border-primary-100, 64 occurrences) and primary-50 its card wash. A
+       pale blue at .16 alpha over white would be invisible. */
+    --line:#D6EBFF;
+    --card:rgba(235,245,255,.65);
   }

@@ -78,6 +78,65 @@ for (const { name, path } of palette.consumers) {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Light-theme parity.
+
+   tokens.css states the light palette TWICE - once inside
+   @media (prefers-color-scheme:light) for visitors who have expressed no
+   preference, and once on :root[data-theme="light"] so the in-page toggle can
+   override the OS in either direction. CSS gives no way to share one
+   declaration list between a media-query context and a bare selector without
+   making the theme JS-dependent, so the duplication is structural.
+
+   It is also a live trap: the two blocks drifted within minutes of being
+   written, and nothing failed - the OS path and the toggle path simply rendered
+   different colours. This makes that silent divergence loud instead.
+--------------------------------------------------------------------------- */
+{
+  const tokensPath = "src/styles/tokens.css";
+  let css = null;
+  try {
+    css = readFileSync(resolve(root, tokensPath), "utf8");
+  } catch {
+    console.log(`  -- ${tokensPath} not readable, light-theme parity skipped`);
+  }
+
+  if (css) {
+    const mediaBlock = css.match(
+      /@media \(prefers-color-scheme:light\)\{\s*:root:not\(\[data-theme="dark"\]\)\{([\s\S]*?)\n  \}\n\}/,
+    );
+    const attrBlock = css.match(/:root\[data-theme="light"\]\{([\s\S]*?)\n  \}/);
+
+    const decls = (txt) =>
+      [...txt.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)]
+        .reduce((m, [, k, v]) => m.set(k, v.replace(/\s+/g, " ").trim()), new Map());
+
+    if (!mediaBlock || !attrBlock) {
+      failures++;
+      console.log(`  X  light-theme parity  (${tokensPath})`);
+      console.log("     - could not locate both light blocks; has the structure changed?");
+    } else {
+      const a = decls(mediaBlock[1]);
+      const b = decls(attrBlock[1]);
+      const problems = [];
+      for (const [k, v] of a) {
+        if (!b.has(k)) problems.push(`${k} missing from :root[data-theme="light"]`);
+        else if (b.get(k) !== v) problems.push(`${k} differs: media "${v}" vs attr "${b.get(k)}"`);
+      }
+      for (const k of b.keys()) {
+        if (!a.has(k)) problems.push(`${k} missing from the prefers-color-scheme block`);
+      }
+      if (problems.length) {
+        failures++;
+        console.log(`  X  light-theme parity  (${tokensPath})`);
+        for (const pr of problems) console.log(`     - ${pr}`);
+      } else {
+        console.log(`  OK light-theme parity (${a.size} tokens match in both blocks)`);
+      }
+    }
+  }
+}
+
 console.log("");
 if (failures) {
   console.error(`FAIL - ${failures} consumer(s) have drifted from brand/palette.json\n`);
