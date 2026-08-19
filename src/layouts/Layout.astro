@@ -23,8 +23,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
    `throughput` PropertyValue) instead of prose buried in one description
    string. Keep the figures here in step with the spec chips in index.astro and
    with public/llms.txt. */
-const ORG_ID = "https://www.cdot.world/#certonymity";
-const CDOT_ID = "https://www.cdot.world/#cdot";
+const ORG_ID = "https://cdot.world/#certonymity";
+const CDOT_ID = "https://cdot.world/#cdot";
 
 /* PropertyValue is schema.org's escape hatch for domain-specific measurements
    that have no dedicated property. Numeric `value` + `unitText` keeps the
@@ -36,7 +36,7 @@ const spec = (name, value, unitText) =>
 
 const layer = (id, name, alternateName, category, description, specs) => ({
   "@type": "SoftwareApplication",
-  "@id": `https://www.cdot.world/#${id}`,
+  "@id": `https://cdot.world/#${id}`,
   name,
   alternateName,
   applicationCategory: category,
@@ -54,8 +54,8 @@ const graph = [
     name: "Certonymity Ltd",
     legalName: "Certonymity Ltd",
     alternateName: "Certonymity",
-    url: "https://www.cdot.world/",
-    logo: "https://www.cdot.world/assets/logo-512.png",
+    url: "https://cdot.world/",
+    logo: "https://cdot.world/assets/logo-512.png",
     email: "info@certonymity.com",
     address: {
       "@type": "PostalAddress",
@@ -74,13 +74,13 @@ const graph = [
     applicationCategory: "FinanceApplication",
     operatingSystem: "Any",
     provider: { "@id": ORG_ID },
-    url: "https://www.cdot.world/",
+    url: "https://cdot.world/",
     description:
-      "cDot is where verified identity, stablecoin payments, programmable money and autonomous agents converge, operating as one trusted network. Rather than forcing everything onto a single chain, cDot is three purpose built blockchains, each engineered for what it does best and interoperable by design.",
+      "cDot is the blockchain network built for secure, private, and instant payments. Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains, each engineered for what it does best: identity, stablecoin settlement, and trading, interoperating as one trusted network.",
     hasPart: [
-      { "@id": "https://www.cdot.world/#c-layer" },
-      { "@id": "https://www.cdot.world/#p-layer" },
-      { "@id": "https://www.cdot.world/#t-layer" },
+      { "@id": "https://cdot.world/#c-layer" },
+      { "@id": "https://cdot.world/#p-layer" },
+      { "@id": "https://cdot.world/#t-layer" },
     ],
   },
   layer(
@@ -88,7 +88,7 @@ const graph = [
     "C-Layer",
     "cDot identity and asset recovery chain",
     "SecurityApplication",
-    "A dedicated identity chain for people, businesses, and AI agents. Privacy with accountability: cryptographic avatars of verified real identities. Designed to run over thousands of low hardware, unreliable nodes around the world for maximum resilience and decentralization.",
+    "A purpose-built identity chain for people, businesses, and agents. Cryptographic avatars of verified real identities provide privacy with accountability. Run by nodes around the world for maximum resilience and decentralisation.",
     [
       spec("Throughput", 15000, "tx/s"),
       spec("Finality", 20, "s"),
@@ -103,7 +103,7 @@ const graph = [
     "P-Layer",
     "cDot stablecoin and agentic payment chain",
     "FinanceApplication",
-    "Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on and off ramping. Autonomous agents transact within verifiable, revocable permissions granted by their principals.",
+    "Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on- and off-ramping. Agentic transactions supported with verifiable, revocable permissions granted by their principals.",
     [
       spec("Throughput", 30000, "tx/s"),
       spec("Finality", "<1", "s"),
@@ -115,7 +115,7 @@ const graph = [
     "T-Layer",
     "cDot trading chain",
     "FinanceApplication",
-    "A high performance decentralized exchange, running as a permissioned overlay on the C-Layer.",
+    "A high-performance decentralized exchange, offering stablecoin swaps and perpetual futures in a predictable execution environment.",
     [
       spec("Throughput", 30000, "tx/s"),
       spec("Finality", "<1", "s"),
