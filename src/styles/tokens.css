@@ -7,24 +7,189 @@
    DERIVED FILE. The canonical definition is brand/palette.json - edit that
    first, then run `npm run brand:check` to confirm this file and the three
    sibling repos still agree.
+
+   THEMING
+   -------
+   The site is dark by default and also ships a light theme. Three rules keep
+   that maintainable:
+
+   1. Colours that appear at several alphas are stored as bare RGB CHANNEL
+      TRIPLETS (--veil-rgb, --accent-rgb, ...) and composed at the point of use
+      as rgb(var(--accent-rgb) / .06). Before this, global.css carried 32
+      hardcoded rgba() literals - six different alphas of #040b18 alone - and
+      every one of them was an invisible dark-mode assumption. A theme now
+      redefines one triplet instead of hunting alphas.
+
+   2. Anything that cannot be expressed as "same colour, different alpha" gets
+      its own semantic token (--glow-text, --shadow-card, --map-land). Several
+      of these resolve to `none` in light mode: a luminous halo is a dark-mode
+      device and on white it reads as a printing fault, not a glow.
+
+   3. Light values are defined in TWO places that must stay in step - a
+      prefers-color-scheme block for visitors who have expressed no preference,
+      and a [data-theme] block so the in-page toggle can override the OS in
+      either direction. Never give a colour its only definition inside one of
+      them.
+
+   The accent ramp is NOT shared between themes and cannot be. --cyan #80BDFE
+   is 9.97:1 on the dark background and 1.87:1 on the light one - unreadable.
+   Light mode therefore has its own ramp at the same hue but inverted
+   lightness. Every value below was checked against WCAG AA for the role it
+   actually plays.
 --------------------------------------------------------------------------- */
+
 :root{
+    /* --- channel triplets, composed with alpha at the point of use --------- */
+    /* Translucent panels laid over content: the fixed header, the mobile nav
+       sheet, and the map's badge/zoom/hint/node chrome. */
+    --veil-rgb:4,11,24;
+    /* Hairlines, card washes, chip fills, hover states. Pale on dark. */
+    --accent-rgb:128,189,254;
+    /* Glows, brand washes, selection. Same in both themes - it is the brand. */
+    --brand-rgb:86,106,253;
+    /* Ring around a map node, separating it from the card beneath. */
+    --node-ring-rgb:255,255,255;
+    /* Drop shadows. Not the brand colour: elevation should read as shadow. */
+    --shadow-rgb:0,10,30;
+
+    /* --- surfaces --------------------------------------------------------- */
     --bg-0:#040b18;
     --bg-1:#081630;
     --bg-2:#0c2148;
+
+    /* --- text ------------------------------------------------------------- */
     --ink:#eaf3ff;
     --ink-dim:rgba(234,243,255,.72);
     --ink-faint:rgba(234,243,255,.5);
+    --danger:#ff9b9b;
+
+    /* --- accent ramp ------------------------------------------------------ */
     --brand:#566AFD;   /* primary-500 - brand blue, matches logo + sibling repos */
     /* primary-600. For white text on a brand-coloured fill only: #fff on
        --brand is 4.31:1, which fails WCAG AA (4.5:1). This is 5.36:1. Do not
        use it in place of --brand for logo-matching surfaces. */
     --brand-strong:#4A5AE8;
-    --blue:#6B9EFD;    /* primary-400 */
+    --blue:#6B9EFD;    /* primary-400 - in-prose links */
     --cyan:#80BDFE;    /* primary-300 - accent text on dark */
+    /* Brand blue as TEXT, e.g. the header tagline. Separate from --brand
+       because --brand is a fill and logo value and is only 4.16:1 on the light
+       background - it fails AA as small text there, while passing at 4.57:1 on
+       the dark one. Use --brand for fills and the logo, this for words. */
+    --brand-text:#566AFD;
+
+    /* --- composites that a theme replaces wholesale ----------------------- */
+    /* Bloom behind the hero's highlighted words. */
+    --glow-text:0 0 32px rgba(var(--brand-rgb),.45);
+    --glow-btn:0 6px 30px rgba(var(--brand-rgb),.35);
+    --glow-btn-hover:0 10px 38px rgba(var(--brand-rgb),.45);
+    /* The map card: a real drop shadow plus a brand bloom around it. */
+    --shadow-card:0 20px 60px rgba(var(--shadow-rgb),.5),
+                  0 0 40px rgba(var(--brand-rgb),.12);
+    --glow-node:0 0 12px rgba(var(--brand-rgb),.9);
+    --glow-node-active:0 0 0 3px rgba(var(--accent-rgb),.35),
+                       0 0 16px rgba(var(--brand-rgb),.9);
+    /* Neutral hover tint on the mobile nav rows. */
+    --hover-veil:rgba(255,255,255,.04);
+    /* Continent dots on the map canvas. Read by public/assets/map.js, which
+       cannot see a CSS colour any other way. */
+    --map-land:rgba(147,197,253,.55);
+
+    /* --- derived ---------------------------------------------------------- */
+    --line:rgba(var(--accent-rgb),.16);
+    --card:rgba(var(--accent-rgb),.05);
+
     /* Geist Mono, for figures and technical values. Variable, so any weight in
        100-900 is available from one file. */
     --font-mono:"Geist Mono Variable","Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --line:rgba(128,189,254,.16);
-    --card:rgba(128,189,254,.05);
+  }
+
+/* ---------------------------------------------------------------------------
+   LIGHT THEME
+   Kept in a single custom property list applied from two selectors below, so
+   the OS preference and the explicit toggle cannot drift apart.
+
+   Contrast, measured against --bg-0 #FAFBFD:
+     --ink      #0B1524  17.68:1
+     --ink-dim           7.51:1
+     --cyan     #2A3894   9.70:1   accent text: eyebrows, chain ids, chips
+     --blue     #3346C9   7.09:1   in-prose links
+     --brand    #566AFD   4.16:1   FILLS AND THE LOGO ONLY - never body text
+     --danger   #B3261E   6.31:1
+--------------------------------------------------------------------------- */
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --veil-rgb:255,255,255;
+    --accent-rgb:42,56,148;
+    --node-ring-rgb:255,255,255;
+    --shadow-rgb:22,38,74;
+
+    --bg-0:#FAFBFD;
+    --bg-1:#F1F5FB;
+    --bg-2:#E4EDF9;
+
+    --ink:#0B1524;
+    --ink-dim:rgba(11,21,36,.72);
+    /* .62 not .5: a dark ink at 50% over white is 3.45:1, which fails AA at
+       the 13px the footer uses. The dark theme's .5 is fine (4.87:1) because
+       a pale ink over near-black loses far less contrast to alpha. */
+    --ink-faint:rgba(11,21,36,.62);
+    --danger:#B3261E;
+
+    --blue:#3346C9;
+    --cyan:#2A3894;
+    --brand-text:#3346C9;
+
+    /* No bloom. A halo on white reads as a printing fault. The hero keeps its
+       colour shift and loses only the glow. */
+    --glow-text:none;
+    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.18);
+    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.24);
+    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.14);
+    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.35);
+    --glow-node-active:0 0 0 3px rgba(var(--brand-rgb),.28),
+                       0 1px 5px rgba(var(--shadow-rgb),.4);
+    --hover-veil:rgba(11,21,36,.045);
+    --map-land:rgba(56,80,150,.42);
+
+    /* Hairlines need more alpha here: a dark line at .16 over white is far
+       fainter than a pale line at .16 over near-black. */
+    --line:rgba(var(--accent-rgb),.22);
+    --card:rgba(var(--accent-rgb),.045);
+  }
+}
+
+:root[data-theme="light"]{
+    --veil-rgb:255,255,255;
+    --accent-rgb:42,56,148;
+    --node-ring-rgb:255,255,255;
+    --shadow-rgb:22,38,74;
+
+    --bg-0:#FAFBFD;
+    --bg-1:#F1F5FB;
+    --bg-2:#E4EDF9;
+
+    --ink:#0B1524;
+    --ink-dim:rgba(11,21,36,.72);
+    /* .62 not .5: a dark ink at 50% over white is 3.45:1, which fails AA at
+       the 13px the footer uses. The dark theme's .5 is fine (4.87:1) because
+       a pale ink over near-black loses far less contrast to alpha. */
+    --ink-faint:rgba(11,21,36,.62);
+    --danger:#B3261E;
+
+    --blue:#3346C9;
+    --cyan:#2A3894;
+    --brand-text:#3346C9;
+
+    --glow-text:none;
+    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.18);
+    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.24);
+    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.14);
+    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.35);
+    --glow-node-active:0 0 0 3px rgba(var(--brand-rgb),.28),
+                       0 1px 5px rgba(var(--shadow-rgb),.4);
+    --hover-veil:rgba(11,21,36,.045);
+    --map-land:rgba(56,80,150,.42);
+
+    --line:rgba(var(--accent-rgb),.22);
+    --card:rgba(var(--accent-rgb),.045);
   }

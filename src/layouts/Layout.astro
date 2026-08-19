@@ -154,9 +154,64 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<!-- Matches --bg-0, so mobile browser chrome does not paint light against the
-     dark page. -->
-<meta name="theme-color" content="#040b18" />
+<!-- Matches --bg-0 so mobile browser chrome does not paint light against the
+     dark page. Kept in step with the theme by the script below; the value here
+     is the dark default, used until that script runs. -->
+<meta name="theme-color" content="#040b18" id="theme-color" />
+
+<!--
+  Theme. This script is deliberately BLOCKING and deliberately the first script
+  in the document: it has to set data-theme before the browser paints, or a
+  visitor who chose light gets a flash of the dark page on every single
+  navigation. Moving it below the stylesheet, deferring it, or making it a
+  module all reintroduce that flash.
+
+  It only ever writes the attribute for an EXPLICIT choice. With nothing stored
+  the attribute is absent and the prefers-color-scheme block in tokens.css
+  decides, so the OS setting keeps working - including for visitors with
+  JavaScript disabled, who get their system preference rather than whatever we
+  guessed.
+-->
+<script is:inline>
+(function(){
+  var KEY = 'cdot-theme';
+  var DARK_BG = '#040b18', LIGHT_BG = '#FAFBFD';   /* keep in step with --bg-0 */
+
+  function stored(){
+    try {
+      var v = localStorage.getItem(KEY);
+      return (v === 'light' || v === 'dark') ? v : null;
+    } catch (e) { return null; }   /* private mode / storage disabled */
+  }
+
+  function systemPref(){
+    return window.matchMedia &&
+           window.matchMedia('(prefers-color-scheme: light)').matches
+      ? 'light' : 'dark';
+  }
+
+  function effective(){ return stored() || systemPref(); }
+
+  function paint(){
+    var s = stored();
+    var root = document.documentElement;
+    if (s) root.setAttribute('data-theme', s);
+    else root.removeAttribute('data-theme');
+    /* The address-bar colour is not reachable from CSS, so it is the one value
+       that has to be pushed imperatively. */
+    var meta = document.getElementById('theme-color');
+    if (meta) meta.setAttribute('content', effective() === 'light' ? LIGHT_BG : DARK_BG);
+  }
+
+  function set(theme){
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    paint();
+  }
+
+  window.__cdotTheme = { stored: stored, effective: effective, paint: paint, set: set };
+  paint();
+})();
+</script>
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />

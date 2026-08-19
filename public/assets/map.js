@@ -21,7 +21,17 @@
      identical formula, so a dot always sits on the land it belongs to. The
      latitude band is cropped to drop the empty polar oceans. */
   const LAT_MAX=75, LAT_MIN=-58;
-  const LAND_COLOR='rgba(147,197,253,.55)';   /* #93C5FD, softened for the dark card */
+  /* The continent dots are painted onto a canvas, which inherits nothing from
+     the cascade, so the colour has to be read out of CSS by hand. It lives in
+     tokens.css as --map-land and differs per theme: pale blue over the dark
+     card, and a dark slate over the light one, where pale blue would vanish.
+     Re-read on theme change rather than cached, since the value moves. */
+  const FALLBACK_LAND='rgba(147,197,253,.55)';
+  function landColor(){
+    var v=getComputedStyle(document.documentElement)
+            .getPropertyValue('--map-land').trim();
+    return v||FALLBACK_LAND;
+  }
 
   /* prefers-reduced-motion: nothing to do here, deliberately. This file starts
      no animation - the requestAnimationFrame below is a repaint scheduler that
@@ -72,7 +82,7 @@
   function drawDotField(ctx,w,h,v,gap,r){
     const {land,TW,TH}=tex;
     ctx.clearRect(0,0,w,h);
-    ctx.fillStyle=LAND_COLOR;
+    ctx.fillStyle=landColor();
     ctx.beginPath();
     for(let sy=0;sy<=h;sy+=gap){
       const vv=(sy-v.y)/(h*v.s);
@@ -232,6 +242,22 @@
   measure();
   if(window.ResizeObserver) new ResizeObserver(measure).observe(vp);
   else addEventListener('resize',measure);
+
+  /* Repaint both canvases when the theme changes. The dots are baked pixels, so
+     unlike everything else on the page they do not follow the cascade - without
+     this the continents keep the previous theme's colour until the next resize.
+     Two triggers, because the theme has two sources: data-theme for an explicit
+     choice, and the OS preference when none is stored. */
+  function repaintForTheme(){ paintLand(); paintMini(); }
+  if(window.MutationObserver){
+    new MutationObserver(repaintForTheme).observe(document.documentElement,
+      {attributes:true,attributeFilter:['data-theme']});
+  }
+  if(window.matchMedia){
+    const scheme=matchMedia('(prefers-color-scheme: dark)');
+    if(scheme.addEventListener) scheme.addEventListener('change',repaintForTheme);
+    else if(scheme.addListener) scheme.addListener(repaintForTheme);
+  }
 
   /* Node markers + selection */
   function showPanel(n){

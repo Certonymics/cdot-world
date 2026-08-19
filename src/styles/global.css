@@ -5,7 +5,7 @@
      properties are set explicitly: overriding the background without the
      foreground leaves the UA's own text colour, which is picked to contrast
      with ITS highlight, not ours. --brand at .32 keeps --ink above 7:1. */
-  ::selection{background:rgba(86,106,253,.32);color:var(--ink)}
+  ::selection{background:rgba(var(--brand-rgb),.32);color:var(--ink)}
   body{
     font-family:"Geist Variable","Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg-0);
@@ -21,7 +21,7 @@
   header{
     position:fixed;top:0;left:0;right:0;z-index:20;
     backdrop-filter:blur(12px);
-    background:rgba(4,11,24,.55);
+    background:rgba(var(--veil-rgb),.55);
     border-bottom:1px solid var(--line);
   }
   .nav{display:flex;align-items:center;justify-content:space-between;height:104px}
@@ -29,9 +29,39 @@
   .brand{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-decoration:none;min-width:0}
   .brand svg.logomark{height:50px;width:121px;display:block;flex-shrink:0}
   @media(max-width:640px){.brand svg.logomark{height:36px;width:87px}}
-  .brand .tag{font-size:11px;font-weight:500;color:var(--brand);letter-spacing:.06em;line-height:1.2}
+  .brand .tag{font-size:11px;font-weight:500;color:var(--brand-text);letter-spacing:.06em;line-height:1.2}
   .nav a.link{color:var(--ink-dim);text-decoration:none;font-size:14.5px;margin-left:26px;transition:color .2s}
   .nav a.link:hover{color:var(--ink)}
+  .nav-controls{display:flex;align-items:center;gap:14px;flex-shrink:0}
+
+  /* Theme toggle */
+  .theme-toggle{
+    display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;
+    margin-left:26px;
+    background:none;border:1px solid transparent;border-radius:9px;
+    color:var(--ink-dim);cursor:pointer;padding:0;
+    transition:color .2s,border-color .2s,background-color .2s;
+  }
+  .theme-toggle:hover{color:var(--ink);border-color:var(--line);background:var(--hover-veil)}
+  .theme-toggle:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .theme-toggle svg{width:18px;height:18px;display:block;
+    fill:none;stroke:currentColor;stroke-width:1.7}
+  /* The sun circle reads better filled at this size. */
+  .theme-toggle .i-sun circle{fill:currentColor;stroke:none}
+  .theme-toggle .i-moon path{fill:currentColor;stroke:none}
+  /* Three states, so each icon needs saying twice. Default (dark) shows the
+     sun, because the button offers the OTHER theme. The prefers-color-scheme
+     rule covers "following the OS", and the [data-theme] rule lets an explicit
+     choice win over it in both directions. */
+  .theme-toggle .i-moon{display:none}
+  @media (prefers-color-scheme:light){
+    :root:not([data-theme="dark"]) .theme-toggle .i-sun{display:none}
+    :root:not([data-theme="dark"]) .theme-toggle .i-moon{display:block}
+  }
+  :root[data-theme="light"] .theme-toggle .i-sun{display:none}
+  :root[data-theme="light"] .theme-toggle .i-moon{display:block}
+  @media(max-width:640px){.theme-toggle{margin-left:0;width:32px;height:32px}}
+
   /* Burger button — hidden on desktop */
   .burger{display:none;flex-direction:column;justify-content:space-between;width:22px;height:16px;
     background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
@@ -50,13 +80,13 @@
       display:none;
       position:fixed;top:72px;left:0;right:0;z-index:19;
       flex-direction:column;
-      background:rgba(4,11,24,.97);
+      background:rgba(var(--veil-rgb),.97);
       border-bottom:1px solid var(--line);
       padding:8px 0 16px;
     }
     .nav nav.is-open{display:flex}
     .nav a.link{margin-left:0;font-size:14.5px;padding:12px 24px}
-    .nav a.link:hover{background:rgba(255,255,255,.04)}
+    .nav a.link:hover{background:var(--hover-veil)}
   }
   h1,h2,.sub,.lead{overflow-wrap:break-word}
 
@@ -90,7 +120,7 @@
     line-height:1.06;font-weight:500;letter-spacing:-.01em;
     max-width:820px;
   }
-  h1 .glow{color:var(--cyan);text-shadow:0 0 32px rgba(86,106,253,.45)}
+  h1 .glow{color:var(--cyan);text-shadow:var(--glow-text)}
   .sub{
     margin-top:22px;max-width:640px;font-size:clamp(15.5px,3.4vw,17.5px);color:var(--ink-dim);
   }
@@ -107,10 +137,10 @@
   }
   .btn-primary{
     color:#fff;background:var(--brand-strong);
-    box-shadow:0 6px 30px rgba(86,106,253,.35);
+    box-shadow:var(--glow-btn);
   }
-  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 38px rgba(86,106,253,.45)}
-  .btn-ghost{color:var(--ink);border:1px solid rgba(128,189,254,.35)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow-btn-hover)}
+  .btn-ghost{color:var(--ink);border:1px solid rgba(var(--accent-rgb),.35)}
   .btn-ghost:hover{border-color:var(--cyan);transform:translateY(-1px)}
 
   /* Sections */
@@ -129,7 +159,7 @@
   /* Pull quote */
   .pull{
     margin:44px 0 0;padding:26px 30px;border-left:3px solid var(--blue);
-    background:linear-gradient(90deg,rgba(86,106,253,.08),transparent 70%);
+    background:linear-gradient(90deg,rgba(var(--brand-rgb),.08),transparent 70%);
     border-radius:0 12px 12px 0;max-width:780px;
   }
   @media(max-width:640px){.pull{padding:20px 18px;margin-top:32px}}
@@ -144,7 +174,7 @@
     transition:border-color .2s,transform .2s;
   }
   @media(max-width:640px){.chain{padding:24px 20px}}
-  .chain:hover{border-color:rgba(128,189,254,.4);transform:translateY(-3px)}
+  .chain:hover{border-color:rgba(var(--accent-rgb),.4);transform:translateY(-3px)}
   @media(max-width:640px){.chain:hover{transform:none}}
   .chain-id{
     display:block;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
@@ -160,7 +190,7 @@
     font-family:var(--font-mono);
     font-size:11.8px;font-weight:600;letter-spacing:-.01em;
     font-variant-numeric:tabular-nums;
-    color:var(--cyan);background:rgba(128,189,254,.06);
+    color:var(--cyan);background:rgba(var(--accent-rgb),.06);
     white-space:nowrap;
   }
   /* nowrap sets a min-content floor the grid column cannot shrink below, so the
@@ -174,9 +204,9 @@
   /* Live C-Layer map (native, dark) */
   .maplive{margin-top:56px}
   .mapcard{
-    position:relative;border:1px solid rgba(128,189,254,.28);border-radius:18px;overflow:hidden;
-    background:linear-gradient(160deg,rgba(128,189,254,.06),rgba(4,11,24,.4) 60%);
-    box-shadow:0 20px 60px rgba(0,10,30,.5), 0 0 40px rgba(86,106,253,.12);
+    position:relative;border:1px solid rgba(var(--accent-rgb),.28);border-radius:18px;overflow:hidden;
+    background:linear-gradient(160deg,rgba(var(--accent-rgb),.06),rgba(var(--veil-rgb),.4) 60%);
+    box-shadow:var(--shadow-card);
   }
   /* pan-y, not none: vertical page scroll must survive a swipe over the map, or
      a mobile reader gets stuck on it. Two-finger gestures are handled in JS. */
@@ -200,41 +230,41 @@
   .maplayer{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
   .mapnode{
     position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;padding:0;border-radius:50%;
-    background:var(--cyan);border:1.5px solid rgba(255,255,255,.9);
-    box-shadow:0 0 12px rgba(86,106,253,.9);z-index:2;cursor:pointer;
+    background:var(--cyan);border:1.5px solid rgba(var(--node-ring-rgb),.9);
+    box-shadow:var(--glow-node);z-index:2;cursor:pointer;
   }
   .mapnode:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
   .mapnode.is-active{
     width:14px;height:14px;margin:-7px 0 0 -7px;
-    background:var(--brand);box-shadow:0 0 0 3px rgba(128,189,254,.35),0 0 16px rgba(86,106,253,.9);
+    background:var(--brand);box-shadow:var(--glow-node-active);
   }
   .mapnode::before{
     content:"";position:absolute;inset:-1.5px;border-radius:50%;
-    background:rgba(128,189,254,.7);animation:cping 1.6s cubic-bezier(0,0,.2,1) infinite;
+    background:rgba(var(--accent-rgb),.7);animation:cping 1.6s cubic-bezier(0,0,.2,1) infinite;
   }
   @keyframes cping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.4);opacity:0}}
   .mapbadge{
     position:absolute;left:14px;top:14px;z-index:5;display:flex;align-items:center;gap:7px;
-    border:1px solid var(--line);border-radius:999px;background:rgba(4,11,24,.72);
+    border:1px solid var(--line);border-radius:999px;background:rgba(var(--veil-rgb),.72);
     padding:5px 12px;font-size:12px;font-weight:600;color:var(--ink-dim);backdrop-filter:blur(6px);
   }
   .mapbadge .dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--cyan)}
   .mapbadge .dot::before{content:"";position:absolute;inset:0;border-radius:50%;
-    background:rgba(128,189,254,.7);animation:cping 1.6s cubic-bezier(0,0,.2,1) infinite}
+    background:rgba(var(--accent-rgb),.7);animation:cping 1.6s cubic-bezier(0,0,.2,1) infinite}
   .mapzoom{
     position:absolute;right:14px;bottom:14px;z-index:5;display:flex;flex-direction:column;
-    border:1px solid var(--line);border-radius:10px;overflow:hidden;background:rgba(4,11,24,.72);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;background:rgba(var(--veil-rgb),.72);
     backdrop-filter:blur(6px);
   }
   .mapzoom button{
     width:36px;height:34px;border:0;background:transparent;color:var(--ink-dim);
     font-size:18px;font-weight:600;cursor:pointer;line-height:1;
   }
-  .mapzoom button:hover{color:var(--cyan);background:rgba(128,189,254,.08)}
+  .mapzoom button:hover{color:var(--cyan);background:rgba(var(--accent-rgb),.08)}
   .mapzoom button + button{border-top:1px solid var(--line)}
   .maphint{
     position:absolute;left:14px;bottom:14px;z-index:5;border:1px solid var(--line);
-    border-radius:999px;background:rgba(4,11,24,.72);padding:4px 11px;
+    border-radius:999px;background:rgba(var(--veil-rgb),.72);padding:4px 11px;
     font-size:11px;color:var(--ink-faint);backdrop-filter:blur(6px);
   }
   @media(max-width:640px){.maphint{display:none}}
@@ -242,20 +272,20 @@
   .minimap{
     position:absolute;right:14px;top:14px;z-index:30;width:168px;height:62px;
     border:1px solid var(--line);border-radius:10px;overflow:hidden;
-    background:rgba(4,11,24,.82);backdrop-filter:blur(6px);cursor:crosshair;
+    background:rgba(var(--veil-rgb),.82);backdrop-filter:blur(6px);cursor:crosshair;
   }
   .minimap[hidden]{display:none}
   .minimap canvas{position:absolute;inset:0;width:100%;height:100%}
   .minirect{
     position:absolute;pointer-events:none;border:2px solid var(--brand);border-radius:2px;
-    background:rgba(86,106,253,.15);
+    background:rgba(var(--brand-rgb),.15);
   }
   @media(max-width:640px){.minimap{display:none}}
   /* Node details panel. */
   .nodepanel{
     position:absolute;left:14px;top:52px;z-index:30;width:210px;
     border:1px solid var(--line);border-radius:12px;padding:14px 16px;
-    background:rgba(4,11,24,.9);backdrop-filter:blur(8px);
+    background:rgba(var(--veil-rgb),.9);backdrop-filter:blur(8px);
   }
   .nodepanel[hidden]{display:none}
   .np-close{
@@ -282,7 +312,7 @@
   .uses{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px;max-width:820px}
   .use{
     border:1px solid var(--line);border-radius:999px;padding:10px 20px;
-    font-size:15px;color:var(--ink-dim);background:rgba(128,189,254,.04);
+    font-size:15px;color:var(--ink-dim);background:rgba(var(--accent-rgb),.04);
   }
   @media(max-width:640px){.use{font-size:13.5px;padding:8px 14px}}
   .uses-note{margin-top:30px;max-width:760px;color:var(--ink-dim);font-size:16.5px}
@@ -300,12 +330,12 @@
   .cf-status:focus{outline:none}
   /* Success replaces the fields, so it should not sit at the very top edge. */
   .cf-status:not(.is-error){margin-top:0;align-self:flex-start}
-  .cf-status.is-error{color:#ff9b9b;font-size:14.5px}
+  .cf-status.is-error{color:var(--danger);font-size:14.5px}
   @media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
   .field{margin-bottom:18px}
   .field label{display:block;font-size:13.5px;color:var(--ink-dim);margin-bottom:7px;letter-spacing:.02em}
   .field input,.field textarea{
-    width:100%;background:rgba(128,189,254,.05);border:1px solid var(--line);
+    width:100%;background:rgba(var(--accent-rgb),.05);border:1px solid var(--line);
     border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15.5px;
     font-family:inherit;transition:border-color .2s;
   }
