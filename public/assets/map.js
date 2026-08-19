@@ -22,6 +22,16 @@
      latitude band is cropped to drop the empty polar oceans. */
   const LAT_MAX=75, LAT_MIN=-58;
   const LAND_COLOR='rgba(147,197,253,.55)';   /* #93C5FD, softened for the dark card */
+
+  /* prefers-reduced-motion: nothing to do here, deliberately. This file starts
+     no animation - the requestAnimationFrame below is a repaint scheduler that
+     draws the dot field once per view change, and panToWorld/apply set the
+     transform outright with no easing. All motion is either the visitor's own
+     drag/zoom (direct manipulation, which reduce-motion is not meant to
+     suppress) or the CSS node ping, which global.css already disables under the
+     media query. If autonomous motion is ever added - an idle drift, an animated
+     fly-to, a pulsing selection - gate it on
+     matchMedia('(prefers-reduced-motion: reduce)').matches here. */
   const MIN_SCALE=1, MAX_SCALE=8, BTN_STEP=1.7;
   const IS_APPLE=/Mac|iPhone|iPad|iPod/.test(navigator.platform||'');
   const MODIFIER_HINT=(IS_APPLE?'⌘':'Ctrl')+' + scroll to zoom — drag to pan';

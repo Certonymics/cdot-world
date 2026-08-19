@@ -1,6 +1,11 @@
   
   *{margin:0;padding:0;box-sizing:border-box}
   html{overflow-x:clip;scroll-behavior:smooth}
+  /* Brand blue behind selected text instead of the browser's default. Both
+     properties are set explicitly: overriding the background without the
+     foreground leaves the UA's own text colour, which is picked to contrast
+     with ITS highlight, not ours. --brand at .32 keeps --ink above 7:1. */
+  ::selection{background:rgba(86,106,253,.32);color:var(--ink)}
   body{
     font-family:"Geist Variable","Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg-0);
