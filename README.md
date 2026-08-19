@@ -29,7 +29,7 @@ verbatim will 404. Whatever the host, it needs:
 |---|---|
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Node version | 20 or later |
+| Node version | **22.12.0 or later** — pinned in `.nvmrc` |
 
 The site is fronted by Cloudflare and served from the apex, `cdot.world`;
 `www.cdot.world` 301-redirects to it. `astro.config.mjs` sets `site` to the apex
@@ -37,6 +37,15 @@ to match, because `site` is what generates the `canonical` and `og:url` tags —
 they name a hostname that redirects, crawlers are told the canonical URL is one
 the server itself disavows. **Keep `site` in step with whichever hostname actually
 serves the page.**
+
+Astro 7 requires Node >= 22.12.0, which is newer than some hosts default to, so
+`.nvmrc` pins it. Cloudflare Pages reads that file; keeping the version in the
+repo rather than a dashboard field means the requirement travels with the code.
+
+Production is the Cloudflare Pages project **`cdot-world`** (Workers & Pages ->
+filter by Pages, not Workers - Pages projects do not appear under Workers). It
+builds the `main` branch and also gives every other branch its own preview URL,
+which is the cheap way to check a change before merging.
 
 Predecessor note: this repo previously held a hand-written `index.html` at the
 root with no build step. If a deploy starts 404ing after a change, check the
