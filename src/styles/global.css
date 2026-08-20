@@ -42,7 +42,15 @@
      wrap's padding, so the links give up as little of their old position as
      possible: 38px rather than 294px. */
   .nav-controls{display:flex;align-items:center;gap:12px;flex-shrink:0;
-    margin-left:20px;margin-right:-8px}
+    margin-left:26px;margin-right:-8px}
+
+  /* c.Email. An outbound link, but it sits in the nav row and reads as one of
+     the nav items, so it takes their treatment rather than a button's. Spacing
+     comes from .nav-controls' gap, not the nav links' margin-left. */
+  .cemail-btn{color:var(--ink-dim);text-decoration:none;font-size:14.5px;
+    white-space:nowrap;transition:color .2s}
+  .cemail-btn:hover{color:var(--ink)}
+  @media(max-width:640px){.cemail-btn{display:none}}
 
   /* Theme toggle */
   .theme-toggle{
