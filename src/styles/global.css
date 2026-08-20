@@ -32,12 +32,21 @@
   .brand .tag{font-size:11px;font-weight:500;color:var(--brand-text);letter-spacing:.06em;line-height:1.2}
   .nav a.link{color:var(--ink-dim);text-decoration:none;font-size:14.5px;margin-left:26px;transition:color .2s}
   .nav a.link:hover{color:var(--ink)}
-  .nav-controls{display:flex;align-items:center;gap:14px;flex-shrink:0}
+  /* .nav is space-between, so adding a third child stopped distributing
+     brand|links and started distributing brand|links|controls - which threw the
+     links 294px inward, into the middle of the header. margin-left:auto absorbs
+     all the free space instead, putting the link group back hard against the
+     controls on the right, whatever the child count. */
+  .nav nav{margin-left:auto}
+  /* Negative right margin lets the toggle sit in the corner itself, inside the
+     wrap's padding, so the links give up as little of their old position as
+     possible: 38px rather than 294px. */
+  .nav-controls{display:flex;align-items:center;gap:12px;flex-shrink:0;
+    margin-left:20px;margin-right:-8px}
 
   /* Theme toggle */
   .theme-toggle{
     display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;
-    margin-left:26px;
     background:none;border:1px solid transparent;border-radius:9px;
     color:var(--ink-dim);cursor:pointer;padding:0;
     transition:color .2s,border-color .2s,background-color .2s;
@@ -54,7 +63,7 @@
   .theme-toggle .i-moon{display:none}
   :root[data-theme="light"] .theme-toggle .i-sun{display:none}
   :root[data-theme="light"] .theme-toggle .i-moon{display:block}
-  @media(max-width:640px){.theme-toggle{margin-left:0;width:32px;height:32px}}
+  @media(max-width:640px){.theme-toggle{width:32px;height:32px}}
 
   /* Burger button — hidden on desktop */
   .burger{display:none;flex-direction:column;justify-content:space-between;width:22px;height:16px;
