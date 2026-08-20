@@ -13,29 +13,74 @@ const tagline = "Secure identity and payments";
       <a class="link" href="#uses">Use cases</a>
       <a class="link" href="#contact">Contact</a>
     </nav>
-    <button class="burger" id="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-controls">
+      <a class="cemail-btn" href="https://c.email/" target="_blank" rel="noopener noreferrer">c.Email</a>
+      <!-- Which icon shows is decided in CSS, because the theme has three
+           states (explicit light, explicit dark, and "follow the OS" where no
+           data-theme attribute exists at all). The label is set by script,
+           since it has to name the action rather than the current state. -->
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4.2"/>
+          <g stroke-linecap="round">
+            <path d="M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6"/>
+            <path d="M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/>
+          </g>
+        </svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M20.1 14.6A8.4 8.4 0 0 1 9.4 3.9a8.4 8.4 0 1 0 10.7 10.7z"/>
+        </svg>
+      </button>
+      <button class="burger" id="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </header>
 
 <script is:inline>
 (function(){
+  /* --- mobile nav ------------------------------------------------------- */
   var btn = document.getElementById('burger-btn');
   var nav = document.getElementById('main-nav');
-  if (!btn || !nav) return;
-  btn.addEventListener('click', function(){
-    var open = nav.classList.toggle('is-open');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btn.classList.toggle('is-open', open);
-  });
-  /* Close on nav link tap so the menu doesn't hang open on mobile. */
-  nav.querySelectorAll('a').forEach(function(a){
-    a.addEventListener('click', function(){
-      nav.classList.remove('is-open');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.classList.remove('is-open');
+  if (btn && nav) {
+    btn.addEventListener('click', function(){
+      var open = nav.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.classList.toggle('is-open', open);
     });
+    /* Close on nav link tap so the menu doesn't hang open on mobile. */
+    nav.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        nav.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.classList.remove('is-open');
+      });
+    });
+  }
+
+  /* --- theme toggle ----------------------------------------------------- */
+  /* window.__cdotTheme is defined by the blocking script in Layout.astro,
+     which has already applied the stored choice before first paint. */
+  var toggle = document.getElementById('theme-toggle');
+  if (!toggle || !window.__cdotTheme) return;
+  var T = window.__cdotTheme;
+
+  function label(){
+    /* Name the action, not the state: a button reading "Dark" is ambiguous
+       about whether that is what it does or what you have. */
+    var next = T.effective() === 'dark' ? 'light' : 'dark';
+    toggle.setAttribute('aria-label', 'Switch to ' + next + ' theme');
+    toggle.setAttribute('title', 'Switch to ' + next + ' theme');
+  }
+
+  toggle.addEventListener('click', function(){
+    T.set(T.effective() === 'dark' ? 'light' : 'dark');
+    label();
   });
+
+  /* No prefers-color-scheme listener: dark is unconditional and light is opt-in,
+     so flipping the OS theme is not something this page should react to. */
+  label();
 })();
 </script>

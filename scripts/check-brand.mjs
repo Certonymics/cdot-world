@@ -78,6 +78,86 @@ for (const { name, path } of palette.consumers) {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Single light block.
+
+   Dark is unconditional and light is opt-in via :root[data-theme="light"], so
+   the palette is stated ONCE. It used to be stated twice - the second copy
+   existed only to serve prefers-color-scheme - and the two drifted within
+   minutes of being written with nothing to catch it: the OS path and the toggle
+   path simply rendered different colours.
+
+   Re-adding a prefers-color-scheme block would reintroduce that, so this fails
+   if one appears. If following the OS is ever wanted again, the duplication has
+   to come back with a parity check alongside it.
+--------------------------------------------------------------------------- */
+{
+  const tokensPath = "src/styles/tokens.css";
+  let css = null;
+  try {
+    css = readFileSync(resolve(root, tokensPath), "utf8");
+  } catch {
+    console.log(`  -- ${tokensPath} not readable, light-theme check skipped`);
+  }
+
+  if (css) {
+    const problems = [];
+    const stripped = css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+    const lightBlocks = stripped.match(/:root\[data-theme="light"\]\s*\{/g) || [];
+    if (lightBlocks.length !== 1) {
+      problems.push(`expected exactly 1 :root[data-theme="light"] block, found ${lightBlocks.length}`);
+    }
+    if (/@media[^{]*prefers-color-scheme/.test(stripped)) {
+      problems.push(
+        "a prefers-color-scheme block is back - that restates the palette and " +
+        "the two copies drift silently. Add a parity check if this is intended.",
+      );
+    }
+
+    /* The address-bar colour is a <meta> tag, so it cannot read a custom
+       property: Layout.astro hardcodes both backgrounds. That duplication has
+       already drifted once - the light constant kept an older --bg-0 after the
+       palette was realigned, leaving the browser chrome a different white from
+       the page. */
+    const layoutPath = "src/layouts/Layout.astro";
+    let layout = null;
+    try {
+      layout = readFileSync(resolve(root, layoutPath), "utf8");
+    } catch {
+      problems.push(`${layoutPath} not readable, theme-color constants unchecked`);
+    }
+    if (layout) {
+      const consts = layout.match(
+        /var DARK_BG\s*=\s*'([^']+)'\s*,\s*LIGHT_BG\s*=\s*'([^']+)'/,
+      );
+      const rootBg = stripped.match(/:root\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/);
+      const lightBg = stripped.match(
+        /:root\[data-theme="light"\]\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/,
+      );
+      if (!consts) {
+        problems.push(`could not find DARK_BG/LIGHT_BG in ${layoutPath}`);
+      } else if (rootBg && lightBg) {
+        const norm = (h) => h.trim().toLowerCase();
+        if (norm(consts[1]) !== norm(rootBg[1])) {
+          problems.push(`DARK_BG ${consts[1]} != dark --bg-0 ${rootBg[1].trim()}`);
+        }
+        if (norm(consts[2]) !== norm(lightBg[1])) {
+          problems.push(`LIGHT_BG ${consts[2]} != light --bg-0 ${lightBg[1].trim()}`);
+        }
+      }
+    }
+
+    if (problems.length) {
+      failures++;
+      console.log(`  X  light theme  (${tokensPath})`);
+      for (const pr of problems) console.log(`     - ${pr}`);
+    } else {
+      console.log("  OK light theme (single opt-in block; theme-color matches --bg-0)");
+    }
+  }
+}
+
 console.log("");
 if (failures) {
   console.error(`FAIL - ${failures} consumer(s) have drifted from brand/palette.json\n`);

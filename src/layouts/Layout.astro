@@ -131,13 +131,83 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 ---
 
 <!doctype html>
+<!--
+     ___ ___       _
+    / __|   \ ___ | |_
+   | (__| |) / _ \|  _|
+    \___|___/\___/ \__|
+
+   Built by Certonymity Ltd.
+
+   You are reading the whole page. No framework runtime, no analytics, no tag
+   manager, no third-party scripts, no font CDN. The only JavaScript is a
+   contact form and the network map - and that map plots real nodes reporting
+   in from real machines, not a decorative loop.
+
+   robots.txt draws a line: retrieval and citation are welcome,
+   training is not.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<!-- Matches --bg-0, so mobile browser chrome does not paint light against the
-     dark page. -->
-<meta name="theme-color" content="#040b18" />
+<!-- Matches --bg-0 so mobile browser chrome does not paint light against the
+     dark page. Kept in step with the theme by the script below; the value here
+     is the dark default, used until that script runs. -->
+<meta name="theme-color" content="#040b18" id="theme-color" />
+
+<!--
+  Theme. This script is deliberately BLOCKING and deliberately the first script
+  in the document: it has to set data-theme before the browser paints, or a
+  visitor who chose light gets a flash of the dark page on every single
+  navigation. Moving it below the stylesheet, deferring it, or making it a
+  module all reintroduce that flash.
+
+  DARK IS THE UNCONDITIONAL DEFAULT. The site does not follow
+  prefers-color-scheme: light is the more common OS default, especially on
+  Windows and managed machines, so honouring it meant most first-time visitors
+  never saw the design the site was built around. Light is opt-in via the
+  toggle, and the attribute is written only for that explicit choice - with
+  nothing stored there is no attribute and the base :root palette (dark) applies,
+  which is also what JavaScript-disabled visitors get.
+-->
+<script is:inline>
+(function(){
+  var KEY = 'cdot-theme';
+  /* Duplicates --bg-0 from tokens.css, because the address-bar colour is a meta
+     tag and cannot read a custom property. Change both together. */
+  var DARK_BG = '#040b18', LIGHT_BG = '#FFFFFF';
+
+  function stored(){
+    try {
+      var v = localStorage.getItem(KEY);
+      return (v === 'light' || v === 'dark') ? v : null;
+    } catch (e) { return null; }   /* private mode / storage disabled */
+  }
+
+  /* No prefers-color-scheme fallback: unset means dark, always. */
+  function effective(){ return stored() || 'dark'; }
+
+  function paint(){
+    var s = stored();
+    var root = document.documentElement;
+    if (s) root.setAttribute('data-theme', s);
+    else root.removeAttribute('data-theme');
+    /* The address-bar colour is not reachable from CSS, so it is the one value
+       that has to be pushed imperatively. */
+    var meta = document.getElementById('theme-color');
+    if (meta) meta.setAttribute('content', effective() === 'light' ? LIGHT_BG : DARK_BG);
+  }
+
+  function set(theme){
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    paint();
+  }
+
+  window.__cdotTheme = { stored: stored, effective: effective, paint: paint, set: set };
+  paint();
+})();
+</script>
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />

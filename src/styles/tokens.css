@@ -7,24 +7,174 @@
    DERIVED FILE. The canonical definition is brand/palette.json - edit that
    first, then run `npm run brand:check` to confirm this file and the three
    sibling repos still agree.
+
+   THEMING
+   -------
+   The site is dark by default and also ships a light theme. Three rules keep
+   that maintainable:
+
+   1. Colours that appear at several alphas are stored as bare RGB CHANNEL
+      TRIPLETS (--veil-rgb, --accent-rgb, ...) and composed at the point of use
+      as rgb(var(--accent-rgb) / .06). Before this, global.css carried 32
+      hardcoded rgba() literals - six different alphas of #040b18 alone - and
+      every one of them was an invisible dark-mode assumption. A theme now
+      redefines one triplet instead of hunting alphas.
+
+   2. Anything that cannot be expressed as "same colour, different alpha" gets
+      its own semantic token (--glow-text, --shadow-card, --map-land). Several
+      of these resolve to `none` in light mode: a luminous halo is a dark-mode
+      device and on white it reads as a printing fault, not a glow.
+
+   3. DARK IS UNCONDITIONAL. Light applies only from :root[data-theme="light"],
+      which the toggle sets and stores. The site deliberately does NOT follow
+      prefers-color-scheme: light is the more common OS default, especially on
+      Windows and managed machines, so honouring it meant most visitors never
+      saw the design the site was built around. Light is now opt-in.
+
+      This also removes a hazard. Following the OS required stating the whole
+      palette twice - once in a media block, once on the attribute - because CSS
+      cannot share one declaration list between a media context and a bare
+      selector. Those two copies drifted within minutes of being written and
+      nothing failed; the OS path and the toggle path simply rendered different
+      colours. One block cannot disagree with itself.
+
+   The accent ramp is NOT shared between themes and cannot be. --cyan #80BDFE
+   is 9.97:1 on the dark background and 1.87:1 on the light one - unreadable.
+   Light mode therefore has its own ramp at the same hue but inverted
+   lightness. Every value below was checked against WCAG AA for the role it
+   actually plays.
 --------------------------------------------------------------------------- */
+
 :root{
+    /* --- channel triplets, composed with alpha at the point of use --------- */
+    /* Translucent panels laid over content: the fixed header, the mobile nav
+       sheet, and the map's badge/zoom/hint/node chrome. */
+    --veil-rgb:4,11,24;
+    /* Hairlines, card washes, chip fills, hover states. Pale on dark. */
+    --accent-rgb:128,189,254;
+    /* Glows, brand washes, selection. Same in both themes - it is the brand. */
+    --brand-rgb:86,106,253;
+    /* Ring around a map node, separating it from the card beneath. */
+    --node-ring-rgb:255,255,255;
+    /* Drop shadows. Not the brand colour: elevation should read as shadow. */
+    --shadow-rgb:0,10,30;
+
+    /* --- surfaces --------------------------------------------------------- */
     --bg-0:#040b18;
     --bg-1:#081630;
     --bg-2:#0c2148;
+
+    /* --- text ------------------------------------------------------------- */
     --ink:#eaf3ff;
     --ink-dim:rgba(234,243,255,.72);
     --ink-faint:rgba(234,243,255,.5);
+    --danger:#ff9b9b;
+
+    /* --- accent ramp ------------------------------------------------------ */
     --brand:#566AFD;   /* primary-500 - brand blue, matches logo + sibling repos */
     /* primary-600. For white text on a brand-coloured fill only: #fff on
        --brand is 4.31:1, which fails WCAG AA (4.5:1). This is 5.36:1. Do not
        use it in place of --brand for logo-matching surfaces. */
     --brand-strong:#4A5AE8;
-    --blue:#6B9EFD;    /* primary-400 */
+    --blue:#6B9EFD;    /* primary-400 - in-prose links */
     --cyan:#80BDFE;    /* primary-300 - accent text on dark */
+    /* Brand blue as TEXT, e.g. the header tagline. Separate from --brand
+       because --brand is a fill and logo value and is only 4.16:1 on the light
+       background - it fails AA as small text there, while passing at 4.57:1 on
+       the dark one. Use --brand for fills and the logo, this for words. */
+    --brand-text:#566AFD;
+
+    /* --- composites that a theme replaces wholesale ----------------------- */
+    /* Bloom behind the hero's highlighted words. */
+    --glow-text:0 0 32px rgba(var(--brand-rgb),.45);
+    --glow-btn:0 6px 30px rgba(var(--brand-rgb),.35);
+    --glow-btn-hover:0 10px 38px rgba(var(--brand-rgb),.45);
+    /* The map card: a real drop shadow plus a brand bloom around it. */
+    --shadow-card:0 20px 60px rgba(var(--shadow-rgb),.5),
+                  0 0 40px rgba(var(--brand-rgb),.12);
+    --glow-node:0 0 12px rgba(var(--brand-rgb),.9);
+    --glow-node-active:0 0 0 3px rgba(var(--accent-rgb),.35),
+                       0 0 16px rgba(var(--brand-rgb),.9);
+    /* Neutral hover tint on the mobile nav rows. */
+    --hover-veil:rgba(255,255,255,.04);
+    /* Continent dots on the map canvas. Read by public/assets/map.js, which
+       cannot see a CSS colour any other way. */
+    --map-land:rgba(147,197,253,.55);
+
+    /* --- derived ---------------------------------------------------------- */
+    --line:rgba(var(--accent-rgb),.16);
+    --card:rgba(var(--accent-rgb),.05);
+
     /* Geist Mono, for figures and technical values. Variable, so any weight in
        100-900 is available from one file. */
     --font-mono:"Geist Mono Variable","Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --line:rgba(128,189,254,.16);
-    --card:rgba(128,189,254,.05);
+  }
+
+/* ---------------------------------------------------------------------------
+   LIGHT THEME
+   Opt-in only, via the header toggle. Nothing here applies unless
+   data-theme="light" is on the root element.
+
+   Values follow 'Cdot site (main)', which was built light from the start; the
+   comments below cite how often each appears in its components. Contrast is
+   measured against --bg-0 #FFFFFF:
+     --ink        #000000  21.00:1  text-black
+     --ink-dim             8.52:1  text-black/70
+     --ink-faint           5.32:1  between its /50 and /60 steps - see below
+     --cyan       #4A5AE8   5.36:1  primary-600: eyebrows, chain ids, chips
+     --blue       #3E4AD3   6.72:1  primary-700: in-prose links
+     --brand      #566AFD   4.31:1  primary-500. FILLS AND THE LOGO ONLY.
+     --danger     #B3261E   6.31:1
+--------------------------------------------------------------------------- */
+:root[data-theme="light"]{
+    --veil-rgb:255,255,255;
+    /* primary-500's channels. Every alpha-composed fill here (chips, inputs,
+       hovers, the ghost-button and map-card borders) resolves to a tint of the
+       brand, which is how the main site builds them - bg-primary-500/10 and
+       friends. */
+    --accent-rgb:86,106,253;
+    --node-ring-rgb:255,255,255;
+    --shadow-rgb:0,0,0;
+
+    /* bg-white, secondary-50, primary-50. */
+    --bg-0:#FFFFFF;
+    --bg-1:#F8FBFF;
+    --bg-2:#EBF5FF;
+
+    /* Pure black, as the main site uses (text-black, 166 occurrences) - not a
+       tinted near-black. At 21:1 it also buys headroom for the dimmed steps. */
+    --ink:#000000;
+    --ink-dim:rgba(0,0,0,.7);
+    /* The main site's own text-black/50 is 3.98:1 and would fail AA at the
+       13px our footer uses, so this sits between its /50 and /60 steps. */
+    --ink-faint:rgba(0,0,0,.58);
+    --danger:#B3261E;
+
+    /* primary-700 and primary-600, the main site's two accent-text steps
+       (39 and 49 occurrences). primary-500 is deliberately NOT used as text:
+       at 4.31:1 on white it fails AA, which is why the reference reserves it
+       for fills and large gradient headings. */
+    --blue:#3E4AD3;
+    --cyan:#4A5AE8;
+    --brand-text:#4A5AE8;
+
+    /* No bloom. A halo on white reads as a printing fault. The hero keeps its
+       colour shift and loses only the glow. Shadows are neutral black at low
+       alpha rather than brand-tinted, so elevation reads as shadow. */
+    --glow-text:none;
+    --glow-btn:0 4px 14px rgba(var(--shadow-rgb),.14);
+    --glow-btn-hover:0 8px 22px rgba(var(--shadow-rgb),.2);
+    --shadow-card:0 14px 40px rgba(var(--shadow-rgb),.1);
+    --glow-node:0 1px 4px rgba(var(--shadow-rgb),.3);
+    --glow-node-active:0 0 0 3px rgba(var(--brand-rgb),.28),
+                       0 1px 5px rgba(var(--shadow-rgb),.35);
+    --hover-veil:rgba(0,0,0,.045);
+    /* Brand-tinted continents. Pale blue would disappear on the light card. */
+    --map-land:rgba(74,90,232,.4);
+
+    /* Solid, not alpha-composed: primary-100 is the main site's hairline
+       (border-primary-100, 64 occurrences) and primary-50 its card wash. A
+       pale blue at .16 alpha over white would be invisible. */
+    --line:#D6EBFF;
+    --card:rgba(235,245,255,.65);
   }
