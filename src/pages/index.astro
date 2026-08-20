@@ -53,7 +53,11 @@ const ogDescription =
     <p class="eyebrow">Network</p>
     <h2>One network, three specialised chains.</h2>
     <p class="lead">Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains, each engineered for what it does best: identity, stablecoin settlement, and trading, interoperating as one trusted network.</p>
-    <div class="chains">
+    <!-- Below 860px this becomes a horizontal snap-scroll row (see global.css).
+         tabindex + label because the cards hold no focusable elements, so the
+         scroll container itself has to be reachable for a keyboard user to see
+         past the first card. -->
+    <div class="chains" tabindex="0" role="group" aria-label="The three cDot chains: C-Layer, P-Layer and T-Layer">
       <div class="chain">
         <span class="chain-id">C-Layer</span>
         <h3>Identity and asset recovery chain</h3>

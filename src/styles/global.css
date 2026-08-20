@@ -170,7 +170,45 @@
 
   /* Chains */
   .chains{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:48px}
-  @media(max-width:860px){.chains{grid-template-columns:minmax(0,1fr)}}
+  /* The row carries tabindex="0" because nothing inside a card is focusable:
+     without it a keyboard user could scroll past the section having only ever
+     seen the C-Layer card. Outside the media query so the ring is visible
+     wherever the element is reachable, including the desktop grid where it is a
+     labelled group that happens not to scroll. */
+  .chains:focus-visible{outline:2px solid var(--cyan);outline-offset:4px;border-radius:18px}
+  /* Below three-across, the cards become a snap-scrolling row rather than a tall
+     vertical stack - three full-height cards in a column is a lot of scrolling
+     to get past on a phone.
+
+     The negative inline margin cancels .wrap's padding so the row can scroll
+     edge to edge, and the matching padding puts the first card back in line with
+     the prose above it. scroll-padding does the same for the snap positions,
+     without which card 2 snaps flush to the viewport edge instead of to the text
+     margin. The breakout has to match .wrap's padding at each breakpoint, hence
+     the two blocks. */
+  @media(max-width:860px){
+    .chains{
+      display:flex;grid-template-columns:none;
+      overflow-x:auto;overscroll-behavior-x:contain;
+      scroll-snap-type:x mandatory;
+      gap:14px;
+      margin-inline:-24px;padding-inline:24px;scroll-padding-inline:24px;
+      /* The peek of the next card is the affordance, so the bar is redundant. */
+      scrollbar-width:none;-ms-overflow-style:none;
+      /* Vertical page scroll must survive a diagonal swipe over the row. */
+      touch-action:pan-y pinch-zoom;
+    }
+    .chains::-webkit-scrollbar{display:none}
+    .chain{
+      /* Capped so a 700-860px tablet gets two readable cards rather than one
+         enormous one. The percentage leaves the next card visibly peeking. */
+      flex:0 0 min(84%,380px);
+      scroll-snap-align:start;
+    }
+  }
+  @media(max-width:640px){
+    .chains{margin-inline:-18px;padding-inline:18px;scroll-padding-inline:18px}
+  }
   .chain{
     border:1px solid var(--line);border-radius:16px;padding:30px 26px;
     background:linear-gradient(160deg,var(--card),transparent 60%);
@@ -196,11 +234,13 @@
     color:var(--cyan);background:rgba(var(--accent-rgb),.06);
     white-space:nowrap;
   }
-  /* nowrap sets a min-content floor the grid column cannot shrink below, so the
-     longest chip ("~50 node-permissioned overlay on the C-Layer", 328px) pushed
-     the whole card past the viewport - 68px off-screen at 320px wide, hidden
-     rather than revealed by overflow-x:hidden. Let them wrap on phones. */
-  @media(max-width:640px){
+  /* nowrap sets a min-content floor the card cannot shrink below, so the longest
+     chip once pushed the whole card past the viewport - 68px off-screen at 320px
+     wide, hidden rather than revealed by overflow-x:hidden. Wrapping is allowed
+     from 860px down, matching where the cards take a capped width: at a 380px
+     card the content box is 328px, exactly the widest chip, so nowrap there
+     would overflow by a hair. */
+  @media(max-width:860px){
     .chain .specs span{white-space:normal}
   }
 
