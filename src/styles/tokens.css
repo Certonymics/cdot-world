@@ -87,6 +87,13 @@
     /* --- composites that a theme replaces wholesale ----------------------- */
     /* Bloom behind the hero's highlighted words. */
     --glow-text:0 0 32px rgba(var(--brand-rgb),.45);
+    /* Brand sweep for the hero's highlighted phrase. Built from the ramp tokens
+       rather than raw hex: --cyan is themed and --brand is not, so this single
+       declaration resolves to a pale-to-brand sweep on dark and a brand-to-
+       deeper one on light, with no second copy to drift.
+       LARGE TEXT ONLY - the darkest stop clears WCAG AA at heading sizes (3:1)
+       but not at body size (4.5:1). */
+    --gradient-text:linear-gradient(95deg,var(--cyan),var(--brand),var(--cyan));
     --glow-btn:0 6px 30px rgba(var(--brand-rgb),.35);
     --glow-btn-hover:0 10px 38px rgba(var(--brand-rgb),.45);
     /* The map card: a real drop shadow plus a brand bloom around it. */

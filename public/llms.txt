@@ -5,47 +5,49 @@
 > Certonymity Ltd (London, UK).
 
 Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains,
-each engineered for what it does best: identity, stablecoin settlement, and trading, interoperating
+each engineered for what it does best: identity, stablecoin settlement, and trading, operating
 as one trusted network.
 
-Mission: provide the settlement layer for value exchanged between people, businesses, and machines.
-cDot uses cryptographic avatars of verified real identities to keep transactions both private and
-safe, with invisible on- and off-ramping allowing anyone to benefit from the speed and low cost of
-stablecoins.
+Mission: cDot is where value is exchanged between people, businesses, and machines. It is the
+blockchain network built for secure, private, and instant payments between any two verified parties.
+Using cryptographic pseudonyms of real verified identities, cDot ensures every transaction is both
+private and accountable. It is an alternative to the inefficiencies and privacy costs of traditional
+finance, a regulatable framework for private payments, and a purpose-built system for the future of
+money.
 
 The problem: stablecoins enable instant, borderless, programmable transactions, but today's
-blockchains aren't designed for them. Existing systems are either fully general or optimized for
-trading, and none treat identity as a first-class primitive. As an alternative to traditional
-finance's invasive identity checks, cryptographic proof-of-human alone hits a ceiling when it comes
-to payments and regulation. This gap becomes critical when AI agents transact on behalf of humans
-and businesses: without native identity, agents cannot be held accountable, and their payments
-cannot be trusted or audited. Created by the team behind c.Email (https://c.email/), cDot uses
-cryptographic avatars of verified real identities to provide anonymity by default and accountability
-when necessary. Payments at scale don't just need speed and low cost - they must be able to verify
-who or what is on each side of a transaction, and no single general-purpose chain can serve both of
-these purposes.
+blockchains aren't designed for them. Existing systems are either fully general or optimised for
+trading, and none were built to integrate identity with payments. Payments at scale don't just need
+speed and low cost - they need verifiable identity on both sides of a transaction. As AI agents
+increasingly transact on behalf of people and businesses, stablecoin payments also need native agent
+identity to remain accountable, auditable, and trusted. No single general-purpose chain can serve all
+these purposes. Combining decentralised identity, stablecoin payments, and agent permissions, cDot
+exists to close the gap. cDot is built by the team behind c.Email (https://c.email/).
 
 The network (three chains, interoperable by design):
 
-1. C-Layer - identity and asset recovery chain: a purpose-built identity chain for people,
-   businesses, and agents. Cryptographic avatars of verified real identities provide privacy with
+1. C-Layer - identity and asset recovery chain: a decentralised identity chain for people,
+   businesses, and agents. Cryptographic pseudonyms of verified real identities provide privacy with
    accountability. 15,000 tx/s through a highly parallel architecture, WASM smart contracts, 20s
    finality, permissionless, public and pseudonymous, run by nodes around the world for maximum
    resilience and decentralisation.
-2. P-Layer - stablecoin and agentic payment chain: engineered for high-throughput, low-cost global
+2. P-Layer - settlement chain: engineered for high-throughput, low-cost global stablecoin
    settlement and truly programmable money, with native on- and off-ramping; 30,000 tx/s, finality
    <1s, byzantine security 45%; agentic transactions supported with verifiable, revocable
-   permissions granted by their principals.
-3. T-Layer - trading chain: a high-performance decentralized exchange, offering stablecoin swaps and
+   permissions.
+3. T-Layer - trading chain: a high-performance decentralised exchange, offering stablecoin swaps and
    perpetual futures in a predictable execution environment. 30,000 tx/s through native
    multithreaded operations, finality <1s, a node-permissioned overlay on the C-layer, private and
    accountable, native NASDAQ-like matching engine.
 
-Use cases: global payments and payroll, remittances, embedded finance, microtransactions,
-machine-to-machine commerce, on- and off-ramping, asset recovery (never lose your self custodied
-crypto), bank accounts. Secure design and invisible cryptography means every transaction settles
-instantly, every participant (human or agent) is verified and accountable, while every real-world
-identity and transaction stays private.
+Use cases - instant, low-cost settlement for any use case: global payments and payroll,
+remittances, embedded finance, microtransactions, machine-to-machine commerce, on- and off-ramping,
+asset recovery (never lose your self custodied crypto), bank accounts. With real-time settlement,
+low fees, and no middlemen, stablecoins are as much a way to save money as a cryptocurrency. cDot's
+secure design and invisible cryptography means every transaction settles instantly, every
+participant (human or agent) is verified and accountable, while every real-world identity and
+transaction stays private. Transfer money, pay teams and suppliers, settle trades, and do much more
+on cDot.
 
 ## Pages
 

@@ -131,7 +131,25 @@
     line-height:1.06;font-weight:500;letter-spacing:-.01em;
     max-width:820px;
   }
+  /* The highlighted phrase in the hero. Scoped to h1 deliberately: it is the
+     page's one typographic accent and stops being an accent if the section
+     headings take it too.
+
+     background-clip:text makes the glyphs transparent so the gradient shows
+     through them - which also means a browser without it would render the phrase
+     invisible. Hence flat --cyan first, gradient only inside @supports.
+
+     No text-shadow alongside the gradient. Paint order puts an inline element's
+     background down before its text, so the glow would land on top of the sweep
+     and mute it; the two are alternative treatments, not stackable ones. */
   h1 .glow{color:var(--cyan);text-shadow:var(--glow-text)}
+  @supports (background-clip:text) or (-webkit-background-clip:text){
+    h1 .glow{
+      background-image:var(--gradient-text);
+      -webkit-background-clip:text;background-clip:text;
+      color:transparent;text-shadow:none;
+    }
+  }
   .sub{
     margin-top:22px;max-width:640px;font-size:clamp(15.5px,3.4vw,17.5px);color:var(--ink-dim);
   }
@@ -153,12 +171,72 @@
   .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow-btn-hover)}
   .btn-ghost{color:var(--ink);border:1px solid rgba(var(--accent-rgb),.35)}
   .btn-ghost:hover{border-color:var(--cyan);transform:translateY(-1px)}
+  /* The map and the theme toggle already ring on focus; the buttons and links
+     did not, so a keyboard reader tabbing through the hero got whatever the UA
+     draws - which on a filled brand-blue button is close to invisible. One rule
+     so every focusable thing answers the same way. */
+  .btn:focus-visible,
+  .nav a.link:focus-visible,
+  .cemail-btn:focus-visible,
+  .foot-link:focus-visible,
+  .burger:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+  /* Pressing cancels the hover lift, so the button reads as going down under the
+     pointer rather than staying up. */
+  .btn:active{transform:translateY(0)}
 
   /* Sections */
   section{padding:96px 0;position:relative}
   @media(max-width:640px){section{padding:64px 0}}
   #problem{padding-top:32px}
   @media(max-width:640px){#problem{padding-top:20px}}
+  /* The header is fixed, so a nav link that scrolls a section to y=0 puts the
+     top of that section behind it. Sections carry 96px of their own top padding
+     and the header is 104px, so the heading was landing 8px under its bottom
+     edge - clipped, on every single nav click.
+
+     Not the full header height: that would be counted on top of the padding the
+     section already has, leaving 200px of dead space above the heading. 32px is
+     the remainder that puts the heading about 24px clear of the header, and it
+     happens to work out the same on mobile (72px header, 64px padding). */
+  section[id]{scroll-margin-top:32px}
+  /* #problem has almost no top padding - it continues #mission's argument - so
+     it needs to supply the clearance itself if it is ever linked to directly. */
+  #problem{scroll-margin-top:96px}
+  @media(max-width:640px){#problem{scroll-margin-top:76px}}
+
+  /* Ambient washes. The hero's radial gradient is the page's signature, and
+     echoing it at two anchor points further down keeps that light drifting
+     across the page rather than stopping dead below the fold: the hero glows
+     from the right, #network from the left, #uses from the right again.
+
+     Each one tops out at --bg-1 with only a small --bg-2 core, so the hero stays
+     the brightest moment on the page and these read as echoes of it.
+
+     Applied as the section's own background rather than a pseudo-element, and
+     every ramp lands on --bg-0 well before the section's edge - so neighbouring
+     sections meet on the same colour and no seam shows at the boundary. That is
+     also why #mission and #problem stay flat: they read as one continuous
+     argument, and washing one but not the other would draw a line through it.
+     #contact stays flat too - it closes the page, and a wash there would pull
+     attention to the footer rather than to the form.
+
+     Sizes are px so the wash keeps its shape as a section grows with its copy;
+     the narrow-screen variants switch to vw/vh because a 1100px circle on a
+     390px screen is just a flat tint. */
+  #network{
+    background:radial-gradient(1100px 620px at 16% 20%,
+      var(--bg-2) 0%,var(--bg-1) 30%,var(--bg-0) 72%);
+  }
+  #uses{
+    background:radial-gradient(1000px 560px at 84% 28%,
+      var(--bg-2) 0%,var(--bg-1) 32%,var(--bg-0) 74%);
+  }
+  @media(max-width:860px){
+    #network{background:radial-gradient(96vw 58vh at 8% 16%,
+      var(--bg-2) 0%,var(--bg-1) 28%,var(--bg-0) 70%)}
+    #uses{background:radial-gradient(96vw 52vh at 92% 24%,
+      var(--bg-2) 0%,var(--bg-1) 30%,var(--bg-0) 72%)}
+  }
   .eyebrow{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
   h2{font-family:"Host Grotesk Variable","Host Grotesk","Geist Variable","Geist",sans-serif;font-size:clamp(25px,6vw,36px);line-height:1.14;font-weight:500;letter-spacing:-.005em;max-width:760px}
   .lead{margin-top:20px;max-width:780px;color:var(--ink-dim);font-size:clamp(15.5px,3.4vw,17.5px)}
@@ -364,10 +442,17 @@
   .use{
     border:1px solid var(--line);border-radius:999px;padding:10px 20px;
     font-size:15px;color:var(--ink-dim);background:rgba(var(--accent-rgb),.04);
+    transition:border-color .2s,color .2s,background-color .2s;
+  }
+  /* These read as interactive - pill-shaped, bordered, and one even carries a
+     title tooltip - but every other card-like thing on the page answers the
+     pointer and these did not. No transform: they sit in a wrapped row, so
+     lifting one would break the line it shares with its neighbours. */
+  .use:hover{
+    border-color:rgba(var(--accent-rgb),.4);color:var(--ink);
+    background:rgba(var(--accent-rgb),.08);
   }
   @media(max-width:640px){.use{font-size:13.5px;padding:8px 14px}}
-  .uses-note{margin-top:30px;max-width:760px;color:var(--ink-dim);font-size:16.5px}
-  .uses-note b{color:var(--ink);font-weight:600}
 
   /* Contact */
   .contact-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:44px;margin-top:44px;align-items:stretch}
@@ -406,12 +491,24 @@
   .addr p:last-child{margin-bottom:0}
   .addr a{color:var(--cyan);text-decoration:none}
   .addr a:hover{text-decoration:underline}
-  .addr .label{margin-top:20px;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
 
   /* Footer */
   footer{border-top:1px solid var(--line);padding:38px 0;background:var(--bg-0)}
   .foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
   .foot p{color:var(--ink-faint);font-size:13.5px}
+  /* Four siblings under space-between: the gaps between them come out equal
+     whatever each item's own width is, which is why none of these carry flex:1.
+     Giving them equal WIDTHS instead would centre each in its own column and
+     leave the gaps visibly uneven, since the mark and the address are nothing
+     like the same size. */
+  .foot-mark{height:32px;width:78px;display:block}
+  .foot-copy{margin:0}
+  .foot-link{color:var(--cyan);text-decoration:none;transition:color .2s}
+  .foot-link:hover{color:var(--ink)}
+  /* Narrow: stack, and let the row gap do the spacing. */
+  @media(max-width:560px){
+    .foot{flex-direction:column;text-align:center}
+  }
 
   /* Respect a reduced-motion preference: the node and badge pings are infinite
      animations, and there can be one per node. */

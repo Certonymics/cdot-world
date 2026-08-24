@@ -76,7 +76,7 @@ const graph = [
     provider: { "@id": ORG_ID },
     url: "https://cdot.world/",
     description:
-      "cDot is the blockchain network built for secure, private, and instant payments. Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains, each engineered for what it does best: identity, stablecoin settlement, and trading, interoperating as one trusted network.",
+      "cDot is the blockchain network built for secure, private, and instant payments. Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains, each engineered for what it does best: identity, stablecoin settlement, and trading, operating as one trusted network.",
     hasPart: [
       { "@id": "https://cdot.world/#c-layer" },
       { "@id": "https://cdot.world/#p-layer" },
@@ -88,7 +88,7 @@ const graph = [
     "C-Layer",
     "cDot identity and asset recovery chain",
     "SecurityApplication",
-    "A purpose-built identity chain for people, businesses, and agents. Cryptographic avatars of verified real identities provide privacy with accountability. Run by nodes around the world for maximum resilience and decentralisation.",
+    "A decentralised identity chain for people, businesses, and agents. Cryptographic pseudonyms of verified real identities provide privacy with accountability. Run by nodes around the world for maximum resilience and decentralisation.",
     [
       spec("Throughput", 15000, "tx/s"),
       spec("Finality", 20, "s"),
@@ -101,9 +101,9 @@ const graph = [
   layer(
     "p-layer",
     "P-Layer",
-    "cDot stablecoin and agentic payment chain",
+    "cDot settlement chain",
     "FinanceApplication",
-    "Engineered for high-throughput, low-cost global settlement and truly programmable money, with native on- and off-ramping. Agentic transactions supported with verifiable, revocable permissions granted by their principals.",
+    "Engineered for high-throughput, low-cost global stablecoin settlement and truly programmable money, with native on- and off-ramping. Agentic transactions supported with verifiable, revocable permissions.",
     [
       spec("Throughput", 30000, "tx/s"),
       spec("Finality", "<1", "s"),
@@ -115,7 +115,7 @@ const graph = [
     "T-Layer",
     "cDot trading chain",
     "FinanceApplication",
-    "A high-performance decentralized exchange, offering stablecoin swaps and perpetual futures in a predictable execution environment.",
+    "A high-performance decentralised exchange, offering stablecoin swaps and perpetual futures in a predictable execution environment.",
     [
       spec("Throughput", 30000, "tx/s"),
       spec("Finality", "<1", "s"),
