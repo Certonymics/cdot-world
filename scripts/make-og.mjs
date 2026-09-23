@@ -60,16 +60,20 @@ const logo = read("src/components/LogoSymbol.astro").match(
 if (!logo) throw new Error("No #cdot-logo <symbol> found in src/components/LogoSymbol.astro");
 const [, logoViewBox, logoBody] = logo;
 
-/* Dark tokens only. Light redefines the same names further down the file, so
-   the lookup is confined to everything above that block. Anchored on the rule
-   itself, with its brace - the file's header comment names the same selector
-   several times, and splitting on that text lands above the dark block. */
+/* The card follows the site's DEFAULT scheme, so that clicking through from a
+   social feed does not jump from one palette to the other. That is light, which
+   lives on a bare :root.
+
+   Picked by the token it carries, NOT by position: there is more than one bare
+   :root block - the brand constants have their own - and "the first --bg-0 in
+   the file" would quietly follow whichever scheme happens to be declared first.
+   Matched to its own closing brace so it cannot run on into the next block. */
 const tokensCss = read("src/styles/tokens.css");
-const lightAt = tokensCss.search(/:root\[data-theme="light"\]\s*\{/);
-const darkTokens = lightAt === -1 ? tokensCss : tokensCss.slice(0, lightAt);
+const schemeBlock = (tokensCss.match(/:root\s*\{[^}]*\}/g) || []).find((b) => /--bg-0/.test(b));
+if (!schemeBlock) throw new Error("No :root block carrying --bg-0 in src/styles/tokens.css");
 const token = (name) => {
-  const m = darkTokens.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`));
-  if (!m) throw new Error(`--${name} not found in the dark block of tokens.css`);
+  const m = schemeBlock.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`));
+  if (!m) throw new Error(`--${name} not found in the default scheme block of tokens.css`);
   return m[1];
 };
 const brand = JSON.parse(read("brand/palette.json")).brand.blue;
@@ -81,8 +85,9 @@ const font = readFileSync(
 /* The card's background is the hero's own gradient, at the same size and focal
    point, so the card and the page a visitor lands on open with one image. */
 const background =
-  `radial-gradient(1200px 700px at 70% 20%,` +
-  `${token("bg-2")} 0%,${token("bg-1")} 45%,${token("bg-0")} 100%)`;
+  `radial-gradient(1200px 760px at 70% 18%,` +
+  `${token("wash")} 0%,${token("bg-2")} 34%,` +
+  `${token("bg-1")} 64%,${token("bg-0")} 100%)`;
 
 const html = `<!doctype html>
 <html><head><meta charset="utf-8"><style>
