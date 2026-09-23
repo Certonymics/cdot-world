@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AppGallery from "../components/AppGallery.astro";
 
 const title = "cDot: Secure identity, communication and payments";
 const description =
@@ -19,28 +20,13 @@ const ogDescription =
     <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale</h1>
     <p class="sub">cDot is the network designed for private payments, verified identity, programmable money, and autonomous agents.</p>
     <div class="hero-ctas">
-      <a class="btn btn-primary" href="#mission">Discover cDot</a>
+      <a class="btn btn-primary" href="#apps">Discover cDot</a>
       <a class="btn btn-ghost" href="#contact">Contact us</a>
     </div>
   </div>
 </div>
 
-<section id="mission">
-  <div class="wrap">
-    <h2>Where value is exchanged between people, businesses, and machines.</h2>
-    <p class="lead">cDot is the blockchain network built for secure, private, and instant payments between any two verified parties. Using cryptographic pseudonyms of real verified identities, cDot ensures every transaction is both private and accountable.</p>
-    <p class="lead">cDot is an alternative to the inefficiencies and privacy costs of traditional finance, a regulatable framework for private payments, and a purpose-built system for the future of money.</p>
-  </div>
-</section>
-
-<section id="problem">
-  <div class="wrap">
-    <h2>Stablecoins enable instant, borderless, programmable transactions. Today's blockchains aren't designed for them.</h2>
-    <p class="lead">Existing systems are either fully general or optimised for trading, and none were built to integrate identity with payments. Payments at scale don't just need speed and low cost — they need verifiable identity on both sides of a transaction.</p>
-    <p class="lead">As AI agents increasingly transact on behalf of people and businesses, stablecoin payments also need native agent identity to remain accountable, auditable, and trusted.</p>
-    <p class="lead">No single general-purpose chain can serve all these purposes. Combining decentralised identity, stablecoin payments, and agent permissions, cDot exists to close the gap.</p>
-  </div>
-</section>
+<AppGallery />
 
 <div class="divider"></div>
 

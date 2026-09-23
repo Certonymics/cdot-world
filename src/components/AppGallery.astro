@@ -1,0 +1,421 @@
+---
+/* App gallery. Ported from AppGallery.jsx in 'Cdot site (main)'.
+ *
+ * THE PHONE SCREENS ARE DELIBERATELY LIGHT IN BOTH THEMES. They depict the cDot
+ * app's own interface, which is light - so they are a picture of a product, the
+ * way a screenshot would be, not part of this site's chrome. Theming them to
+ * follow the site would mean inventing a dark version of an app that does not
+ * have one. Everything around them - heading, tabs, feature pills - is themed
+ * normally, so the section still belongs to whichever scheme is on.
+ *
+ * Styles are scoped to this component rather than living in global.css. That
+ * breaks the repo's usual habit, but a phone mockup's internals are the one
+ * thing on the site that genuinely should not be reachable from anywhere else,
+ * and it keeps ~150 lines of decorative CSS out of the global sheet.
+ */
+const TABS = [
+  { key: "identity", name: "Identity", copy: "Share proofs of attributes, not personal data." },
+  { key: "email",    name: "Email",    copy: "Encrypted, authenticated email with your existing account." },
+  { key: "chat",     name: "Chat",     copy: "Messaging without surveillance, bots, or impersonation." },
+  { key: "pay",      name: "Pay",      copy: "Private, instant, borderless payments." },
+  { key: "vault",    name: "Vault",    copy: "Store any asset and prove ownership cryptographically." },
+];
+
+/* Icon bodies only - the <svg> wrapper is in the markup, so every icon gets the
+   same box and stroke without repeating the attributes fifteen times. */
+const I = {
+  link:   '<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  user:   '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/>',
+  lock:   '<path d="M3 11h18v10H3zM7 11V7a5 5 0 0110 0v4"/>',
+  check:  '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  face:   '<path d="M9 10h.01M15 10h.01M12 16c1.5 0 2.5-.5 3-1.5"/><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>',
+  bolt:   '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>',
+  apps:   '<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>',
+  at:     '<path d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>',
+  pin:    '<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>',
+  inbox:  '<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>',
+  chat:   '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>',
+  wallet: '<path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>',
+  burger: '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+};
+
+const PILLS = {
+  identity: [["link", "Reusable identity proofs"], ["shield", "No personal data shared"], ["user", "Anonymous by default"]],
+  email:    [["lock", "End-to-end encrypted"], ["check", "Anti-spam authentication"], ["face", "Face unlock for sensitive emails"]],
+  chat:     [["lock", "End-to-end encrypted"], ["shield", "Verified senders"], ["user", "No email or phone number needed"]],
+  pay:      [["bolt", "Instant, borderless payments"], ["apps", "Transactions encrypted on-chain"], ["at", "Pay with only your email"]],
+  vault:    [["shield", "Store and protect any asset"], ["pin", "Prove ownership with your identity"], ["lock", "Extra security for high-value assets"]],
+};
+
+/* Which bottom-nav item is lit on each screen. */
+const NAV = [["inbox", "Inbox"], ["chat", "Chat"], ["wallet", "Wallet"], ["apps", "Apps"], ["shield", "Vault"]];
+const NAV_ON = { identity: 0, email: 0, chat: 1, pay: 2, vault: 4 };
+
+const EMAILS = [
+  ["SM", "Sophie Martin", "29 May", "7a21f0::secured payload", "enc://v1:4c9f8e7a118b5d7f33f2", null, true],
+  ["AC", "Alice Chen", "2 Jun", "Security Update – Mandatory Action", "URGENT: Please update your password…", null, true],
+  ["RM", "Robert Martinez", "1 Jun", "Mission: Website Redesign – 2,500 USDC", "New mission available: Redesign company…", "Pending validation", true],
+  ["LT", "Lisa Thompson", "31 May", "Mission: Mobile App – 8,000 USDC", "New mission available: Develop mobile app…", "Pending payment", true],
+  ["TA", "Thomas Anderson", "30 May", "Freelance Opportunity: UI/UX Design", "Hello! I saw your work on LinkedIn…", null, false],
+];
+---
+
+<section id="apps">
+  <div class="wrap">
+    <h2>One app to protect you, wherever you go</h2>
+    <p class="lead">Whatever you need to do, do it privately with cDot.</p>
+
+    <div class="ag-tabs" role="tablist" aria-label="cDot app features">
+      {TABS.map((t, i) => (
+        <button
+          class="ag-tab"
+          type="button"
+          role="tab"
+          data-tab={t.key}
+          id={`ag-tab-${t.key}`}
+          aria-selected={i === 0 ? "true" : "false"}
+          aria-controls={`ag-panel-${t.key}`}
+          tabindex={i === 0 ? 0 : -1}
+        >{t.name}</button>
+      ))}
+    </div>
+
+    <p class="ag-copy" id="ag-copy">{TABS[0].copy}</p>
+    <!-- The per-tab line, handed to the script as data rather than duplicated
+         into it - one definition of the copy, up in the frontmatter. -->
+    <script
+      type="application/json"
+      id="ag-data"
+      is:inline
+      set:html={JSON.stringify(Object.fromEntries(TABS.map((t) => [t.key, t.copy])))}
+    />
+
+    <!-- Horizontal scroll below 1100px: five 218px screens do not fit, and
+         shrinking them any further makes the screen content unreadable. -->
+    <div class="ag-rail" tabindex="0" role="group" aria-label="App screens">
+      {TABS.map((t, i) => (
+        <div
+          class:list={["ag-unit", { "is-active": i === 0 }]}
+          data-unit={t.key}
+          id={`ag-panel-${t.key}`}
+          role="tabpanel"
+          aria-labelledby={`ag-tab-${t.key}`}
+        >
+          <div class="ag-phone">
+            <div class="ag-status"><span>9:41</span></div>
+
+            <div class="ag-appbar">
+              <span class="ag-ic"><svg viewBox="0 0 24 24" set:html={I.burger} /></span>
+              <span class="ag-avatar">JD</span>
+              <span class="ag-who">Jean Dupont +3 <span class="ag-caret">&#9662;</span></span>
+              <span class="ag-ic">
+                {t.key === "pay" || t.key === "vault"
+                  ? <b class="ag-cur">$ <span class="ag-caret">&#9662;</span></b>
+                  : <svg viewBox="0 0 24 24" set:html={I.search} />}
+              </span>
+            </div>
+
+            {t.key === "identity" && (
+              <div class="ag-body ag-pad">
+                <p class="ag-lbl">Select proofs to share:</p>
+                <div class="ag-stack">
+                  {["Age 16 or older", "Age 18 or older", "Age 21 or older"].map((p, n) => (
+                    <div class="ag-opt">
+                      <span class:list={["ag-radio", { on: n === 1 }]}></span>
+                      <span>{p}</span>
+                    </div>
+                  ))}
+                </div>
+                <div class="ag-cta">Share proof</div>
+              </div>
+            )}
+
+            {t.key === "email" && (
+              <div class="ag-body">
+                <div class="ag-filters">
+                  <span class="ag-chip on">All</span>
+                  <span class="ag-chip">Secure</span>
+                  <span class="ag-chip">Unsecure</span>
+                </div>
+                <div class="ag-list">
+                  {EMAILS.map(([ini, name, date, subj, prev, tag, ok]) => (
+                    <div class="ag-mail">
+                      <span class:list={["ag-avatar sm", { warn: !ok }]}>{ini}</span>
+                      <div class="ag-mail-b">
+                        <div class="ag-row">
+                          <span class="ag-name">{name}{ok && <i class="ag-tick">&#10003;</i>}</span>
+                          <span class="ag-date">{date}</span>
+                        </div>
+                        <div class="ag-subj">{subj}</div>
+                        <div class="ag-prev">{prev}</div>
+                        {tag && <div class="ag-tag">{tag}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {t.key === "chat" && (
+              <div class="ag-body ag-pad ag-tint">
+                <div class="ag-chead">
+                  <span class="ag-avatar grn">ML</span>
+                  <span class="ag-meta">Verified identity &middot; <i class="ag-enc">Encrypted</i></span>
+                </div>
+                <div class="ag-msg">Did the new keys sync to your phone?</div>
+                <div class="ag-msg me">Yep &mdash; fully encrypted on both ends.</div>
+                <div class="ag-msg">Perfect. No one else can read this.</div>
+              </div>
+            )}
+
+            {t.key === "pay" && (
+              <div class="ag-body ag-pad">
+                <div class="ag-subtabs"><span class="on">Wallet</span><span>Activity</span></div>
+                <div class="ag-card">
+                  <p class="ag-lbl">Send payment</p>
+                  <div class="ag-chead">
+                    <span class="ag-avatar">JR</span>
+                    <span>
+                      <b class="ag-name">Jordan Reyes <i class="ag-tick">&#10003;</i></b>
+                      <span class="ag-meta">jordan@cdot</span>
+                    </span>
+                  </div>
+                  <div class="ag-amt"><b>0.25 ETH</b><span class="ag-meta">&#8776; $812.40</span></div>
+                  <div class="ag-ok">&#10003; Signed &amp; verifiable on-chain</div>
+                  <div class="ag-cta">Send securely</div>
+                </div>
+              </div>
+            )}
+
+            {t.key === "vault" && (
+              <div class="ag-body ag-pad">
+                <p class="ag-lbl">Account recovery</p>
+                <p class="ag-meta">Verify it&rsquo;s really you</p>
+                <div class="ag-face">
+                  <svg viewBox="0 0 24 24" set:html={I.user} />
+                  <i class="ag-badge">&#10003;</i>
+                </div>
+                <div class="ag-checks">
+                  {["Face match & liveness", "Biometric check passed", "Keys restored on this device"].map((c) => (
+                    <div class="ag-check">
+                      <span class="ag-sq"><svg viewBox="0 0 24 24" set:html={I.shield} /></span>
+                      <span>{c}</span>
+                      <i class="ag-yes">&#10003;</i>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div class="ag-nav">
+              {NAV.map(([ic, label], n) => (
+                <span class:list={["ag-nav-i", { on: n === NAV_ON[t.key] }]}>
+                  {label === "Vault" && t.key !== "vault" && <i class="ag-soon">Soon</i>}
+                  <svg viewBox="0 0 24 24" set:html={I[ic]} />
+                  <span>{label}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <ul class="ag-pills">
+            {PILLS[t.key].map(([ic, label]) => (
+              <li><svg viewBox="0 0 24 24" set:html={I[ic]} />{label}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* --- section chrome: themed like the rest of the site ------------------- */
+  #apps .wrap > h2,
+  #apps .wrap > .lead{text-align:center;margin-left:auto;margin-right:auto}
+  .ag-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:32px}
+  .ag-tab{
+    border-radius:999px;padding:9px 18px;font-size:14px;font-family:inherit;font-weight:500;
+    border:1px solid var(--line);background:transparent;color:var(--ink-dim);
+    cursor:pointer;transition:color .2s,background-color .2s,border-color .2s;
+  }
+  .ag-tab:hover{color:var(--ink)}
+  /* --brand-strong, not --brand: white on --brand is 4.31:1 and this label is
+     small text, so it would miss AA. One ramp step down clears it at 5.36:1. */
+  .ag-tab[aria-selected="true"]{
+    background:var(--brand-strong);border-color:var(--brand-strong);color:#fff;
+  }
+  .ag-tab:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+  .ag-copy{margin-top:18px;text-align:center;color:var(--ink-dim);font-size:15.5px}
+
+  .ag-rail{display:flex;justify-content:center;align-items:flex-start;gap:12px;padding:40px 0 8px}
+  @media(max-width:1100px){
+    .ag-rail{
+      justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;
+      padding-left:2px;padding-right:2px;-webkit-overflow-scrolling:touch;
+    }
+    .ag-unit{scroll-snap-align:center}
+  }
+  .ag-rail:focus-visible{outline:2px solid var(--cyan);outline-offset:4px;border-radius:18px}
+
+  .ag-unit{
+    flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;
+    transform:scale(.87);opacity:.4;filter:blur(.5px);cursor:pointer;
+    transition:transform .35s ease,opacity .35s ease,filter .35s ease;
+  }
+  .ag-unit.is-active{transform:scale(1);opacity:1;filter:none;cursor:default;z-index:2}
+  @media(prefers-reduced-motion:reduce){
+    .ag-unit{transition:opacity .2s ease}
+  }
+
+  .ag-pills{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;width:100%}
+  .ag-pills li{
+    display:flex;align-items:center;gap:7px;white-space:nowrap;
+    border:1.5px solid rgba(var(--brand-rgb),.2);border-radius:100px;
+    padding:6px 12px;font-size:11px;font-weight:600;color:var(--brand-text);
+    background:var(--card);
+  }
+  .ag-pills svg{width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+
+  /* --- the phone itself: light in BOTH themes, see the note at the top ----- */
+  .ag-phone{
+    width:218px;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;
+    background:#eef0ff;box-shadow:var(--shadow-card);font-family:inherit;
+  }
+  .ag-status{display:flex;justify-content:space-between;align-items:center;
+    padding:10px 18px 2px;font-size:12px;font-weight:700;color:#111;background:#fff}
+  .ag-appbar{display:flex;align-items:center;gap:8px;padding:6px 12px 8px;
+    background:#fff;border-bottom:1px solid rgba(0,0,0,.06)}
+  .ag-ic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    color:#6b7280;flex-shrink:0}
+  .ag-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+  .ag-cur{font-size:13px;font-weight:700;color:#374151}
+  .ag-caret{color:#9ca3af;font-size:10px}
+  .ag-avatar{width:26px;height:26px;border-radius:50%;background:#566afd;display:flex;
+    align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0}
+  .ag-avatar.sm{width:26px;height:26px;font-size:8px;margin-top:1px}
+  .ag-avatar.warn{background:#f97316}
+  .ag-avatar.grn{width:30px;height:30px;background:#16a34a;font-size:10px}
+  .ag-who{font-size:12px;font-weight:600;color:#111;flex:1}
+
+  .ag-body{height:322px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .ag-pad{padding:12px}
+  .ag-tint{background:#f5f6ff}
+  .ag-lbl{font-size:12px;font-weight:600;color:#111;margin:0 0 8px}
+  .ag-meta{font-size:10px;color:#9ca3af;display:block}
+  .ag-stack{display:flex;flex-direction:column;gap:8px}
+  .ag-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    border:1.5px solid rgba(86,106,253,.2);background:#f8f8ff;font-size:11px;font-weight:600;color:#111}
+  .ag-radio{width:16px;height:16px;border-radius:50%;border:2px solid #566afd;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center}
+  .ag-radio.on::after{content:"";width:8px;height:8px;border-radius:50%;background:#566afd}
+  .ag-cta{margin-top:auto;background:#566afd;border-radius:10px;padding:9px 0;
+    font-size:11px;font-weight:600;color:#fff;text-align:center}
+
+  .ag-filters{display:flex;gap:4px;padding:5px 10px 6px;background:#fff;
+    border-bottom:1px solid rgba(0,0,0,.06);flex-shrink:0}
+  .ag-chip{border:1px solid #e5e7eb;border-radius:20px;padding:2px 9px;font-size:9px;color:#6b7280}
+  .ag-chip.on{border:1.5px solid #566afd;color:#566afd;font-weight:700;padding:2px 10px}
+  .ag-list{flex:1;overflow:hidden}
+  .ag-mail{display:flex;gap:7px;padding:7px 10px;border-bottom:1px solid #f5f5f5;align-items:flex-start}
+  .ag-mail:last-child{border-bottom:0}
+  .ag-mail-b{flex:1;min-width:0}
+  .ag-row{display:flex;justify-content:space-between;align-items:center}
+  .ag-name{font-size:10px;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ag-tick{color:#566afd;font-style:normal;margin-left:2px}
+  .ag-date{font-size:8px;color:#9ca3af;flex-shrink:0;margin-left:4px}
+  .ag-subj{font-size:9px;font-weight:600;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ag-prev,.ag-tag{font-size:8px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ag-tag{color:#566afd;font-weight:600}
+
+  .ag-chead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .ag-enc{color:#16a34a;font-style:normal}
+  .ag-msg{background:#fff;border-radius:12px;padding:8px 10px;margin-bottom:6px;
+    font-size:11px;color:#374151}
+  .ag-msg.me{background:#566afd;color:#fff;border-radius:16px 16px 4px 16px;
+    margin-left:auto;width:fit-content;max-width:85%}
+
+  .ag-subtabs{display:flex;border-bottom:1px solid #f0f0f0;margin-bottom:10px}
+  .ag-subtabs span{padding:4px 10px 8px;font-size:11px;color:#9ca3af}
+  .ag-subtabs .on{font-weight:600;color:#566afd;border-bottom:2px solid #566afd}
+  .ag-card{border:1px solid #f0f0f0;border-radius:14px;padding:12px}
+  .ag-amt{text-align:center;margin-bottom:6px}
+  .ag-amt b{display:block;font-size:22px;font-weight:800;color:#111}
+  .ag-ok{background:#f0fdf4;border-radius:6px;padding:6px 10px;font-size:10px;
+    color:#16a34a;text-align:center;margin-bottom:8px}
+
+  .ag-face{width:68px;height:68px;border-radius:50%;border:2px solid #c7d2fe;position:relative;
+    display:flex;align-items:center;justify-content:center;margin:12px auto 14px}
+  .ag-face svg{width:28px;height:28px;fill:none;stroke:#566afd;stroke-width:1.5}
+  .ag-badge{position:absolute;bottom:0;right:0;width:18px;height:18px;border-radius:50%;
+    background:#16a34a;color:#fff;font-size:10px;font-style:normal;display:flex;
+    align-items:center;justify-content:center}
+  .ag-checks{border-top:1px solid #f5f5f5}
+  .ag-check{display:flex;align-items:center;gap:8px;padding:9px 0;
+    border-bottom:1px solid #f5f5f5;font-size:11px;color:#111}
+  .ag-check:last-child{border-bottom:0}
+  .ag-sq{width:26px;height:26px;border-radius:6px;background:#eef0ff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center}
+  .ag-sq svg{width:13px;height:13px;fill:none;stroke:#566afd;stroke-width:2}
+  .ag-check span:nth-child(2){flex:1}
+  .ag-yes{color:#16a34a;font-size:13px;font-weight:700;font-style:normal}
+
+  .ag-nav{display:flex;background:#fff;border-top:1px solid rgba(0,0,0,.07);
+    padding:6px 0 10px;flex-shrink:0}
+  .ag-nav-i{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-size:9px;color:#9ca3af;position:relative}
+  .ag-nav-i.on{color:#566afd}
+  .ag-nav-i svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+  .ag-soon{position:absolute;top:-1px;right:6px;background:#566afd;color:#fff;font-size:7px;
+    font-weight:700;font-style:normal;border-radius:3px;padding:1px 3px;line-height:1.2}
+</style>
+
+<script is:inline>
+(function(){
+  var tabs  = Array.prototype.slice.call(document.querySelectorAll('.ag-tab'));
+  var units = Array.prototype.slice.call(document.querySelectorAll('.ag-unit'));
+  var copy  = document.getElementById('ag-copy');
+  if (!tabs.length || !units.length) return;
+
+  var TEXT = JSON.parse(document.getElementById('ag-data').textContent);
+
+  function select(key, focus){
+    tabs.forEach(function(t){
+      var on = t.dataset.tab === key;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      /* Roving tabindex: the tablist is one stop, arrows move within it. */
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+    });
+    units.forEach(function(u){ u.classList.toggle('is-active', u.dataset.unit === key); });
+    if (copy) copy.textContent = TEXT[key] || '';
+  }
+
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ select(t.dataset.tab, false); });
+  });
+
+  /* Clicking a dimmed phone brings it forward - the whole row reads as
+     clickable, so only answering the pills above would be a dead end. */
+  units.forEach(function(u){
+    u.addEventListener('click', function(){
+      if (!u.classList.contains('is-active')) select(u.dataset.unit, false);
+    });
+  });
+
+  document.querySelector('.ag-tabs').addEventListener('keydown', function(e){
+    var i = tabs.findIndex(function(t){ return t.getAttribute('aria-selected') === 'true'; });
+    if (i < 0) return;
+    var next = e.key === 'ArrowRight' ? i + 1
+             : e.key === 'ArrowLeft'  ? i - 1
+             : e.key === 'Home'       ? 0
+             : e.key === 'End'        ? tabs.length - 1
+             : -1;
+    if (next === -1) return;
+    e.preventDefault();
+    select(tabs[(next + tabs.length) % tabs.length].dataset.tab, true);
+  });
+})();
+</script>
