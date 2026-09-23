@@ -66,5 +66,5 @@ User-agent: Bytespider
 Disallow: /
 
 # Structured summary for language models: /llms.txt
-# No Sitemap directive - the site is a single page at the domain root, which
-# needs no sitemap to be discovered. Add one here if a second route appears.
+
+Sitemap: https://cdot.world/sitemap.xml
