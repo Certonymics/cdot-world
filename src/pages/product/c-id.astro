@@ -293,40 +293,6 @@ const FAQ = [
   .how-ctas{margin-top:38px}
   .pi-wrap{display:flex;justify-content:center}
 
-  /* --- FAQ ---------------------------------------------------------------- */
-  .faq{margin-top:30px;border-top:1px solid var(--line);max-width:780px}
-  .faq-item{border-bottom:1px solid var(--line)}
-  .faq-item summary{
-    list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:20px;
-    padding:20px 0;font-size:17px;font-weight:500;color:var(--ink);
-  }
-  .faq-item summary::-webkit-details-marker{display:none}
-  .faq-item summary:hover{color:var(--cyan)}
-  .faq-item summary:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
-  .faq-item summary span:first-child{flex:1}
-  /* Drawn in CSS rather than swapped between + and - characters, so it can
-     rotate through the change instead of jumping. */
-  .faq-mark{
-    position:relative;width:14px;height:14px;flex-shrink:0;margin-top:5px;
-  }
-  .faq-mark::before,.faq-mark::after{
-    content:"";position:absolute;left:0;top:6px;width:14px;height:2px;
-    border-radius:2px;background:var(--cyan);transition:transform .25s ease;
-  }
-  .faq-mark::after{transform:rotate(90deg)}
-  .faq-item[open] .faq-mark::after{transform:rotate(0)}
-  .faq-a{padding:0 44px 24px 0;color:var(--ink-dim);font-size:15.5px;line-height:1.7}
-  .faq-a :global(p){margin:0 0 14px}
-  .faq-a :global(p:last-child){margin-bottom:0}
-  .faq-a :global(ul){margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:8px}
-  .faq-a :global(.faq-note){font-size:13px;color:var(--ink-faint)}
-  .faq-foot{margin-top:26px}
-  .faq-foot a{color:var(--blue);text-decoration:none}
-  .faq-foot a:hover{text-decoration:underline}
-  @media(prefers-reduced-motion:reduce){
-    .faq-mark::before,.faq-mark::after{transition:none}
-  }
-
   /* --- phone (light in both themes, as in the homepage gallery) ----------- */
   .pi{
     width:218px;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;
