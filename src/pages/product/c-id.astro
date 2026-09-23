@@ -9,6 +9,7 @@
  * semantics for free, so the accordion needs no script at all.
  */
 import Layout from "../../layouts/Layout.astro";
+import StoreDropdown from "../../components/StoreDropdown.astro";
 
 const title = "Identity — cDot";
 const description =
@@ -17,19 +18,6 @@ const description =
 const IOS = "https://apps.apple.com/gb/app/c-email-secure-email/id6787208131";
 const ANDROID = "https://play.google.com/store/apps/details?id=org.certonym.c.email&hl=en_GB";
 const DEMO = "https://agepass.xyz/";
-
-/* The real store marks, taken from react-icons' Fa set in c.email-website -
-   the same icons that page uses. Lifted rather than redrawn: an approximated
-   brand logo reads as a mistake. Note the two carry different viewBoxes, so
-   they are sized by height with width:auto to keep each one's proportions. */
-const APPLE = {
-  box: "0 0 384 512",
-  d: "M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z",
-};
-const PLAY = {
-  box: "0 0 512 512",
-  d: "M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z",
-};
 
 const STEPS = [
   {
@@ -92,28 +80,7 @@ const FAQ = [
     <h1>Prove your age, not your identity</h1>
     <p class="sub">Verify with c.Email to get your c.ID: a reusable, privacy-preserving proof of age linked to your email address.</p>
     <div class="hero-ctas">
-      <!-- A dropdown, as on the AgePass page: one button over both stores,
-           rather than sending everyone to whichever platform was listed first. -->
-      <div class="dl">
-        <button class="btn btn-primary dl-btn" type="button"
-                aria-expanded="false" aria-haspopup="true" aria-controls="dl-hero">
-          <svg class="dl-ico" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-          </svg>
-          Download c.Email
-          <svg class="dl-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
-        </button>
-        <div class="dl-menu" id="dl-hero">
-          <a href={IOS} target="_blank" rel="noopener noreferrer">
-            <svg class="dl-brand" viewBox={APPLE.box} aria-hidden="true"><path d={APPLE.d} /></svg>
-            App Store
-          </a>
-          <a href={ANDROID} target="_blank" rel="noopener noreferrer">
-            <svg class="dl-brand" viewBox={PLAY.box} aria-hidden="true"><path d={PLAY.d} /></svg>
-            Google Play
-          </a>
-        </div>
-      </div>
+      <StoreDropdown label="Download c.Email" id="dl-hero" />
       <a class="btn btn-ghost" href={DEMO} target="_blank" rel="noopener noreferrer">View demo</a>
     </div>
   </div>
@@ -200,7 +167,9 @@ const FAQ = [
           <div class="pi-bar">
             <span class="pi-ic"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
             <span class="pi-av">JD</span>
-            <span class="pi-who">Jean Dupont +3 <span class="pi-caret">&#9662;</span></span>
+            <!-- nbsp binds the caret to "+3" so it cannot wrap onto a line of
+                 its own - see the same note in AppGallery.astro. -->
+            <span class="pi-who">Jean Dupont +3&nbsp;<span class="pi-caret">&#9662;</span></span>
             <span class="pi-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           </div>
           <div class="pi-body">
@@ -220,28 +189,11 @@ const FAQ = [
     </div>
 
     <div class="hero-ctas how-ctas">
-      <!-- Same treatment as the hero. This one had been a bare link to the App
-           Store, which left Android with nowhere to go. -->
-      <div class="dl">
-        <button class="btn btn-primary dl-btn" type="button"
-                aria-expanded="false" aria-haspopup="true" aria-controls="dl-how">
-          <svg class="dl-ico" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-          </svg>
-          Get your c.ID
-          <svg class="dl-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
-        </button>
-        <div class="dl-menu" id="dl-how">
-          <a href={IOS} target="_blank" rel="noopener noreferrer">
-            <svg class="dl-brand" viewBox={APPLE.box} aria-hidden="true"><path d={APPLE.d} /></svg>
-            c.Email for iOS
-          </a>
-          <a href={ANDROID} target="_blank" rel="noopener noreferrer">
-            <svg class="dl-brand" viewBox={PLAY.box} aria-hidden="true"><path d={PLAY.d} /></svg>
-            c.Email for Android
-          </a>
-        </div>
-      </div>
+      <StoreDropdown
+        label="Get your c.ID"
+        id="dl-how"
+        itemLabels={["c.Email for iOS", "c.Email for Android"]}
+      />
       <a class="btn btn-ghost" href={DEMO} target="_blank" rel="noopener noreferrer">View an existing c.ID</a>
     </div>
   </div>
@@ -270,38 +222,6 @@ const FAQ = [
 </Layout>
 
 <style>
-  /* --- store dropdown ----------------------------------------------------- */
-  /* Its own thing rather than the header's .has-menu: that one flattens to a
-     permanently-open list below 640px, which is right for a nav sheet and
-     wrong for a button. */
-  /* inline-flex on the wrapper so the button fills it. As a flex item of
-     .hero-ctas the wrapper stretches to the row; without this the button keeps
-     its own height inside a stretched box and ends up short again. */
-  .dl{position:relative;display:inline-flex}
-  .dl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%}
-  .dl-ico{width:15px;height:15px}
-  .dl-chev{width:13px;height:13px;transition:transform .2s}
-  .dl-btn svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .dl.is-open .dl-chev{transform:rotate(180deg)}
-  .dl-menu{
-    display:none;position:absolute;left:0;top:100%;margin-top:10px;min-width:200px;z-index:30;
-    background:var(--bg-1);border:1px solid var(--line);border-radius:12px;padding:6px;
-    box-shadow:var(--shadow-card);
-  }
-  .dl.is-open .dl-menu{display:block}
-  .dl-menu a{
-    display:flex;align-items:center;gap:10px;
-    padding:9px 12px;border-radius:8px;text-decoration:none;
-    color:var(--ink-dim);font-size:14.5px;white-space:nowrap;
-    transition:background-color .2s,color .2s;
-  }
-  /* Sized by height with width:auto: the two marks have different viewBoxes
-     (384x512 and 512x512), so a square box would squash one of them. Filled,
-     not stroked - unlike the chevron and arrow on the button itself. */
-  .dl-brand{height:15px;width:auto;flex-shrink:0;fill:currentColor;stroke:none}
-  .dl-menu a:hover{background:rgba(var(--brand-rgb),.10);color:var(--ink)}
-  .dl-menu a:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
-
   /* --- comparison --------------------------------------------------------- */
   .cmp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:36px}
   @media(max-width:860px){.cmp-grid{grid-template-columns:1fr}}
@@ -435,37 +355,3 @@ const FAQ = [
     font-size:11px;font-weight:600;color:#fff;text-align:center}
 </style>
 
-<script is:inline>
-(function(){
-  var dls = Array.prototype.slice.call(document.querySelectorAll('.dl'));
-  if (!dls.length) return;
-
-  function setOpen(dl, open){
-    dl.classList.toggle('is-open', open);
-    dl.querySelector('.dl-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  function closeAll(except){
-    dls.forEach(function(d){ if (d !== except) setOpen(d, false); });
-  }
-
-  dls.forEach(function(dl){
-    dl.querySelector('.dl-btn').addEventListener('click', function(e){
-      /* Without this the document handler below closes it again on the same click. */
-      e.stopPropagation();
-      var open = !dl.classList.contains('is-open');
-      closeAll(dl);
-      setOpen(dl, open);
-    });
-  });
-
-  document.addEventListener('click', function(){ closeAll(); });
-  document.addEventListener('keydown', function(e){
-    if (e.key !== 'Escape') return;
-    /* Hand focus back to the button that opened it, or Escape strands the
-       keyboard user inside a panel that no longer exists. */
-    var open = dls.filter(function(d){ return d.classList.contains('is-open'); })[0];
-    if (open) open.querySelector('.dl-btn').focus();
-    closeAll();
-  });
-})();
-</script>

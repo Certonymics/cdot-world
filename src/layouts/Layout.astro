@@ -13,8 +13,12 @@ interface Props {
   description: string;
   ogTitle?: string;
   ogDescription?: string;
+  /* For pages that are not destinations - currently only 404. Suppresses the
+     canonical as well as adding the directive: a 404 naming itself canonical
+     is asserting that the missing URL is the right one to index. */
+  noindex?: boolean;
 }
-const { title, description, ogTitle, ogDescription } = Astro.props;
+const { title, description, ogTitle, ogDescription, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
 /* Structured data. A @graph rather than a single Organization node: the three
@@ -210,7 +214,9 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 </script>
 <title>{title}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical} />
+{noindex
+  ? <meta name="robots" content="noindex, follow" />
+  : <link rel="canonical" href={canonical} />}
 <meta property="og:title" content={ogTitle ?? title} />
 <meta property="og:description" content={ogDescription ?? description} />
 <meta property="og:url" content={canonical} />

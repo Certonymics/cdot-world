@@ -129,7 +129,11 @@ const EMAILS = [
             <div class="ag-appbar">
               <span class="ag-ic"><svg viewBox="0 0 24 24" set:html={I.burger} /></span>
               <span class="ag-avatar">JD</span>
-              <span class="ag-who">Jean Dupont +3 <span class="ag-caret">&#9662;</span></span>
+              <!-- nbsp, so the caret cannot be left stranded on a line of its
+                   own: the label is wider than the 92px this column gets, so it
+                   wraps, and a normal space here lets the arrow wrap alone.
+                   Bound to "+3", the break falls after "Dupont" instead. -->
+              <span class="ag-who">Jean Dupont +3&nbsp;<span class="ag-caret">&#9662;</span></span>
               <span class="ag-ic">
                 {t.key === "pay" || t.key === "vault"
                   ? <b class="ag-cur">$ <span class="ag-caret">&#9662;</span></b>

@@ -1,13 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import AppGallery from "../components/AppGallery.astro";
+import StoreDropdown from "../components/StoreDropdown.astro";
 
-const title = "cDot: Secure identity, communication and payments";
+/* Kept in step with the hero. These had drifted into describing the previous,
+   infrastructure-led pitch - the description was the old subheading verbatim,
+   so it was advertising a sentence no longer on the page. */
+const title = "cDot: Secure identity, email, messaging, and payments";
 const description =
-  "cDot is the network designed for private payments, verified identity, programmable money, and autonomous agents.";
-const ogTitle = "cDot — Secure identity, communication and payments";
+  "When apps and websites track everything you do, stay private online with cDot: the app for secure identity, email, messaging, and payments.";
+const ogTitle = "cDot — Secure identity, email, messaging, and payments";
+/* Ported from HowItWorks.jsx in 'Cdot site (main)'. Its `highlight` and
+   `features` branches are dropped - no step there sets either. */
+const HOW = [
+  ["Download the app", "Get the free cDot app for iOS or Android."],
+  ["Connect your email", "You’ll be able to send encrypted emails with your existing address, plus prove your identity and pay with just your email."],
+  ["Scan your ID and take a selfie", "A one-time check that encrypts your identity information into anonymous attribute proofs."],
+  ["Start using cDot", "Your encrypted identity is now tied to your email, powering private messaging, payments, and verification."],
+];
+
 const ogDescription =
-  "cDot is the blockchain network built for secure, private, and instant payments. A regulatable framework for private payments, and a purpose-built system for the future of money.";
+  "When apps and websites track everything you do, stay private online with cDot. Share only what you want, when you want — across identity, email, messaging, and payments.";
 ---
 
 <Layout title={title} description={description} ogTitle={ogTitle} ogDescription={ogDescription}>
@@ -17,16 +30,62 @@ const ogDescription =
     <img src="/assets/Calque_1.svg" alt="" width="283" height="338" decoding="async">
   </div>
   <div class="wrap">
-    <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale</h1>
-    <p class="sub">cDot is the network designed for private payments, verified identity, programmable money, and autonomous agents.</p>
+    <h1>The app for <span class="glow">secure identity, email, messaging, and payments</span>.</h1>
+    <p class="sub">When apps and websites track everything you do, stay private online with cDot. Share only what you want, when you want.</p>
     <div class="hero-ctas">
-      <a class="btn btn-primary" href="#apps">Discover cDot</a>
-      <a class="btn btn-ghost" href="#contact">Contact us</a>
+      <StoreDropdown label="Download the app" id="dl-home" />
+      <a class="btn btn-ghost" href="/network">Discover the network</a>
     </div>
   </div>
 </div>
 
 <AppGallery />
+
+<div class="divider"></div>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">Protect your privacy in just a few minutes.</p>
+    <!-- An <ol>, so the order is in the markup rather than only in the styling:
+         the numbers are drawn by a CSS counter, and a reader who never sees
+         them still gets a numbered list. -->
+    <ol class="hiw">
+      {HOW.map(([t, b]) => (
+        <li>
+          <div class="hiw-card">
+            <h3>{t}</h3>
+            <p>{b}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Ported from WhyCdotExists.jsx in 'Cdot site (main)'. A teaser: the full
+     version belongs on /about, which the closing link points at. -->
+<section id="why">
+  <div class="wrap">
+    <h2>Why cDot exists</h2>
+    <p class="lead">The internet never came with a way to prove who you are, keep your data private, or move money safely. cDot is the internet&rsquo;s missing piece: letting you move across the internet untracked and ensuring your money stays yours, whatever happens. Our network is run by a worldwide community — and because it&rsquo;s open-source, anyone can build on it.</p>
+    <p class="lead why-more"><a href="/about">Learn more about cDot</a></p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Ported from NoDataStatement.jsx in 'Cdot site (main)'. Left-aligned and on
+     our tokens; needs no styles of its own, being a heading and two leads. -->
+<section id="privacy">
+  <div class="wrap">
+    <h2>Our goal is to protect your data, not collect it.</h2>
+    <p class="lead">Most apps track your activity and harvest information about you. With cDot, you share anonymous proofs, not personal data, so you only reveal what you choose to.</p>
+    <p class="lead">With no data business to protect, cDot is community-run, open-source, and borderless. You&rsquo;re in control of your identity, funds, and private keys. Our system just makes sure you never lose them.</p>
+  </div>
+</section>
 
 <div class="divider"></div>
 

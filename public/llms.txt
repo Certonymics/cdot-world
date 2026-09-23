@@ -1,65 +1,83 @@
 # cDot
 
-> cDot is the blockchain network built for secure, private, and instant payments, designed for
-> private payments, verified identity, programmable money and autonomous agents. Built by
-> Certonymity Ltd (London, UK).
+> cDot is the app for secure identity, email, messaging, and payments. When apps and websites
+> track everything you do, cDot keeps you private online: share only what you want, when you
+> want. Built by Certonymity Ltd (London, UK), the team behind c.Email (https://c.email/).
 
-Rather than forcing everything onto a single chain, cDot is a family of purpose-built blockchains,
-each engineered for what it does best: identity, stablecoin settlement, and trading, operating
-as one trusted network.
+cDot has two faces, and both are on this site. For people, it is an app: one verified identity
+that works across email, messaging, payments and age checks, without handing your personal data
+to every service you use. Underneath, it is a blockchain network - a family of purpose-built
+chains, each engineered for what it does best: identity, stablecoin settlement, and trading,
+operating as one trusted network.
 
-Mission: cDot is where value is exchanged between people, businesses, and machines. It is the
-blockchain network built for secure, private, and instant payments between any two verified parties.
-Using cryptographic pseudonyms of real verified identities, cDot ensures every transaction is both
-private and accountable. It is an alternative to the inefficiencies and privacy costs of traditional
-finance, a regulatable framework for private payments, and a purpose-built system for the future of
-money.
+## How it works
 
-The problem: stablecoins enable instant, borderless, programmable transactions, but today's
-blockchains aren't designed for them. Existing systems are either fully general or optimised for
-trading, and none were built to integrate identity with payments. Payments at scale don't just need
-speed and low cost - they need verifiable identity on both sides of a transaction. As AI agents
-increasingly transact on behalf of people and businesses, stablecoin payments also need native agent
-identity to remain accountable, auditable, and trusted. No single general-purpose chain can serve all
-these purposes. Combining decentralised identity, stablecoin payments, and agent permissions, cDot
-exists to close the gap. cDot is built by the team behind c.Email (https://c.email/).
+Download the app, connect your existing email address, then scan an ID and take a selfie once.
+That one-time check encrypts your identity information into anonymous attribute proofs held on
+your device. From then on your encrypted identity is tied to your email, powering private
+messaging, payments, and verification - services receive a proof of what they need to know,
+not your data.
 
-The network (three chains, interoperable by design):
+## The network
+
+Three chains, interoperable by design. Specifications are on https://cdot.world/network/.
 
 1. C-Layer - identity and asset recovery chain: a decentralised identity chain for people,
-   businesses, and agents. Cryptographic pseudonyms of verified real identities provide privacy with
-   accountability. 15,000 tx/s through a highly parallel architecture, WASM smart contracts, 20s
-   finality, permissionless, public and pseudonymous, run by nodes around the world for maximum
-   resilience and decentralisation.
+   businesses, and agents. Cryptographic pseudonyms of verified real identities provide privacy
+   with accountability. 15,000 tx/s through a highly parallel architecture, WASM smart contracts,
+   20s finality, permissionless, public and pseudonymous, run by nodes around the world for
+   maximum resilience and decentralisation. Anyone can run a node and earn CDOT tokens.
 2. P-Layer - settlement chain: engineered for high-throughput, low-cost global stablecoin
-   settlement and truly programmable money, with native on- and off-ramping; 30,000 tx/s, finality
-   <1s, byzantine security 45%; agentic transactions supported with verifiable, revocable
-   permissions.
-3. T-Layer - trading chain: a high-performance decentralised exchange, offering stablecoin swaps and
-   perpetual futures in a predictable execution environment. 30,000 tx/s through native
-   multithreaded operations, finality <1s, a node-permissioned overlay on the C-layer, private and
-   accountable, native NASDAQ-like matching engine.
+   settlement and truly programmable money, with native on- and off-ramping; 30,000 tx/s,
+   finality <1s, byzantine security 45%; agentic transactions supported with verifiable,
+   revocable permissions.
+3. T-Layer - trading chain: a high-performance decentralised exchange, offering stablecoin swaps
+   and perpetual futures in a predictable execution environment. 30,000 tx/s through native
+   multithreaded operations, finality <1s, a node-permissioned overlay on the C-layer, private
+   and accountable, native NASDAQ-like matching engine.
 
-Use cases - instant, low-cost settlement for any use case: global payments and payroll,
-remittances, embedded finance, microtransactions, machine-to-machine commerce, on- and off-ramping,
-asset recovery (never lose your self custodied crypto), bank accounts. With real-time settlement,
-low fees, and no middlemen, stablecoins are as much a way to save money as a cryptocurrency. cDot's
-secure design and invisible cryptography means every transaction settles instantly, every
-participant (human or agent) is verified and accountable, while every real-world identity and
-transaction stays private. Transfer money, pay teams and suppliers, settle trades, and do much more
-on cDot.
+## Why it exists
+
+Stablecoins enable instant, borderless, programmable transactions, but today's blockchains
+aren't designed for them. Existing systems are either fully general or optimised for trading,
+and none were built to integrate identity with payments. Payments at scale don't just need speed
+and low cost - they need verifiable identity on both sides of a transaction. As AI agents
+increasingly transact on behalf of people and businesses, stablecoin payments also need native
+agent identity to remain accountable, auditable, and trusted. No single general-purpose chain
+can serve all these purposes. Combining decentralised identity, stablecoin payments, and agent
+permissions, cDot exists to close the gap.
 
 ## Pages
 
-- [cDot](https://cdot.world/): the single landing page - mission, the problem, the three
-  chains and their specifications, use cases, and contact.
+- [cDot](https://cdot.world/): the app, its five products, how it works, and contact.
+- [Network](https://cdot.world/network/): the three chains and their specifications, plus the
+  live C-Layer node map and node-operator signup.
+- [c.ID](https://cdot.world/product/c-id/): prove your age, not your identity. A reusable,
+  privacy-preserving proof of age linked to your email address, using zero-knowledge proofs so
+  a service learns only that you meet its age requirement. Includes an FAQ.
+- [c.Pay](https://cdot.world/product/c-pay/): instant, borderless, private payments -
+  stablecoin settlement, why the existing chains do not serve it, and the use cases.
+- [c.Email](https://cdot.world/product/c-email/): encrypted, authenticated email with your
+  existing account.
+- [c.Chat](https://cdot.world/product/c-chat/): decentralised private messaging.
+- [c.Vault](https://cdot.world/product/c-vault/): store and recover any asset.
+- [FAQ](https://cdot.world/faq/)
+- [About](https://cdot.world/about/)
+
+Note: c.Email, c.Chat, c.Vault, FAQ and About are published but not yet written out in full.
+Prefer the pages above them for anything substantive.
 
 ## Data
 
 - [C-Layer node registry](https://map.c-layer.certonym.org/api/data): live JSON of the
-  community-run nodes plotted on the site's network map.
+  community-run nodes plotted on the network map.
 
 ## Contact
 
 - [info@certonymity.com](mailto:info@certonymity.com): general enquiries.
 - Certonymity Ltd, 86-87 Campden Street, London W8 7EN, United Kingdom.
+
+## Disclaimer
+
+cDot is technical infrastructure. Any regulated activities, including banking and payments, are
+performed by licensed partners.

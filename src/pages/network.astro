@@ -104,7 +104,7 @@ const description =
       <p class="mapcount" id="mapcount">Connecting to the C-Layer&hellip;</p>
       <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
     </div>
-    <p class="lead">The C-layer is currently under development, but anyone can run a node. Register your interest:</p>
+    <p class="lead">Anyone can run a node — join the network to secure the C-layer and earn CDOT tokens.</p>
     <form class="node-form" id="clayerForm" name="clayer-nodes">
       <!-- A placeholder is not a label: it vanishes on first keystroke and many
            screen readers skip it entirely. Visually hidden, still announced. -->
@@ -113,7 +113,7 @@ const description =
              placeholder="name@company.com" required>
       <!-- Honeypot: hidden from people, filled in by bots. -->
       <input class="cf-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <button class="btn btn-primary" type="submit">Sign up</button>
+      <button class="btn btn-primary" type="submit">Register your interest</button>
     </form>
     <p class="node-status" id="clayer-status" role="status" aria-live="polite"></p>
   </div>
@@ -146,7 +146,7 @@ const description =
     statusEl.classList.add('is-error');
     sending = false;
     button.disabled = false;
-    button.textContent = 'Sign up';
+    button.textContent = 'Register your interest';
   }
 
   form.addEventListener('submit', async function(e){
@@ -155,7 +155,7 @@ const description =
 
     sending = true;
     button.disabled = true;
-    button.textContent = 'Signing up…';
+    button.textContent = 'Registering…';
     statusEl.textContent = '';
     statusEl.classList.remove('is-error');
 
@@ -166,7 +166,7 @@ const description =
          submission fails before it starts. Sent as text/plain it is a "simple
          request" and goes straight through; doPost reads the raw body regardless. */
       /* Without a timeout a stalled connection leaves the button disabled on
-         "Signing up…" forever, with no way to retry. */
+         "Registering…" forever, with no way to retry. */
       const response = await fetch(CLAYER_SIGNUP_URL, {
         signal: AbortSignal.timeout(15000),
         method: 'POST',
@@ -176,7 +176,7 @@ const description =
       /* Only confirm what the server actually confirmed. */
       if (!response.ok || !result || !result.ok) return fail(result && result.error);
 
-      /* The form goes away on success, so there is no live Sign up button left
+      /* The form goes away on success, so there is no live Register button left
          under a thank-you message inviting a second submission. */
       form.hidden = true;
       statusEl.textContent = 'Thanks — we’ll be in touch!';
