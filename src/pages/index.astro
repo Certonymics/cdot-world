@@ -3,13 +3,19 @@ import Layout from "../layouts/Layout.astro";
 import AppGallery from "../components/AppGallery.astro";
 import StoreDropdown from "../components/StoreDropdown.astro";
 
-/* Kept in step with the hero. These had drifted into describing the previous,
-   infrastructure-led pitch - the description was the old subheading verbatim,
-   so it was advertising a sentence no longer on the page. */
-const title = "cDot: Secure identity, email, messaging, and payments";
+/* These follow the TAGLINE, not the hero. The hero names the four products -
+   "identity, email, messaging, and payments" - where the tagline collapses the
+   middle two into "communication". It is the tagline that is baked into og.png
+   and sits in the header of every page, so a search result or a shared link
+   that reads differently from the card beside it would look like a different
+   product. These track the line that travels. */
+const title = "cDot: Secure identity, communication and payments";
 const description =
-  "When apps and websites track everything you do, stay private online with cDot: the app for secure identity, email, messaging, and payments.";
-const ogTitle = "cDot — Secure identity, email, messaging, and payments";
+  "When apps and websites track everything you do, stay private online with cDot: the app for secure identity, communication and payments.";
+const ogTitle = "cDot — Secure identity, communication and payments";
+const ogDescription =
+  "When apps and websites track everything you do, stay private online with cDot. Share only what you want, when you want — across identity, communication and payments.";
+
 /* Ported from HowItWorks.jsx in 'Cdot site (main)'. Its `highlight` and
    `features` branches are dropped - no step there sets either. */
 const HOW = [
@@ -18,9 +24,6 @@ const HOW = [
   ["Scan your ID and take a selfie", "A one-time check that encrypts your identity information into anonymous attribute proofs."],
   ["Start using cDot", "Your encrypted identity is now tied to your email, powering private messaging, payments, and verification."],
 ];
-
-const ogDescription =
-  "When apps and websites track everything you do, stay private online with cDot. Share only what you want, when you want — across identity, email, messaging, and payments.";
 ---
 
 <Layout title={title} description={description} ogTitle={ogTitle} ogDescription={ogDescription}>
@@ -82,8 +85,7 @@ const ogDescription =
 <section id="privacy">
   <div class="wrap">
     <h2>Our goal is to protect your data, not collect it.</h2>
-    <p class="lead">Most apps track your activity and harvest information about you. With cDot, you share anonymous proofs, not personal data, so you only reveal what you choose to.</p>
-    <p class="lead">With no data business to protect, cDot is community-run, open-source, and borderless. You&rsquo;re in control of your identity, funds, and private keys. Our system just makes sure you never lose them.</p>
+    <p class="lead">Most apps track your activity and harvest information about you. With cDot, you share anonymous proofs, not personal data, so you only reveal what you choose to. With no data business to protect, cDot is community-run, open-source, and borderless. You&rsquo;re in control of your identity, funds, and private keys. Our system just makes sure you never lose them.</p>
   </div>
 </section>
 

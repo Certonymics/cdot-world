@@ -12,7 +12,11 @@
     color:var(--ink);
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
+    /* No overflow-x here. html's `clip` above already stops sideways scroll,
+       and unlike `hidden` it does not turn the element into a scroll
+       container - which on body would make it the scrollport for every
+       position:sticky on the site, and since body is exactly as tall as its
+       content and never scrolls internally, nothing would ever stick. */
   }
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
   @media(max-width:640px){.wrap{padding:0 18px}}
@@ -169,13 +173,15 @@
 
   /* Page hero. The interior-page counterpart to .hero, and the template every
      new page uses: the same gradient language and the same left-aligned
-     h1 + .sub, but shorter, on a tighter type scale, and with no watermark.
-     The difference is the point - the homepage has to stay the loudest thing
-     on the site, and repeating its hero full size would flatten the hierarchy.
-     The mark in particular is the homepage's signature and does not repeat.
+     h1 + .sub, but shorter and on a tighter type scale. The difference is the
+     point - the homepage has to stay the loudest thing on the site, and
+     repeating its hero full size would flatten the hierarchy. It carries the
+     cprint mark too, but magnified and hung off the right edge rather than the
+     homepage's whole-figure treatment, so the two read as related without one
+     being a copy of the other.
 
-     No min-height: these pages are as tall as their content, where the homepage
-     hero deliberately holds most of the first screen.
+     A modest min-height, not the homepage's 92vh: enough for the mark to read
+     as a slice of something larger, not enough to hold the screen.
 
      THE TYPE LADDER IS THE POINT. Three rungs, each needing daylight between it
      and the next, at the wide end where most desktop reading happens:
@@ -201,7 +207,39 @@
     position:relative;
     background:radial-gradient(1050px 660px at 72% 16%,
       var(--wash) 0%,var(--bg-2) 34%,var(--bg-1) 64%,var(--bg-0) 100%);
+    min-height:420px;display:flex;align-items:center;
   }
+  /* The cprint mark, as it sits on certonym.org's hero: the full artwork at
+     1200px, hung off the right edge by 20% of its own width and centred
+     vertically, so what shows is a magnified slice rather than the whole print.
+     At 1440px tall it is far taller than any hero here, which is the point.
+
+     A BACKGROUND on a pseudo-element, not an <img>. A background cannot spill
+     outside its own box, so this crops to the hero without overflow:hidden -
+     which .page-hero must not have, or it clips the store dropdown that opens
+     out of the Identity hero.
+
+     The filter is the original's, verbatim. It opens with brightness(0), so it
+     flattens whatever the source fill is and tints from black - meaning the
+     colour comes out the same here as it does there. */
+  .page-hero::after{
+    content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:url("/assets/cprint.svg") no-repeat right -240px center;
+    background-size:1200px auto;
+    opacity:.02;
+    filter:brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2000%)
+           hue-rotate(220deg) brightness(.9) contrast(1.2);
+  }
+  /* Dark needs more than light's .02, where the mark is a near-black tint laid
+     on a near-black page and simply vanishes - but not much more. The filter
+     leaves it darker than the surface it sits on, so it reads as a shadow
+     rather than a highlight - and a shadow resolves into a shape long before a
+     highlight would. It wants to be felt and not seen. */
+  :root[data-theme="dark"] .page-hero::after{opacity:.06}
+  @media(max-width:860px){
+    .page-hero::after{background-size:820px auto;background-position:right -160px center}
+  }
+  /* z-index 2 keeps the copy above the cprint layer below it. */
   .page-hero .wrap{position:relative;z-index:2;width:100%;padding-top:152px;padding-bottom:88px}
   .page-hero h1{font-size:clamp(30px,6.8vw,46px);max-width:760px}
   .page-hero .sub{margin-top:20px}
@@ -686,6 +724,43 @@
     .hiw li{gap:14px}
     .hiw li::before{width:34px;height:34px;font-size:14.5px}
     .hiw li::after{left:17px}
+  }
+
+  /* FAQ accordion. <details>/<summary>, so the open/close behaviour, keyboard
+     handling and screen-reader semantics come from the element rather than from
+     script - the section works with JavaScript off. Global rather than scoped
+     to a page: two product pages carry one of these now. */
+  .faq{margin-top:30px;border-top:1px solid var(--line);max-width:780px}
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-item summary{
+    list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:20px;
+    padding:20px 0;font-size:17px;font-weight:500;color:var(--ink);
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary:hover{color:var(--cyan)}
+  .faq-item summary:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+  .faq-item summary span:first-child{flex:1}
+  /* Drawn in CSS rather than swapping + for -, so it rotates through the
+     change instead of jumping. */
+  .faq-mark{position:relative;width:14px;height:14px;flex-shrink:0;margin-top:5px}
+  .faq-mark::before,.faq-mark::after{
+    content:"";position:absolute;left:0;top:6px;width:14px;height:2px;
+    border-radius:2px;background:var(--cyan);transition:transform .25s ease;
+  }
+  .faq-mark::after{transform:rotate(90deg)}
+  .faq-item[open] .faq-mark::after{transform:rotate(0)}
+  .faq-a{padding:0 44px 24px 0;color:var(--ink-dim);font-size:15.5px;line-height:1.7}
+  .faq-a p{margin:0 0 14px}
+  .faq-a p:last-child{margin-bottom:0}
+  .faq-a ul{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+  .faq-a .faq-note{font-size:13px;color:var(--ink-faint)}
+  .faq-a a{color:var(--blue);text-decoration:none}
+  .faq-a a:hover{text-decoration:underline}
+  .faq-foot{margin-top:26px}
+  .faq-foot a{color:var(--blue);text-decoration:none}
+  .faq-foot a:hover{text-decoration:underline}
+  @media(prefers-reduced-motion:reduce){
+    .faq-mark::before,.faq-mark::after{transition:none}
   }
 
   .notfound{min-height:70vh;display:flex;align-items:center;padding-top:116px}

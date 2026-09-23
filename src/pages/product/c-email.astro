@@ -1,15 +1,733 @@
 ---
+/* Content ported from the c.email-website homepage (Home.jsx): the hero, "Why
+ * use c.Email?", "How c.Email works" and the FAQ. Its "Built on the cDot
+ * framework" and C-layer map sections are left out - the framework is what
+ * this whole site is about, and the map lives on /network.
+ *
+ * Styling is ours throughout: left-aligned, our tokens, and the two list
+ * sections reuse patterns the site already has - the numbered .hiw steps from
+ * the homepage, and the global <details> FAQ from the other product pages.
+ * The original renders Why and How as interactive panels with illustrations;
+ * flattened here to a card grid and the step list, which is what this site
+ * does with a set of points.
+ */
 import Layout from "../../layouts/Layout.astro";
+import StoreDropdown from "../../components/StoreDropdown.astro";
 
-const title = "Email — cDot";
-const description = "Secure, verified email on cDot.";
+const title = "Email \u2014 cDot";
+const description =
+  "Send authenticated, end-to-end encrypted messages from your existing email address. Available on iOS, Android, and Chrome.";
+
+const CHROME =
+  "https://chromewebstore.google.com/detail/cemail-beta/nkjndjopnihapdifnakhijbhpmcjioeb";
+
+const WHY = [
+  { v: "enc",     t: "Protect your emails from prying eyes",
+    b: "End-to-end encryption with post-quantum security keeps your emails between you and the people you choose." },
+  { v: "auth",    t: "Verified sending",
+    b: "Verified sending prevents impersonation and guarantees you know exactly who an email is from." },
+  { v: "connect", t: "Keep your current email address",
+    b: "Get started instantly \u2013 you\u2019ll carry on using your current email, with no migration process or technical knowledge required." },
+  { v: "fyeo",    t: "Maximum security for the most important emails",
+    b: "Turn on For Your Eyes Only to make emails decryptable only when the intended recipient is looking at the screen." },
+  { v: "cipher",  t: "Keep hackers out of your inbox",
+    b: "c.Email keeps your private key on your device for invisible two-factor authentication \u2014 even if someone guesses your email password, they can\u2019t read your encrypted messages." },
+  { v: "data",    t: "Stay in control of your data",
+    b: "c.Email never shares your data with anyone. Even when we verify your identity, your data is only stored on your device." },
+];
+
+/* The verified tick that sits on the sender row, from the original. */
+const TICK = '<path d="M9.80785 16C9.7269 16 9.64538 15.9795 9.57375 15.9408L8.38228 15.3023C8.26523 15.2395 8.13304 15.2061 8.00026 15.2061C7.86749 15.2061 7.7353 15.2395 7.61825 15.3023L6.42678 15.9408C6.35457 15.9795 6.27362 16 6.19268 16C6.02729 16 5.87297 15.9179 5.7798 15.7801L5.01926 14.6573C4.86785 14.4333 4.61628 14.2996 4.34782 14.2996L2.9933 14.3072C2.73649 14.3072 2.52335 14.1161 2.49423 13.8622L2.33933 12.5119C2.30846 12.241 2.14599 12.0041 1.90549 11.8786L0.706445 11.2542C0.479915 11.1363 0.378005 10.8666 0.470015 10.6268L0.955687 9.35855C1.05352 9.10407 1.01858 8.81853 0.863677 8.59513L0.090329 7.48109C-0.0558385 7.2706 -0.0214804 6.98388 0.170692 6.81501L1.18629 5.91967C1.39011 5.74025 1.49144 5.47112 1.45708 5.20023L1.28646 3.85166C1.25443 3.5966 1.4169 3.35913 1.66498 3.29933L2.97757 2.98153C3.24079 2.91762 3.45451 2.72706 3.54943 2.47142L4.02055 1.19789C4.09276 1.00205 4.28085 0.870712 4.48817 0.870712C4.52951 0.870712 4.57028 0.875989 4.61046 0.885957L5.91898 1.219C5.9842 1.23541 6.05117 1.24421 6.11814 1.24421C6.31846 1.24421 6.51122 1.16974 6.66088 1.03547L7.666 0.128408C7.75801 0.0457344 7.87622 0 7.9991 0C8.12197 0 8.24077 0.0457344 8.3322 0.128408L9.33732 1.03547C9.4864 1.17033 9.67915 1.24421 9.88006 1.24421C9.94703 1.24421 10.014 1.236 10.0792 1.219L11.3877 0.885957C11.4279 0.875989 11.4693 0.870712 11.51 0.870712C11.7173 0.870712 11.9054 1.00205 11.9776 1.19789L12.4488 2.47142C12.5431 2.72706 12.7574 2.91762 13.0206 2.98153L14.3332 3.29933C14.5813 3.35913 14.7438 3.5966 14.7117 3.85166L14.5411 5.20023C14.5068 5.47054 14.6081 5.73967 14.8119 5.91967L15.8275 6.81501C16.0197 6.98446 16.054 7.2706 15.9079 7.48109L15.1345 8.59513C14.979 8.81853 14.9447 9.10407 15.0425 9.35855L15.5282 10.6268C15.6202 10.8666 15.5183 11.1363 15.2918 11.2542L14.0927 11.8786C13.8522 12.0041 13.6897 12.2404 13.6589 12.5119L13.504 13.8622C13.4748 14.1161 13.2617 14.3072 13.0078 14.3072L11.655 14.2996C11.3813 14.2996 11.1303 14.4333 10.9784 14.6573L10.2178 15.7801C10.1246 15.9173 9.97032 16 9.80494 16H9.80785Z" fill="#566AFD"/><path d="M6.55773 10.7753C6.44184 10.7753 6.32596 10.7319 6.2357 10.6451L4.47179 8.94533C4.28602 8.76649 4.27961 8.46922 4.45723 8.28218C4.63484 8.09514 4.93009 8.08869 5.11585 8.26752L6.55307 9.65245L10.8787 5.36046C11.0621 5.17869 11.3568 5.18104 11.5373 5.36515C11.7178 5.54984 11.7155 5.84653 11.5327 6.0283L6.88442 10.6398C6.79358 10.7296 6.67536 10.7747 6.55715 10.7747L6.55773 10.7753Z" fill="white"/>';
+
+const CIPHER = [
+  "enc://v1:9b72fa44c1ee58d0baf3",
+  "7f3a91bc204d8e15c6a0b94f2d",
+  "e81c07ab5936f4d2ac18be705a",
+  "4f8a2c9e7b1d::a91e6c3bf0",
+  "d52b8fe013ca7649bd2e8f01",
+];
+
+const DATA_ROWS = [
+  ["Name", "Sarah Mitchell"],
+  ["Email", "sm@outlook..."],
+  ["Document", "Passport"],
+  ["Biometrics", "\u2022\u2022\u2022\u2022\u2022\u2022"],
+];
+const HOW = [
+  { v: "link",   t: "Link your email address",
+    b: "Choose any Gmail or Outlook address to connect instantly." },
+  { v: "verify", t: "Confirm your identity",
+    b: "Scan your existing ID and pass a liveness check. Your data is only stored on your device." },
+  { v: "did",    t: "Create your decentralised identity document (DID)",
+    b: "Encrypted emails are cryptographically signed to guarantee authenticity." },
+  { v: "send",   t: "Send and receive secure emails",
+    b: "Emails are encrypted and decrypted on your device, never on our servers." },
+];
+
+const DID_ROWS = [
+  ["Public encryption key", "enc:4f8a\u2026c9e7"],
+  ["Public verification key", "ver:b3d1\u2026a02f"],
+];
+
+/* The three sending levels, as the original lists them. */
+const LEVELS = [
+  ["notsecure", "NOT SECURE", "Not authenticated, encrypted, or recommended.", true],
+  ["secure", "SECURE", "Authenticated and end-to-end encrypted: even we can\u2019t read it.", false],
+  ["foryoureyesonly", "FOR YOUR EYES ONLY", "Authenticated, encrypted, and protected with our biometric decryption technology.", false],
+];
+
+/* A tick used on both verification rows. */
+const OK = '<circle cx="8" cy="8" r="7" fill="#566afd"/><path d="M4.5 8l2.5 2.5 4.5-4.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+const FAQ = [
+  { q: `What is c.Email?`, html: `
+    <p>c.Email is an app and browser extension that lets you send authenticated, end-to-end encrypted emails from your existing address.</p>` },
+  { q: `How does c.Email work?`, html: `
+    <p>To use c.Email, just connect your existing email address – you don't have to create a new account. You then complete a quick, one-time identity check to create your decentralised identity document (DID). This contains your public encryption and verification keys, letting you encrypt and digitally sign your emails.</p>
+    <p>When sending emails, you can then choose between three security levels:</p>
+    <p><strong>Not secure:</strong> Not authenticated or encrypted. Unencrypted emails can be read by email providers and hackers – leaving you vulnerable to surveillance, data theft, and fraud. Not recommended.</p>
+    <p><strong>Secure:</strong> Authenticated and protected with post-quantum secure encryption. Can only be read by you and the intended recipient. For when privacy and trust matter.</p>
+    <p><strong>For Your Eyes Only:</strong> Authenticated and only decrypted when the intended recipient is looking at the screen. The reader must pass a continuous liveness check using our biometric decryption technology and a template of the biometric data from their initial identity verification (which is stored on their device, nowhere else). For when absolute secrecy matters.</p>` },
+  { q: `Why should I use c.Email?`, html: `
+    <p>Email, unfortunately, was not designed with security in mind and faces widespread problems with privacy and authenticity. Email providers and hackers can read your emails, leaving your personal data unsafe. Scams and phishing are ubiquitous.</p>
+    <p>To solve this problem, c.Email lets you send authenticated, end-to-end encrypted messages from your existing email address. Email remains ubiquitous because of its simplicity, speed, and availability. We created c.Email from a belief that these features do not have to come at the expense of privacy – and that privacy should be available to everyone.</p>
+    <p>And because your private decryption key stays on your device, c.Email effectively functions as a form of invisible two-factor authentication: even someone who has guessed your email password won't be able to read or send encrypted emails.</p>` },
+  { q: `How does c.Email encrypt my emails?`, html: `
+    <p>c.Email keeps your emails private using end-to-end encryption (E2EE). This is a method of encryption that ensures only the sender and receiver of a message can read it by only encrypting the message on the sender's device, and decrypting on the receiver's, rather than on servers.</p>
+    <p>Specifically, c.Email uses hybrid public-key encryption (HPKE). This pairs classical and post-quantum cryptography, which means that your emails stay private even if either system is broken at some point in the future. c.Email uses ML-KEM, the post-quantum standard published by NIST (the National Institute of Standards and Technology).</p>
+    <p>c.Email is not involved in the sending process. Instead, emails are encrypted on your device before sending, remain encrypted in transit, and are only decrypted on the recipient's device. Nothing is ever stored, encrypted, or decrypted on our servers. (The only exception to this is for businesses using our Business Self-Serve plan, which encrypts emails on a secure server, hosted either by you or us with key management handled by you.) This means no-one else can read your emails: not your email provider, and not us, even if we wanted to.</p>` },
+  { q: `How much does c.Email cost?`, html: `
+    <p>c.Email is free for all users. We'll always have a free tier, and will soon be introducing premium features as part of an expanded product suite — watch this space!</p>` },
+  { q: `Isn't there a contrast between email encryption and identity verification?`, html: `
+    <p>We are committed to building an internet where privacy is a core feature, not a complicated add-on. Email, by definition, can never be fully anonymous – it's just not what it's for. Metadata, IP addresses, and other essential features of email can always be used to link emails to sender or recipient identities.</p>
+    <p>However, email is a key part of the internet (and in many cases, a key part of life full stop), so we think everyone should be able to send private, safe emails. c.Email offers privacy — in other words, protection against your emails being read by hackers and email providers — through end-to-end encryption, and security — protection against impersonation — through identity verification. We don't try and offer you full anonymity, and that is by choice.</p>` },
+];
 ---
 
 <Layout title={title} description={description}>
-  <div class="page-hero">
-    <div class="wrap">
-      <h1>Email</h1>
-      <p class="sub">Coming soon.</p>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>Secure emails made easy</h1>
+    <p class="sub">Send authenticated, end-to-end encrypted messages from your existing email address.</p>
+    <div class="hero-ctas">
+      <StoreDropdown label="Download app" id="dl-email" />
+      {/* A plain link, not a dropdown: the original wraps this in the same
+          store-menu component as the app button, but it opens onto a single
+          destination, and a menu of one is just a button with an extra click.
+          Hidden on small screens, as it is there - a Chrome extension is
+          nothing a phone can install. */}
+      <a class="btn btn-ghost desktop-only" href={CHROME} target="_blank" rel="noopener noreferrer">
+        Install Chrome extension
+      </a>
     </div>
   </div>
+</div>
+
+<section id="why">
+  <div class="wrap">
+    <h2>Why use c.Email?</h2>
+    <p class="lead">Don&rsquo;t choose between security and convenience. c.Email&rsquo;s encryption means hackers and email providers can&rsquo;t read your emails, while verification means no-one can impersonate you &mdash; and you don&rsquo;t even have to change your email.</p>
+
+    <!-- Titles, screen and copy are three flat lists placed into three grid
+         columns, rather than the original's two separate DOM trees for desktop
+         and mobile. One copy of the content, and the narrow layout just stacks
+         the same three blocks. -->
+    <div class="why">
+      <div class="why-tabs" role="tablist" aria-label="Why use c.Email">
+        {WHY.map((w, i) => (
+          <button
+            class="why-tab"
+            type="button"
+            role="tab"
+            data-why={i}
+            id={`why-tab-${i}`}
+            aria-controls={`why-panel-${i}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            tabindex={i === 0 ? 0 : -1}
+          >{w.t}</button>
+        ))}
+      </div>
+
+      <!-- The screens are depictions of the c.Email app, so they keep their own
+           light palette in both themes - as the phone mockups elsewhere do. -->
+      <div class="why-stage">
+        {WHY.map((w, i) => (
+          <div
+            class:list={["why-vis", { "is-on": i === 0 }]}
+            data-vis={i}
+            aria-hidden="true"
+          >
+            {w.v === "enc" && (
+              <article class="vm vm-card">
+                <div class="vm-row"><b>Emily Rodriguez</b><span>2 Jun</span></div>
+                <p class="vm-subj">4f8a2c9e7b1d::a91e</p>
+                <div class="vm-row vm-foot">
+                  <p class="vm-enc">enc://v1:9b72fa44c1ee58d0baf3</p>
+                  <img src="/assets/secure.svg" alt="" width="16" height="16" />
+                </div>
+              </article>
+            )}
+
+            {w.v === "auth" && (
+              <div class="vm vm-auth">
+                <div class="vm-sender">
+                  <span class="vm-av">S</span>
+                  <b>Sarah Mitchell</b>
+                  <svg viewBox="0 0 16 16" width="14" height="14" class="vm-tick" set:html={TICK} />
+                </div>
+                <div class="vm-id">
+                  <svg class="vm-rings" viewBox="0 0 110 110" width="110" height="110" aria-hidden="true">
+                    {[14, 26, 38, 50, 62, 74, 86, 98].map((r) => (
+                      <circle cx="90" cy="20" r={r} />
+                    ))}
+                  </svg>
+                  <span class="vm-idic">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <div class="vm-fields">
+                    <div><p>Name</p><b>Sarah Mitchell</b></div>
+                    <div><p>Document used</p><b>Passport</b></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {w.v === "connect" && (
+              <div class="vm vm-connect">
+                <div class="vm-field">
+                  <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+                    <rect x="2" y="4" width="20" height="16" rx="2.5" />
+                    <path d="M2 8l8.5 5.5a3 3 0 003 0L22 8" />
+                  </svg>
+                  <span>sarah@outlook.com</span>
+                  <svg class="vm-ok" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                    <circle cx="8" cy="8" r="7" fill="#566afd" stroke="none" />
+                    <path d="M4.5 8l2.5 2.5 4.5-4.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div class="vm-cta">Connect email</div>
+              </div>
+            )}
+
+            {w.v === "fyeo" && (
+              <div class="vm vm-over">
+                <article class="vm-card vm-blur">
+                  <div class="vm-row"><b>Emily Rodriguez</b><span>2h</span></div>
+                  <p class="vm-subj">4f8a2c9e7b1d::a91e</p>
+                  <div class="vm-fyeo">
+                    <img src="/assets/foryoureyesonly.svg" alt="" width="16" height="16" />
+                    <span>For your eyes only</span>
+                  </div>
+                </article>
+                <div class="vm-badge">
+                  <img src="/assets/foryoureyesonly.svg" alt="" width="38" height="38" />
+                </div>
+              </div>
+            )}
+
+            {w.v === "cipher" && (
+              <article class="vm vm-card">
+                {CIPHER.map((l) => <p class="vm-cipher">{l}</p>)}
+              </article>
+            )}
+
+            {w.v === "data" && (
+              <div class="vm vm-over">
+                <div class="vm-rows vm-blur">
+                  {DATA_ROWS.map(([k, v]) => (
+                    <div><span>{k}</span><b>{v}</b></div>
+                  ))}
+                </div>
+                <div class="vm-badge">
+                  <img src="/assets/certonymicon.svg" alt="" width="42" height="42" />
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div class="why-copy">
+        {WHY.map((w, i) => (
+          <p
+            class:list={["why-text", { "is-on": i === 0 }]}
+            data-txt={i}
+            id={`why-panel-${i}`}
+            role="tabpanel"
+            aria-labelledby={`why-tab-${i}`}
+          >{w.b}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <h2>How c.Email works</h2>
+    <p class="lead">A few quick steps to protect your emails from surveillance, scams, and impersonation.</p>
+
+    <!-- Scroll-driven, as on c.email: the screen sits still while the steps
+         move past it, and swaps as each one reaches the middle of the view.
+         One DOM for both widths - the panel is sticky either way, and narrow
+         screens simply stack it above the steps instead of beside them. -->
+    <div class="s4">
+      <div class="s4-col">
+        <div class="s4-stage" aria-hidden="true">
+          {HOW.map((st, i) => (
+            <div class:list={["s4-vis", { "is-on": i === 0 }]} data-vis={i}>
+              <div class="s4-card">
+{st.v === "link" && (
+                <div class="hv-tiles">
+                  <span><img src="/assets/gmail-logo.svg" alt="" width="34" height="34" /></span>
+                  <span><img src="/assets/outlook-logo.svg" alt="" width="34" height="34" /></span>
+                  <span>
+                    <svg viewBox="0 -960 960 960" width="34" height="34">
+                      <path d="M145.09-145.87q-32.51 0-55.87-23.35-23.35-23.36-23.35-55.87v-509.82q0-32.74 23.35-56.26 23.36-23.53 55.87-23.53h669.82q32.74 0 56.26 23.53 23.53 23.52 23.53 56.26v509.82q0 32.51-23.53 55.87-23.52 23.35-56.26 23.35H145.09ZM480-443.91l-334.91-223v441.82h669.82v-441.82L480-443.91Zm0-73 330.91-218H150.09l329.91 218Zm-334.91-150v-68 509.82-441.82Z"/>
+                    </svg>
+                  </span>
+                </div>
+              )}
+
+              {st.v === "verify" && (
+                <div class="hv-rows">
+                  <div class="hv-row">
+                    <span class="hv-ic">
+                      <svg viewBox="0 0 22 18" width="22" height="18">
+                        <rect x="1" y="1" width="20" height="16" rx="2" stroke-width="1.5"/>
+                        <circle cx="7.5" cy="9" r="2.5" stroke-width="1.3"/>
+                        <line x1="12" y1="5.5" x2="19" y2="5.5" stroke-width="1.3" stroke-linecap="round"/>
+                        <line x1="12" y1="9" x2="17" y2="9" stroke-width="1.3" stroke-linecap="round"/>
+                        <line x1="12" y1="12.5" x2="15" y2="12.5" stroke-width="1.3" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <span class="hv-txt"><b>ID scan</b><i>NFC chip detected</i></span>
+                    <svg class="hv-ok" viewBox="0 0 16 16" width="14" height="14" set:html={OK} />
+                  </div>
+                  <div class="hv-row">
+                    <span class="hv-ic">
+                      <svg viewBox="0 0 22 22" width="22" height="22">
+                        <path d="M1 6V2h4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 2h4v4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M1 16v4h4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 20h4v-4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8" cy="9.5" r="1" fill="#566afd" stroke="none"/>
+                        <circle cx="14" cy="9.5" r="1" fill="#566afd" stroke="none"/>
+                        <path d="M8 13.5Q11 15.5 14 13.5" stroke-width="1.2" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <span class="hv-txt"><b>Liveness check</b><i>Face verified</i></span>
+                    <svg class="hv-ok" viewBox="0 0 16 16" width="14" height="14" set:html={OK} />
+                  </div>
+                </div>
+              )}
+
+              {st.v === "did" && (
+                <article class="hv-did">
+                  <div class="hv-did-head">
+                    <svg viewBox="0 0 16 16" width="17" height="17">
+                      <path d="M8 1a5 5 0 00-5 5v2a9 9 0 01-.6 3.2M5.5 3.6A4 4 0 0111 6v2a13 13 0 01-.5 3.6M8 6v2a17 17 0 01-1 5.6M8 11.5a24 24 0 01-.4 3.2" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+                    </svg>
+                    <b>Your DID</b>
+                  </div>
+                  {DID_ROWS.map(([k, v]) => (
+                    <div class="hv-did-row"><span>{k}</span><b>{v}</b></div>
+                  ))}
+                </article>
+              )}
+
+              {st.v === "send" && (
+                <div class="hv-levels">
+                  {LEVELS.map(([icon, label, note, warn]) => (
+                    <div class:list={["hv-level", { warn }]}>
+                      <img src={`/assets/${icon}.svg`} alt="" width="18" height="18" />
+                      <span><b>{label}</b><i>{note}</i></span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <ol class="s4-steps">
+        {HOW.map((st, i) => (
+          <li class="s4-step" data-step={i}>
+            <p class="s4-n">{i + 1}. {st.t}</p>
+            <p class="s4-b">{st.b}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>FAQ</h2>
+    <div class="faq">
+      {FAQ.map((f) => (
+        <details class="faq-item">
+          <summary>
+            <span>{f.q}</span>
+            <span class="faq-mark" aria-hidden="true"></span>
+          </summary>
+          <div class="faq-a" set:html={f.html} />
+        </details>
+      ))}
+    </div>
+    {/* c.Email's own site, not ours. That product has a full, working site of
+        its own, and its complete FAQ lives there rather than on /faq here. */}
+    <p class="lead faq-foot">
+      <a href="https://c.email/faq" target="_blank" rel="noopener noreferrer">Read our full FAQ</a>
+    </p>
+  </div>
+</section>
+
 </Layout>
+
+<style>
+  /* --- Why: titles | screen | copy ---------------------------------------- */
+  /* Only the interactive block is washed, not the heading above it - the wash
+     is what marks off the part you can actually touch. Same gradient family as
+     the heroes, one notch shallower so it reads as a panel, not a banner. */
+  .why{
+    display:grid;grid-template-columns:1fr auto 1fr;gap:48px;align-items:center;
+    margin-top:38px;padding:44px;border:1px solid var(--line);border-radius:22px;
+    /* c.Email's .hero-gradient verbatim: a white base with three soft blooms -
+       #EBF5FF top-centre, #D3EBFF bottom-left, #B3D7FF bottom-right - all at
+       low alpha, so the blue only ever suggests itself. */
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(235,245,255,.9) 0%, rgba(235,245,255,.4) 30%, transparent 70%),
+      radial-gradient(ellipse 70% 50% at 10% 100%, rgba(211,235,255,.7) 0%, rgba(211,235,255,.3) 40%, transparent 70%),
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(179,215,255,.6) 0%, rgba(179,215,255,.2) 40%, transparent 70%),
+      linear-gradient(135deg, #fff 0%, rgba(235,245,255,.5) 50%, #fff 100%);
+  }
+  /* The same three blooms on our dark surfaces - the original is light-only, so
+     its literal blues would read as a lit panel here. */
+  :root[data-theme="dark"] .why{
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(var(--brand-rgb),.14) 0%, rgba(var(--brand-rgb),.06) 30%, transparent 70%),
+      radial-gradient(ellipse 70% 50% at 10% 100%, rgba(var(--accent-rgb),.12) 0%, rgba(var(--accent-rgb),.05) 40%, transparent 70%),
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(var(--brand-rgb),.10) 0%, rgba(var(--brand-rgb),.04) 40%, transparent 70%),
+      linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%);
+  }
+  @media(max-width:1000px){
+    /* Stacks to the same three blocks rather than switching to a second copy
+       of the content, which is what the original does at this width. */
+    .why{grid-template-columns:1fr;gap:26px;justify-items:start;padding:28px}
+  }
+  .why-tabs{display:flex;flex-direction:column;gap:4px}
+  @media(max-width:1000px){.why-tabs{flex-direction:row;flex-wrap:wrap;gap:8px}}
+  .why-tab{
+    text-align:left;padding:12px 16px;border-radius:12px;cursor:pointer;
+    font-family:inherit;font-size:14.5px;font-weight:500;
+    border:1px solid transparent;background:transparent;color:var(--ink-dim);
+    transition:color .2s,background-color .2s,border-color .2s;
+  }
+  .why-tab:hover{color:var(--ink);background:var(--hover-veil)}
+  .why-tab[aria-selected="true"]{
+    color:var(--ink);background:var(--bg-0);
+    border-color:var(--line);box-shadow:var(--shadow-card);
+  }
+  .why-tab:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+  @media(max-width:1000px){
+    .why-tab{padding:9px 16px;border-radius:999px;border-color:var(--line)}
+  }
+
+  /* One box, all six screens stacked inside it: sizing to the tallest keeps
+     the panel from resizing as the selection moves. */
+  .why-stage{
+    position:relative;display:grid;place-items:center;
+    width:260px;min-height:200px;padding:36px;
+    border:1px solid var(--line);border-radius:18px;background:var(--bg-0);
+  }
+  .why-vis{grid-area:1/1;opacity:0;pointer-events:none;transition:opacity .25s ease}
+  .why-vis.is-on{opacity:1}
+  .why-copy{display:grid}
+  .why-text{grid-area:1/1;opacity:0;color:var(--ink-dim);font-size:17px;line-height:1.65;
+    transition:opacity .25s ease}
+  .why-text.is-on{opacity:1}
+  @media(prefers-reduced-motion:reduce){
+    .why-vis,.why-text{transition:none}
+  }
+
+  /* --- the six screens. Light in both themes: they depict the c.Email app,
+         which is light, exactly as the phone mockups elsewhere do. ---------- */
+  .vm{font-size:11px;color:#111}
+  .vm-card{width:186px;border:1px solid rgba(86,106,253,.25);border-radius:12px;
+    background:rgba(235,245,255,.55);padding:12px}
+  .vm-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .vm-row b{font-size:11px;font-weight:600;color:rgba(0,0,0,.8);overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .vm-row span{font-size:10px;color:rgba(0,0,0,.45);flex-shrink:0}
+  .vm-subj{margin-top:4px;font-size:11px;font-weight:500;color:rgba(0,0,0,.8)}
+  .vm-foot{margin-top:4px;align-items:flex-end}
+  .vm-enc{font-size:10px;color:rgba(0,0,0,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vm-cipher{font-family:var(--font-mono);font-size:10px;line-height:1.45;
+    color:rgba(0,0,0,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .vm-auth{display:flex;flex-direction:column;gap:10px;width:180px}
+  .vm-sender{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;
+    background:#fff;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .vm-av{width:24px;height:24px;border-radius:50%;background:#566afd;color:#fff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+  .vm-sender b{flex:1;font-size:11px;font-weight:600;color:rgba(0,0,0,.8);overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .vm-tick{width:14px;height:14px;flex-shrink:0}
+  .vm-id{position:relative;overflow:hidden;display:flex;gap:12px;padding:12px;
+    border-radius:12px;border:1px solid rgba(86,106,253,.2);background:#eef0ff}
+  .vm-rings{position:absolute;right:-10px;top:-10px;width:110px;height:110px;opacity:.12;
+    fill:none;stroke:#566afd;stroke-width:1.5}
+  .vm-idic{position:relative;width:36px;height:36px;border-radius:9px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;background:rgba(86,106,253,.2);
+    color:#566afd}
+  .vm-idic svg{width:18px;height:18px;fill:currentColor;opacity:.7}
+  .vm-fields{position:relative;display:flex;flex-direction:column;gap:6px}
+  .vm-fields p{font-size:9px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;
+    color:rgba(86,106,253,.55)}
+  .vm-fields b{font-size:11px;font-weight:700;color:#566afd}
+
+  .vm-connect{display:flex;flex-direction:column;gap:8px;width:190px}
+  .vm-field{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;
+    background:#fff;border:1px solid rgba(86,106,253,.25);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .vm-field > svg:first-child{width:13px;height:13px;flex-shrink:0;fill:none;
+    stroke:rgba(0,0,0,.3);stroke-width:1.8;stroke-linecap:round}
+  .vm-field span{flex:1;font-size:11px;font-weight:500;color:rgba(0,0,0,.7);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vm-ok{width:14px;height:14px;flex-shrink:0}
+  .vm-cta{border-radius:12px;background:#566afd;color:#fff;text-align:center;
+    padding:9px 12px;font-size:11px;font-weight:600}
+
+  /* The blurred card with a crisp mark over it: the point is that the content
+     is unreadable until the right person is looking. */
+  .vm-over{position:relative;display:grid;place-items:center;width:180px}
+  .vm-over > *{grid-area:1/1}
+  .vm-blur{filter:blur(2.5px);opacity:.65;user-select:none}
+  .vm-badge{position:relative;display:flex;align-items:center;justify-content:center;
+    padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.9);
+    backdrop-filter:blur(4px);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .vm-fyeo{display:flex;align-items:center;gap:6px;margin-top:8px}
+  .vm-fyeo span{font-size:10px;font-weight:600;color:#566afd}
+  .vm-rows{width:170px;border-radius:12px;border:1px solid rgba(86,106,253,.15);
+    background:rgba(235,245,255,.5)}
+  .vm-rows div{display:flex;align-items:center;gap:8px;padding:6px 12px;
+    border-top:1px solid rgba(86,106,253,.1)}
+  .vm-rows div:first-child{border-top:0}
+  .vm-rows span{width:56px;flex-shrink:0;font-size:9px;font-weight:500;color:rgba(0,0,0,.4)}
+  .vm-rows b{flex:1;font-size:10px;font-weight:600;color:rgba(0,0,0,.6);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+  /* --- How it works: sticky screen, steps scrolling past ----------------- */
+  .s4{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-top:36px}
+  /* Each step is about a screenful tall, so exactly one of them owns the
+     middle of the view at a time - which is what the observer keys off. */
+  .s4-step{
+    min-height:calc(100svh - 8rem);display:flex;flex-direction:column;
+    justify-content:center;border-bottom:1px solid var(--line);
+  }
+  .s4-steps{list-style:none;margin:0;padding:0}
+  .s4-step:last-child{border-bottom:0}
+  .s4-n{font-weight:600;color:var(--cyan);font-size:17px;margin-bottom:10px}
+  .s4-b{color:var(--ink-dim);font-size:17px;line-height:1.65;max-width:34rem}
+
+  /* As on c.email: the full-height column is what sticks, and the panel is
+     centred inside it - so the box itself is a wide rectangle sized to the
+     column, not to the viewport. Hardcoded pale blue rather than tokens
+     because the screens inside depict the light-themed app, exactly like the
+     phone mockups elsewhere on the site. */
+  .s4-col{
+    position:sticky;top:112px;height:calc(100svh - 8rem);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .s4-stage{
+    width:100%;min-height:320px;
+    display:grid;place-items:center;
+    border:1px solid #D6EBFF;border-radius:16px;background:#FAFCFF;padding:40px;
+  }
+  .s4-vis{
+    grid-area:1/1;opacity:0;transform:translateY(12px);pointer-events:none;
+    transition:opacity .35s ease,transform .35s ease;
+  }
+  .s4-vis.is-on{opacity:1;transform:none}
+  .s4-card{width:100%;max-width:262px}
+  @media(prefers-reduced-motion:reduce){
+    .s4-vis{transition:opacity .2s ease;transform:none}
+  }
+
+  @media(max-width:900px){
+    /* Stacked: the panel still sticks, just above the steps rather than
+       beside them, so it stays in view as they pass. */
+    .s4{grid-template-columns:1fr;gap:20px}
+    .s4-col{top:88px;height:auto}
+    .s4-stage{min-height:240px;padding:26px}
+    .s4-step{min-height:62vh}
+    .s4-n,.s4-b{font-size:15.5px}
+  }
+
+  /* The four screens. Light in both themes, like every other app mockup. */
+  .hv-tiles{display:flex;align-items:center;justify-content:center;gap:14px}
+  .hv-tiles span{width:56px;height:56px;border-radius:12px;display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;
+    border:1px solid rgba(86,106,253,.2);background:rgba(235,245,255,.7)}
+  .hv-tiles svg{fill:#566afd}
+
+  .hv-rows{display:flex;flex-direction:column;gap:10px}
+  .hv-row{display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;
+    border:1px solid rgba(86,106,253,.25);background:rgba(235,245,255,.55)}
+  .hv-ic{width:38px;height:38px;border-radius:9px;flex-shrink:0;display:flex;
+    align-items:center;justify-content:center;background:rgba(86,106,253,.15)}
+  .hv-ic svg{fill:none;stroke:#566afd}
+  .hv-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+  .hv-txt b{font-size:11px;font-weight:600;color:rgba(0,0,0,.8)}
+  .hv-txt i{font-style:normal;font-size:10px;color:rgba(0,0,0,.45)}
+  .hv-ok{flex-shrink:0}
+
+  .hv-did{border:1px solid rgba(86,106,253,.25);border-radius:12px;
+    background:rgba(235,245,255,.55);padding:14px}
+  .hv-did-head{display:flex;align-items:center;gap:8px;padding-bottom:11px;margin-bottom:11px;
+    border-bottom:1px solid rgba(86,106,253,.15);color:#566afd}
+  .hv-did-head b{font-size:12px;font-weight:600;color:rgba(0,0,0,.8)}
+  .hv-did-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-size:11px;margin-top:9px}
+  .hv-did-row:first-of-type{margin-top:0}
+  .hv-did-row span{flex-shrink:0;color:rgba(0,0,0,.5)}
+  .hv-did-row b{font-weight:500;color:rgba(0,0,0,.8);text-align:right}
+
+  .hv-levels{display:flex;flex-direction:column;gap:9px}
+  .hv-level{display:flex;align-items:flex-start;gap:11px;padding:12px;border-radius:12px;
+    border:1px solid #566afd;background:#eff3ff}
+  .hv-level.warn{border-color:#ff7300;background:#fff5eb}
+  .hv-level img{flex-shrink:0;margin-top:1px}
+  .hv-level span{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .hv-level b{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#566afd}
+  .hv-level i{font-style:normal;font-size:10px;line-height:1.35;color:rgba(86,106,253,.8)}
+  .hv-level.warn b{color:#ff7300}
+  .hv-level.warn i{color:rgba(255,115,0,.8)}
+
+  /* --- the same four screens, in dark ------------------------------------
+     Unlike the phone mockups elsewhere - which depict the app itself and so
+     stay light in both themes - these are diagrams, and a pale blue slab in a
+     dark page reads as a lightbox. The panel goes to a neutral slate grey
+     rather than another navy, so it separates from the page behind it, and
+     everything inside has to follow: the contents are hardcoded black-on-blue
+     and would otherwise be invisible on it. */
+  :root[data-theme="dark"] .s4-stage{
+    background:#141820;border-color:rgba(234,243,255,.14);
+  }
+  :root[data-theme="dark"] .hv-tiles span{
+    border-color:rgba(var(--brand-rgb),.38);background:rgba(234,243,255,.06);
+  }
+  :root[data-theme="dark"] .hv-tiles svg{fill:var(--cyan)}
+
+  :root[data-theme="dark"] .hv-row{
+    border-color:rgba(var(--brand-rgb),.32);background:rgba(234,243,255,.05);
+  }
+  :root[data-theme="dark"] .hv-ic{background:rgba(var(--brand-rgb),.24)}
+  :root[data-theme="dark"] .hv-ic svg{stroke:var(--cyan)}
+  :root[data-theme="dark"] .hv-txt b{color:var(--ink)}
+  :root[data-theme="dark"] .hv-txt i{color:var(--ink-faint)}
+
+  :root[data-theme="dark"] .hv-did{
+    border-color:rgba(var(--brand-rgb),.32);background:rgba(234,243,255,.05);
+  }
+  :root[data-theme="dark"] .hv-did-head{
+    border-bottom-color:rgba(var(--brand-rgb),.22);color:var(--cyan);
+  }
+  :root[data-theme="dark"] .hv-did-head b,
+  :root[data-theme="dark"] .hv-did-row b{color:var(--ink)}
+  :root[data-theme="dark"] .hv-did-row span{color:var(--ink-faint)}
+
+  :root[data-theme="dark"] .hv-level{
+    border-color:rgba(var(--brand-rgb),.55);background:rgba(var(--brand-rgb),.12);
+  }
+  :root[data-theme="dark"] .hv-level b{color:var(--cyan)}
+  :root[data-theme="dark"] .hv-level i{color:rgba(234,243,255,.62)}
+  /* #ff7300 sits at about 3:1 on this panel - too dark for 10px body text, so
+     the warning state lifts to a lighter amber here. */
+  :root[data-theme="dark"] .hv-level.warn{
+    border-color:#ff9a3d;background:rgba(255,115,0,.13);
+  }
+  :root[data-theme="dark"] .hv-level.warn b{color:#ff9a3d}
+  :root[data-theme="dark"] .hv-level.warn i{color:rgba(255,154,61,.82)}
+
+  @media(max-width:640px){
+    .desktop-only{display:none}
+  }
+</style>
+
+<script is:inline>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.why-tab'));
+  if (!tabs.length) return;
+  var vis  = Array.prototype.slice.call(document.querySelectorAll('.why-vis'));
+  var txt  = Array.prototype.slice.call(document.querySelectorAll('.why-text'));
+
+  function select(i, focus){
+    tabs.forEach(function(t, n){
+      var on = n === i;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      /* Roving tabindex: the list is one tab stop and arrows move within it. */
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+    });
+    vis.forEach(function(v, n){ v.classList.toggle('is-on', n === i); });
+    txt.forEach(function(p, n){ p.classList.toggle('is-on', n === i); });
+  }
+
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ select(i, false); });
+  });
+
+  document.querySelector('.why-tabs').addEventListener('keydown', function(e){
+    var i = tabs.findIndex(function(t){ return t.getAttribute('aria-selected') === 'true'; });
+    if (i < 0) return;
+    var next = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? i + 1
+             : e.key === 'ArrowUp'   || e.key === 'ArrowLeft'  ? i - 1
+             : e.key === 'Home' ? 0
+             : e.key === 'End'  ? tabs.length - 1
+             : -1;
+    if (next === -1) return;
+    e.preventDefault();
+    select((next + tabs.length) % tabs.length, true);
+  });
+})();
+</script>
+
+<script is:inline>
+(function(){
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.s4-step'));
+  var vis   = Array.prototype.slice.call(document.querySelectorAll('.s4-vis'));
+  if (!steps.length || !vis.length) return;
+
+  function show(i){
+    vis.forEach(function(v, n){ v.classList.toggle('is-on', n === i); });
+  }
+
+  /* No IntersectionObserver - and more importantly no JS at all - leaves the
+     first screen showing and the copy entirely readable, so the section
+     degrades to a plain illustrated list rather than to nothing. */
+  if (!('IntersectionObserver' in window)) return;
+
+  /* A band one pixel high across the middle of the viewport: a step counts as
+     current the moment it crosses the centre line, which is what keeps the
+     swap in step with reading rather than with the top edge of the section. */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) show(steps.indexOf(e.target));
+    });
+  }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+
+  steps.forEach(function(el){ io.observe(el); });
+})();
+</script>
