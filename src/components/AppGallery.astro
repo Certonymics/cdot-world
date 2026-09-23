@@ -49,6 +49,14 @@ const PILLS = {
   vault:    [["shield", "Store and protect any asset"], ["pin", "Prove ownership with your identity"], ["lock", "Extra security for high-value assets"]],
 };
 
+/* Signed distance from the active tab, wrapping both ways: with five screens
+   that gives 0, ±1, ±2, so the two furthest away sit off-stage whichever
+   direction you came from. Rendered for tab 0; the script recomputes it. */
+const off = (i, active = 0) => {
+  const d = (i - active + TABS.length) % TABS.length;
+  return d > TABS.length / 2 ? d - TABS.length : d;
+};
+
 /* Which bottom-nav item is lit on each screen. */
 const NAV = [["inbox", "Inbox"], ["chat", "Chat"], ["wallet", "Wallet"], ["apps", "Apps"], ["shield", "Vault"]];
 const NAV_ON = { identity: 0, email: 0, chat: 1, pay: 2, vault: 4 };
@@ -67,7 +75,8 @@ const EMAILS = [
     <h2>One app to protect you, wherever you go</h2>
     <p class="lead">Whatever you need to do, do it privately with cDot.</p>
 
-    <div class="ag-tabs" role="tablist" aria-label="cDot app features">
+    <div class="ag-layout">
+      <div class="ag-tabs" role="tablist" aria-label="cDot app features">
       {TABS.map((t, i) => (
         <button
           class="ag-tab"
@@ -78,27 +87,38 @@ const EMAILS = [
           aria-selected={i === 0 ? "true" : "false"}
           aria-controls={`ag-panel-${t.key}`}
           tabindex={i === 0 ? 0 : -1}
+          data-label={t.name}
         >{t.name}</button>
       ))}
-    </div>
+      </div>
 
-    <p class="ag-copy" id="ag-copy">{TABS[0].copy}</p>
-    <!-- The per-tab line, handed to the script as data rather than duplicated
-         into it - one definition of the copy, up in the frontmatter. -->
-    <script
-      type="application/json"
-      id="ag-data"
-      is:inline
-      set:html={JSON.stringify(Object.fromEntries(TABS.map((t) => [t.key, t.copy])))}
-    />
+      <!-- Every tab's copy and pills are rendered up front and revealed by CSS
+           rather than built on demand: nothing to rebuild on each change, and
+           the text is all in the markup for a crawler. -->
+      <div class="ag-info">
+        {TABS.map((t, i) => (
+          <div class:list={["ag-info-item", { "is-active": i === 0 }]} data-info={t.key}>
+            <p class="ag-copy">{t.copy}</p>
+            <ul class="ag-feats">
+              {PILLS[t.key].map(([ic, label]) => (
+                <li><svg viewBox="0 0 24 24" set:html={I[ic]} />{label}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
 
-    <!-- Horizontal scroll below 1100px: five 218px screens do not fit, and
-         shrinking them any further makes the screen content unreadable. -->
-    <div class="ag-rail" tabindex="0" role="group" aria-label="App screens">
+    <!-- Carousel. All five screens stay in the DOM; data-off is each one's
+         signed distance from the active tab, wrapping at both ends, and CSS
+         turns that into a position. Only -1/0/+1 are visible - five will not
+         fit at a readable size, and the tab list above is what tells you where
+         in the five you are. -->
+    <div class="ag-stage">
       {TABS.map((t, i) => (
         <div
-          class:list={["ag-unit", { "is-active": i === 0 }]}
+          class="ag-unit"
           data-unit={t.key}
+          data-off={off(i)}
           id={`ag-panel-${t.key}`}
           role="tabpanel"
           aria-labelledby={`ag-tab-${t.key}`}
@@ -212,72 +232,147 @@ const EMAILS = [
             <div class="ag-nav">
               {NAV.map(([ic, label], n) => (
                 <span class:list={["ag-nav-i", { on: n === NAV_ON[t.key] }]}>
-                  {label === "Vault" && t.key !== "vault" && <i class="ag-soon">Soon</i>}
                   <svg viewBox="0 0 24 24" set:html={I[ic]} />
                   <span>{label}</span>
                 </span>
               ))}
             </div>
           </div>
-
-          <ul class="ag-pills">
-            {PILLS[t.key].map(([ic, label]) => (
-              <li><svg viewBox="0 0 24 24" set:html={I[ic]} />{label}</li>
-            ))}
-          </ul>
         </div>
       ))}
+    </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* --- section chrome: themed like the rest of the site ------------------- */
-  #apps .wrap > h2,
-  #apps .wrap > .lead{text-align:center;margin-left:auto;margin-right:auto}
-  .ag-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:32px}
-  .ag-tab{
-    border-radius:999px;padding:9px 18px;font-size:14px;font-family:inherit;font-weight:500;
-    border:1px solid var(--line);background:transparent;color:var(--ink-dim);
-    cursor:pointer;transition:color .2s,background-color .2s,border-color .2s;
+  /* --- section chrome: themed and left-aligned like the rest of the site --- */
+  /* Two rows, two columns: the pills and the copy stack down the left, and the
+     stage spans both rows on the right. Spanning is what lifts the screens up
+     level with the top of the pills, rather than starting below them - and it
+     does it structurally, so nothing has to be nudged by a magic offset that
+     would drift the moment the pills wrapped to a second line.
+
+     The left column is sized to hold the pill row on one line (they measure
+     about 500px all told), which also puts the stage's left edge clear of the
+     rightmost pill by the full column gap. */
+  .ag-layout{
+    /* One value for the space above the pills and the space below them, so the
+       row sits equidistant between the standfirst and the copy by construction
+       rather than by two numbers that happen to match today. */
+    --ag-gap:36px;
+    display:grid;
+    grid-template-columns:minmax(0,500px) 1fr;
+    /* auto 1fr, not auto auto. With two auto rows the grid shares the stage's
+       spare height between them, which pushes the pill row down off the top
+       line and carries everything under it along too. */
+    grid-template-rows:auto 1fr;
+    column-gap:48px;align-items:start;margin-top:var(--ag-gap);
   }
-  .ag-tab:hover{color:var(--ink)}
-  /* --brand-strong, not --brand: white on --brand is 4.31:1 and this label is
-     small text, so it would miss AA. One ramp step down clears it at 5.36:1. */
+  .ag-tabs{grid-column:1;grid-row:1}
+  .ag-info{grid-column:1;grid-row:2;align-self:start;margin-top:var(--ag-gap)}
+  .ag-stage{grid-column:2;grid-row:1 / span 2}
+
+  /* A row, each pill sized to its own label. */
+  .ag-tabs{display:flex;flex-wrap:wrap;gap:8px}
+  .ag-tab{
+    border-radius:999px;padding:10px 20px;font-size:15px;font-family:inherit;font-weight:500;
+    text-align:left;cursor:pointer;
+    border:1.5px solid rgba(var(--brand-rgb),.2);
+    background:transparent;color:var(--ink-dim);
+    transition:color .2s,background-color .2s,border-color .2s;
+  }
+  /* Every pill silently reserves the width of its own label at weight 600, so
+     that selecting one - which bolds it - cannot change its width. It matters
+     more at natural widths than it did at a shared one: "Payments" measures
+     66.7px at 500 and 70.9px at 600, and that 4px would shove every pill after
+     it along the row each time it was picked. */
+  .ag-tab::before{
+    content:attr(data-label);
+    display:block;height:0;overflow:hidden;visibility:hidden;font-weight:600;
+  }
+  /* Hover and selected are the same translucent brand wash at two strengths,
+     borrowed from the feature pills below, and both turn the label brand blue.
+     Selected takes a heavier border and weight too, because the two washes
+     alone sit close enough that hover would read as selection.
+
+     --cyan, not --brand-text. In light they are the same value (#4A5AE8), so
+     this IS the brand blue there; in dark --brand-text is #566AFD, which is
+     only 4.57:1 on the background before any wash and cannot clear 4.5:1 at
+     15px once one is laid over it - at any alpha. --cyan is the accent-text
+     step of the same ramp and is tuned per scheme for exactly this job.
+
+     The .12 is load-bearing: at .16 the light pairing drops to 4.38:1. */
+  .ag-tab:hover{color:var(--cyan);border-color:rgba(var(--brand-rgb),.35);
+    background:rgba(var(--brand-rgb),.07)}
   .ag-tab[aria-selected="true"]{
-    background:var(--brand-strong);border-color:var(--brand-strong);color:#fff;
+    color:var(--cyan);font-weight:600;
+    border-color:rgba(var(--brand-rgb),.5);
+    background:rgba(var(--brand-rgb),.12);
   }
   .ag-tab:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
-  .ag-copy{margin-top:18px;text-align:center;color:var(--ink-dim);font-size:15.5px}
 
-  .ag-rail{display:flex;justify-content:center;align-items:flex-start;gap:12px;padding:40px 0 8px}
-  @media(max-width:1100px){
-    .ag-rail{
-      justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;
-      padding-left:2px;padding-right:2px;-webkit-overflow-scrolling:touch;
-    }
-    .ag-unit{scroll-snap-align:center}
-  }
-  .ag-rail:focus-visible{outline:2px solid var(--cyan);outline-offset:4px;border-radius:18px}
+  .ag-info-item{display:none}
+  .ag-info-item.is-active{display:block}
+  .ag-copy{margin:0;color:var(--ink-dim);font-size:15.5px}
 
+  /* --- stage ------------------------------------------------------------- */
+  /* Fixed height because the screens are absolutely positioned: without it the
+     stage would collapse and drag the footer up under the phones. */
+  .ag-stage{position:relative;height:474px;overflow:hidden;min-width:0}
   .ag-unit{
-    flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;
-    transform:scale(.87);opacity:.4;filter:blur(.5px);cursor:pointer;
-    transition:transform .35s ease,opacity .35s ease,filter .35s ease;
+    position:absolute;top:0;left:50%;
+    transition:transform .4s cubic-bezier(.22,.61,.36,1),opacity .4s ease,filter .4s ease;
   }
-  .ag-unit.is-active{transform:scale(1);opacity:1;filter:none;cursor:default;z-index:2}
+  .ag-unit[data-off="0"]{transform:translateX(-50%) scale(1);opacity:1;filter:none;z-index:3}
+  .ag-unit[data-off="-1"],
+  .ag-unit[data-off="1"]{opacity:.34;filter:blur(.6px) grayscale(.35);cursor:pointer;z-index:2}
+  /* 148px, not the old 168px: the stage column is narrower now that the pills
+     share the row, and at 168 the outer screens ran past its edge and were
+     clipped by the overflow. At 148 the spread is 478px inside a 484px column. */
+  .ag-unit[data-off="-1"]{transform:translateX(calc(-50% - 148px)) scale(.82)}
+  .ag-unit[data-off="1"]{transform:translateX(calc(-50% + 148px)) scale(.82)}
+  /* Off-stage. pointer-events:none so a click cannot land on a phone nobody
+     can see; they hold nothing focusable, so there is no tab stop to strand. */
+  .ag-unit[data-off="-2"],
+  .ag-unit[data-off="2"]{opacity:0;pointer-events:none;z-index:1}
+  .ag-unit[data-off="-2"]{transform:translateX(calc(-50% - 260px)) scale(.7)}
+  .ag-unit[data-off="2"]{transform:translateX(calc(-50% + 260px)) scale(.7)}
   @media(prefers-reduced-motion:reduce){
     .ag-unit{transition:opacity .2s ease}
   }
 
-  .ag-pills{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;width:100%}
-  .ag-pills li{
-    display:flex;align-items:center;gap:7px;white-space:nowrap;
-    border:1.5px solid rgba(var(--brand-rgb),.2);border-radius:100px;
-    padding:6px 12px;font-size:11px;font-weight:600;color:var(--brand-text);
-    background:var(--card);
+  /* Below the grid breakpoint the columns stack and the tabs go back to a
+     wrapped row: a vertical list of five above a phone pushes the screens off
+     the first screenful entirely. */
+  @media(max-width:900px){
+    /* One column, so the spanning stage becomes a third row and everything
+       falls back into source order: pills, copy, screens. */
+    .ag-layout{grid-template-columns:1fr;grid-template-rows:auto;row-gap:28px}
+    .ag-tabs,.ag-info,.ag-stage{grid-column:1;grid-row:auto}
+    .ag-info{margin-top:0}
+    .ag-stage{height:454px}
+    /* The copy follows the phone it describes once they stack. */
+    .ag-info{margin-top:4px}
+    .ag-unit[data-off="-1"]{transform:translateX(calc(-50% - 140px)) scale(.8)}
+    .ag-unit[data-off="1"]{transform:translateX(calc(-50% + 140px)) scale(.8)}
   }
-  .ag-pills svg{width:13px;height:13px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+
+  /* Plain list, no chrome. As pills these sat directly under the tab pills and
+     read as a second row of controls; without the border and fill they are
+     what they are, three points of copy. Losing the pill also lets them wrap,
+     which the longer ones need in a column this narrow - hence flex-start and
+     the nudge on the icon, so it aligns to the first line rather than to the
+     centre of a two-line item. */
+  .ag-feats{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .ag-feats li{
+    display:flex;align-items:flex-start;gap:9px;
+    font-size:14px;line-height:1.5;color:var(--ink);
+  }
+  .ag-feats svg{
+    width:15px;height:15px;flex-shrink:0;margin-top:3px;
+    fill:none;stroke:var(--cyan);stroke-width:2;
+  }
 
   /* --- the phone itself: light in BOTH themes, see the note at the top ----- */
   .ag-phone{
@@ -368,40 +463,57 @@ const EMAILS = [
     font-size:9px;color:#9ca3af;position:relative}
   .ag-nav-i.on{color:#566afd}
   .ag-nav-i svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
-  .ag-soon{position:absolute;top:-1px;right:6px;background:#566afd;color:#fff;font-size:7px;
-    font-weight:700;font-style:normal;border-radius:3px;padding:1px 3px;line-height:1.2}
 </style>
 
 <script is:inline>
 (function(){
   var tabs  = Array.prototype.slice.call(document.querySelectorAll('.ag-tab'));
   var units = Array.prototype.slice.call(document.querySelectorAll('.ag-unit'));
-  var copy  = document.getElementById('ag-copy');
+  var infos = Array.prototype.slice.call(document.querySelectorAll('.ag-info-item'));
   if (!tabs.length || !units.length) return;
 
-  var TEXT = JSON.parse(document.getElementById('ag-data').textContent);
+  var KEYS = tabs.map(function(t){ return t.dataset.tab; });
+  var n = KEYS.length;
+
+  /* Signed distance from active, wrapping both ways - so stepping off either
+     end of the list slides in from the opposite side rather than jumping the
+     full width of the stage. Mirrors the `off` helper in the frontmatter. */
+  function offset(i, active){
+    var d = (i - active + n) % n;
+    return d > n / 2 ? d - n : d;
+  }
 
   function select(key, focus){
-    tabs.forEach(function(t){
-      var on = t.dataset.tab === key;
+    var active = KEYS.indexOf(key);
+    if (active < 0) return;
+
+    tabs.forEach(function(t, i){
+      var on = i === active;
       t.setAttribute('aria-selected', on ? 'true' : 'false');
       /* Roving tabindex: the tablist is one stop, arrows move within it. */
       t.tabIndex = on ? 0 : -1;
       if (on && focus) t.focus();
     });
-    units.forEach(function(u){ u.classList.toggle('is-active', u.dataset.unit === key); });
-    if (copy) copy.textContent = TEXT[key] || '';
+    units.forEach(function(u, i){ u.dataset.off = offset(i, active); });
+    infos.forEach(function(el){
+      el.classList.toggle('is-active', el.dataset.info === key);
+    });
   }
 
+  /* Click only. Hover used to select as well, but with the copy swapping and
+     five screens sliding on every pill the pointer crossed, simply moving
+     across the row set the whole section going. Hover keeps its colour change
+     on the pill; changing what is shown is a decision, so it takes a click. */
   tabs.forEach(function(t){
     t.addEventListener('click', function(){ select(t.dataset.tab, false); });
   });
 
-  /* Clicking a dimmed phone brings it forward - the whole row reads as
-     clickable, so only answering the pills above would be a dead end. */
+  /* Clicking a neighbouring screen brings it forward. Only the two either side
+     answer - the pair off-stage are pointer-events:none, so a click cannot
+     land on a phone that is not visible. */
   units.forEach(function(u){
     u.addEventListener('click', function(){
-      if (!u.classList.contains('is-active')) select(u.dataset.unit, false);
+      if (u.dataset.off !== '0') select(u.dataset.unit, false);
     });
   });
 

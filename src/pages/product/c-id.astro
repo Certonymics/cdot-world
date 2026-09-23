@@ -1,15 +1,471 @@
 ---
+/* Content ported from AgePass.jsx in c.email-website, minus its "for platforms
+ * and developers" section. "AgePass" becomes "c.ID" throughout.
+ *
+ * Rebuilt rather than copied: left-aligned to match this site, on our tokens
+ * and type scale rather than Darker Grotesque and a black/opacity ramp, and
+ * the FAQ is <details>/<summary> instead of React state - the native element
+ * gives the open/close behaviour, keyboard handling and screen-reader
+ * semantics for free, so the accordion needs no script at all.
+ */
 import Layout from "../../layouts/Layout.astro";
 
 const title = "Identity — cDot";
-const description = "Verified identity on cDot.";
+const description =
+  "c.ID is a reusable, privacy-preserving proof of age linked to your email address. Prove your age without revealing your identity or personal data.";
+
+const IOS = "https://apps.apple.com/gb/app/c-email-secure-email/id6787208131";
+const ANDROID = "https://play.google.com/store/apps/details?id=org.certonym.c.email&hl=en_GB";
+const DEMO = "https://agepass.xyz/";
+
+/* The real store marks, taken from react-icons' Fa set in c.email-website -
+   the same icons that page uses. Lifted rather than redrawn: an approximated
+   brand logo reads as a mistake. Note the two carry different viewBoxes, so
+   they are sized by height with width:auto to keep each one's proportions. */
+const APPLE = {
+  box: "0 0 384 512",
+  d: "M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z",
+};
+const PLAY = {
+  box: "0 0 512 512",
+  d: "M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z",
+};
+
+const STEPS = [
+  {
+    t: "Get c.Email",
+    html: `Download the c.Email app for <a href="${IOS}" target="_blank" rel="noopener noreferrer">iOS</a> or <a href="${ANDROID}" target="_blank" rel="noopener noreferrer">Android</a> to get started.`,
+  },
+  {
+    t: "Prove your identity",
+    html: "Use an existing document and pass a liveness check to prove your identity in 30 seconds. Your personal data stays on your device.",
+  },
+  {
+    t: "Get your c.ID",
+    html: "Get your c.ID along with full access to c.Email&rsquo;s encryption features.",
+  },
+  {
+    t: "Verify your age anonymously",
+    html: "On age-gated platforms accepting c.ID, you can sign up with your email address and automatically prove your eligibility &mdash; the platform receives a zero-knowledge proof without ever seeing your personal data.",
+  },
+  {
+    t: "View your c.ID",
+    html: `Check, edit, or delete the attributes you can prove any time at <a href="${DEMO}" target="_blank" rel="noopener noreferrer">agepass.xyz</a>.`,
+  },
+];
+
+const FAQ = [
+  {
+    q: "What is c.ID?",
+    html: `<p>c.ID is a tool that lets you anonymously pass age verification checks online using only your email address, while remaining fully compliant with rules around age-restricted services.</p>
+           <p>You automatically get a c.ID once you verify your identity with c.Email, our app for secure, private email.</p>`,
+  },
+  {
+    q: "How does it work?",
+    html: `<p>Your c.ID is linked to your email address, so to get one, you first need to download c.Email, our app for secure email.</p>
+           <p>You then prove your identity on a one-time basis with an existing ID and a liveness check. This process takes around 30 seconds, and your identity information is stored only on your device. Once you&rsquo;ve done this, you&rsquo;ll have a c.ID (as well as email encryption at the touch of a button via c.Email).</p>
+           <p>You can then sign up to as many age-gated services as you want with the email address you used. You won&rsquo;t have to prove your age to any of them &mdash; instead, your c.ID allows them to get a zero-knowledge proof* that you pass their age requirement, without ever seeing your data or learning who you are.</p>
+           <p>All of this happens under the hood &mdash; you don&rsquo;t need to understand cryptography or zero-knowledge proofs to use c.ID.</p>
+           <p class="faq-note">*Zero-knowledge proof: a cryptographic protocol that allows one party to prove the truth of a statement to another, without sharing what the statement actually is.</p>`,
+  },
+  {
+    q: "How is c.ID different from traditional identity verification?",
+    html: `<p>Currently, online age checks work in a few different ways:</p>
+           <ul>
+             <li>Document capture and storage, which forces users to hand over excessive personal information to third parties.</li>
+             <li>Age estimation using AI tools, which can be inaccurate and are mistrusted by privacy-conscious users.</li>
+             <li>Self-certification, which can be easily bypassed and is increasingly no longer compliant with regulations in many countries.</li>
+           </ul>
+           <p>We think these models are broken &mdash; so we created c.ID as a safe, privacy-first, fully compliant alternative.</p>`,
+  },
+  {
+    q: "What happens to my data?",
+    html: `<p>When you prove your identity to c.ID on a one-time basis, your data is stored on your device only. That&rsquo;s one difference between verifying with us and with each platform individually &mdash; we don&rsquo;t store your information.</p>`,
+  },
+];
 ---
 
 <Layout title={title} description={description}>
-  <div class="page-hero">
-    <div class="wrap">
-      <h1>Identity</h1>
-      <p class="sub">Coming soon.</p>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>Prove your age, not your identity</h1>
+    <p class="sub">Verify with c.Email to get your c.ID: a reusable, privacy-preserving proof of age linked to your email address.</p>
+    <div class="hero-ctas">
+      <!-- A dropdown, as on the AgePass page: one button over both stores,
+           rather than sending everyone to whichever platform was listed first. -->
+      <div class="dl">
+        <button class="btn btn-primary dl-btn" type="button"
+                aria-expanded="false" aria-haspopup="true" aria-controls="dl-hero">
+          <svg class="dl-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          Download c.Email
+          <svg class="dl-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
+        </button>
+        <div class="dl-menu" id="dl-hero">
+          <a href={IOS} target="_blank" rel="noopener noreferrer">
+            <svg class="dl-brand" viewBox={APPLE.box} aria-hidden="true"><path d={APPLE.d} /></svg>
+            App Store
+          </a>
+          <a href={ANDROID} target="_blank" rel="noopener noreferrer">
+            <svg class="dl-brand" viewBox={PLAY.box} aria-hidden="true"><path d={PLAY.d} /></svg>
+            Google Play
+          </a>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href={DEMO} target="_blank" rel="noopener noreferrer">View demo</a>
     </div>
   </div>
+</div>
+
+<section id="compare">
+  <div class="wrap">
+    <h2>Privacy-preserving age verification</h2>
+    <p class="lead">Use c.ID to share only what you want, when you want.</p>
+
+    <div class="cmp-grid">
+      <div class="cmp">
+        <div class="cmp-art">
+          <div class="cmp-panel">
+            <div class="cmp-drop">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+              </svg>
+              <p>Drag &amp; drop passport or ID</p>
+              <span>or click to upload</span>
+            </div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <h3>Traditional identity verification</h3>
+          <ol>
+            <li>Join a service requiring age verification.</li>
+            <li>Submit your ID and reveal your identity in full.</li>
+            <li>Trust the service not to expose your data to attackers, use it for marketing purposes, train AI systems on it, share it with third parties, or sell it to the highest bidder.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="cmp is-ours">
+        <div class="cmp-art">
+          <div class="cmp-panel">
+            <div class="cmp-proof">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              <p>Your c.ID allowed you to prove you were 18 or older.</p>
+            </div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <h3>c.ID</h3>
+          <ol>
+            <li>Join a service requiring age verification.</li>
+            <li>Prove that you are over the required age &mdash; without sharing your name, age, date of birth, or other personal data.</li>
+            <li>Use the service without having to trust it.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">Prove your age anonymously with just your email.</p>
+
+    <div class="how-grid">
+      <ol class="steps">
+        {STEPS.map((s) => (
+          <li>
+            <p class="step-t">{s.t}</p>
+            <p class="step-b" set:html={s.html} />
+          </li>
+        ))}
+      </ol>
+
+      <!-- Same screen as the Identity phone in the homepage gallery. Its chrome
+           is restated here rather than shared: the gallery's version is one of
+           five bodies inside a carousel and does not come apart cleanly. If a
+           third ever needs it, that is the point to extract a shell component
+           rather than keep a third copy. -->
+      <div class="pi-wrap" aria-hidden="true">
+        <div class="pi">
+          <div class="pi-status"><span>9:41</span></div>
+          <div class="pi-bar">
+            <span class="pi-ic"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
+            <span class="pi-av">JD</span>
+            <span class="pi-who">Jean Dupont +3 <span class="pi-caret">&#9662;</span></span>
+            <span class="pi-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          </div>
+          <div class="pi-body">
+            <p class="pi-lbl">Select proofs to share:</p>
+            <div class="pi-opts">
+              {["Age 16 or older", "Age 18 or older", "Age 21 or older"].map((p, i) => (
+                <div class="pi-opt">
+                  <span class:list={["pi-radio", { on: i === 1 }]}></span>
+                  <span>{p}</span>
+                </div>
+              ))}
+            </div>
+            <div class="pi-cta">Share proof</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-ctas how-ctas">
+      <!-- Same treatment as the hero. This one had been a bare link to the App
+           Store, which left Android with nowhere to go. -->
+      <div class="dl">
+        <button class="btn btn-primary dl-btn" type="button"
+                aria-expanded="false" aria-haspopup="true" aria-controls="dl-how">
+          <svg class="dl-ico" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          Get your c.ID
+          <svg class="dl-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
+        </button>
+        <div class="dl-menu" id="dl-how">
+          <a href={IOS} target="_blank" rel="noopener noreferrer">
+            <svg class="dl-brand" viewBox={APPLE.box} aria-hidden="true"><path d={APPLE.d} /></svg>
+            c.Email for iOS
+          </a>
+          <a href={ANDROID} target="_blank" rel="noopener noreferrer">
+            <svg class="dl-brand" viewBox={PLAY.box} aria-hidden="true"><path d={PLAY.d} /></svg>
+            c.Email for Android
+          </a>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href={DEMO} target="_blank" rel="noopener noreferrer">View an existing c.ID</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      {FAQ.map((f) => (
+        <details class="faq-item">
+          <summary>
+            <span>{f.q}</span>
+            <span class="faq-mark" aria-hidden="true"></span>
+          </summary>
+          <div class="faq-a" set:html={f.html} />
+        </details>
+      ))}
+    </div>
+    <p class="lead faq-foot">Still have questions? <a href="/#contact">Get in touch</a>.</p>
+  </div>
+</section>
+
 </Layout>
+
+<style>
+  /* --- store dropdown ----------------------------------------------------- */
+  /* Its own thing rather than the header's .has-menu: that one flattens to a
+     permanently-open list below 640px, which is right for a nav sheet and
+     wrong for a button. */
+  /* inline-flex on the wrapper so the button fills it. As a flex item of
+     .hero-ctas the wrapper stretches to the row; without this the button keeps
+     its own height inside a stretched box and ends up short again. */
+  .dl{position:relative;display:inline-flex}
+  .dl-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%}
+  .dl-ico{width:15px;height:15px}
+  .dl-chev{width:13px;height:13px;transition:transform .2s}
+  .dl-btn svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .dl.is-open .dl-chev{transform:rotate(180deg)}
+  .dl-menu{
+    display:none;position:absolute;left:0;top:100%;margin-top:10px;min-width:200px;z-index:30;
+    background:var(--bg-1);border:1px solid var(--line);border-radius:12px;padding:6px;
+    box-shadow:var(--shadow-card);
+  }
+  .dl.is-open .dl-menu{display:block}
+  .dl-menu a{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 12px;border-radius:8px;text-decoration:none;
+    color:var(--ink-dim);font-size:14.5px;white-space:nowrap;
+    transition:background-color .2s,color .2s;
+  }
+  /* Sized by height with width:auto: the two marks have different viewBoxes
+     (384x512 and 512x512), so a square box would squash one of them. Filled,
+     not stroked - unlike the chevron and arrow on the button itself. */
+  .dl-brand{height:15px;width:auto;flex-shrink:0;fill:currentColor;stroke:none}
+  .dl-menu a:hover{background:rgba(var(--brand-rgb),.10);color:var(--ink)}
+  .dl-menu a:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
+
+  /* --- comparison --------------------------------------------------------- */
+  .cmp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:36px}
+  @media(max-width:860px){.cmp-grid{grid-template-columns:1fr}}
+  .cmp{
+    border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    display:flex;flex-direction:column;background:var(--card);
+  }
+  /* The one we are arguing for gets the brand edge, so the pair reads as a
+     comparison with a preferred side rather than two neutral options. */
+  .cmp.is-ours{border:1.5px solid rgba(var(--brand-rgb),.5)}
+  .cmp-art{
+    position:relative;min-height:220px;display:flex;align-items:center;
+    justify-content:center;padding:28px;overflow:hidden;
+    background:rgba(var(--brand-rgb),.07);
+  }
+  /* The dotted field, kept from the original - it is what makes the panel above
+     read as a surface rather than a flat block. */
+  .cmp-art::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(circle,rgba(var(--brand-rgb),.28) 1px,transparent 1px);
+    background-size:7px 7px;
+  }
+  .cmp.is-ours .cmp-art::before{
+    background-image:
+      linear-gradient(to right,rgba(var(--brand-rgb),.24) 1px,transparent 1px),
+      linear-gradient(rgba(var(--brand-rgb),.24) 1px,transparent 1px);
+    background-size:9px 9px;
+  }
+  .cmp-panel{
+    position:relative;width:100%;max-width:340px;border-radius:14px;padding:18px;
+    background:rgba(var(--veil-rgb),.72);border:1px solid rgba(var(--veil-rgb),.6);
+    backdrop-filter:blur(12px);box-shadow:var(--shadow-card);
+  }
+  .cmp-drop{
+    border:2px dashed var(--line);border-radius:12px;padding:22px 14px;
+    display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;
+  }
+  .cmp-drop svg{width:32px;height:32px;fill:none;stroke:var(--ink-faint);stroke-width:1.6}
+  .cmp-drop p{margin:0;font-size:13.5px;font-weight:600;color:var(--ink-dim)}
+  .cmp-drop span{font-size:12px;color:var(--ink-faint)}
+  .cmp-proof{display:flex;align-items:center;gap:14px}
+  .cmp-proof svg{width:34px;height:34px;flex-shrink:0;fill:none;stroke:#16a34a;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round}
+  .cmp-proof p{margin:0;font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.45}
+  .cmp-body{padding:24px 24px 26px}
+  .cmp-body h3{font-size:19px;font-weight:600;margin-bottom:14px}
+  .cmp.is-ours .cmp-body h3{color:var(--cyan)}
+  .cmp-body ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px}
+  .cmp-body li{color:var(--ink-dim);font-size:14.5px;line-height:1.6}
+  .cmp-body li::marker{color:var(--ink-faint);font-weight:600}
+
+  /* --- how it works ------------------------------------------------------- */
+  .how-grid{
+    display:grid;grid-template-columns:1fr minmax(0,300px);
+    gap:56px;align-items:start;margin-top:36px;
+  }
+  @media(max-width:860px){
+    .how-grid{grid-template-columns:1fr;gap:36px}
+    .pi-wrap{justify-content:flex-start}
+  }
+  .steps{list-style:none;margin:0;padding:0;counter-reset:step;
+    display:flex;flex-direction:column;gap:22px}
+  .steps li{counter-increment:step}
+  .step-t{margin:0 0 4px;font-weight:600;color:var(--cyan);font-size:15.5px}
+  .step-t::before{content:counter(step) ". "}
+  .step-b{margin:0;color:var(--ink-dim);font-size:15.5px;line-height:1.65;max-width:56ch}
+  .step-b :global(a){color:var(--blue);text-decoration:none}
+  .step-b :global(a:hover){text-decoration:underline}
+  .how-ctas{margin-top:38px}
+  .pi-wrap{display:flex;justify-content:center}
+
+  /* --- FAQ ---------------------------------------------------------------- */
+  .faq{margin-top:30px;border-top:1px solid var(--line);max-width:780px}
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-item summary{
+    list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:20px;
+    padding:20px 0;font-size:17px;font-weight:500;color:var(--ink);
+  }
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary:hover{color:var(--cyan)}
+  .faq-item summary:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+  .faq-item summary span:first-child{flex:1}
+  /* Drawn in CSS rather than swapped between + and - characters, so it can
+     rotate through the change instead of jumping. */
+  .faq-mark{
+    position:relative;width:14px;height:14px;flex-shrink:0;margin-top:5px;
+  }
+  .faq-mark::before,.faq-mark::after{
+    content:"";position:absolute;left:0;top:6px;width:14px;height:2px;
+    border-radius:2px;background:var(--cyan);transition:transform .25s ease;
+  }
+  .faq-mark::after{transform:rotate(90deg)}
+  .faq-item[open] .faq-mark::after{transform:rotate(0)}
+  .faq-a{padding:0 44px 24px 0;color:var(--ink-dim);font-size:15.5px;line-height:1.7}
+  .faq-a :global(p){margin:0 0 14px}
+  .faq-a :global(p:last-child){margin-bottom:0}
+  .faq-a :global(ul){margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+  .faq-a :global(.faq-note){font-size:13px;color:var(--ink-faint)}
+  .faq-foot{margin-top:26px}
+  .faq-foot a{color:var(--blue);text-decoration:none}
+  .faq-foot a:hover{text-decoration:underline}
+  @media(prefers-reduced-motion:reduce){
+    .faq-mark::before,.faq-mark::after{transition:none}
+  }
+
+  /* --- phone (light in both themes, as in the homepage gallery) ----------- */
+  .pi{
+    width:218px;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;
+    background:#eef0ff;box-shadow:var(--shadow-card);
+  }
+  .pi-status{display:flex;justify-content:space-between;align-items:center;
+    padding:10px 18px 2px;font-size:12px;font-weight:700;color:#111;background:#fff}
+  .pi-bar{display:flex;align-items:center;gap:8px;padding:6px 12px 8px;background:#fff;
+    border-bottom:1px solid rgba(0,0,0,.06)}
+  .pi-ic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    color:#6b7280;flex-shrink:0}
+  .pi-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+  .pi-av{width:26px;height:26px;border-radius:50%;background:#566afd;display:flex;
+    align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0}
+  .pi-who{font-size:12px;font-weight:600;color:#111;flex:1}
+  .pi-caret{color:#9ca3af;font-size:10px}
+  .pi-body{height:367px;padding:16px 14px;background:#fff;display:flex;flex-direction:column}
+  .pi-lbl{margin:0 0 12px;font-size:11px;font-weight:700;color:#111}
+  .pi-opts{display:flex;flex-direction:column;gap:8px}
+  .pi-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    border:1.5px solid rgba(86,106,253,.2);background:#f8f8ff;font-size:11px;font-weight:600;color:#111}
+  .pi-radio{width:16px;height:16px;border-radius:50%;border:2px solid #566afd;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center}
+  .pi-radio.on::after{content:"";width:8px;height:8px;border-radius:50%;background:#566afd}
+  .pi-cta{margin-top:auto;background:#566afd;border-radius:10px;padding:9px 0;
+    font-size:11px;font-weight:600;color:#fff;text-align:center}
+</style>
+
+<script is:inline>
+(function(){
+  var dls = Array.prototype.slice.call(document.querySelectorAll('.dl'));
+  if (!dls.length) return;
+
+  function setOpen(dl, open){
+    dl.classList.toggle('is-open', open);
+    dl.querySelector('.dl-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function closeAll(except){
+    dls.forEach(function(d){ if (d !== except) setOpen(d, false); });
+  }
+
+  dls.forEach(function(dl){
+    dl.querySelector('.dl-btn').addEventListener('click', function(e){
+      /* Without this the document handler below closes it again on the same click. */
+      e.stopPropagation();
+      var open = !dl.classList.contains('is-open');
+      closeAll(dl);
+      setOpen(dl, open);
+    });
+  });
+
+  document.addEventListener('click', function(){ closeAll(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    /* Hand focus back to the button that opened it, or Escape strands the
+       keyboard user inside a panel that no longer exists. */
+    var open = dls.filter(function(d){ return d.classList.contains('is-open'); })[0];
+    if (open) open.querySelector('.dl-btn').focus();
+    closeAll();
+  });
+})();
+</script>

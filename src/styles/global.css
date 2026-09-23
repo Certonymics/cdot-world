@@ -193,8 +193,12 @@
      hero instead. Nobody sees both pages at once; what has to hold on any one
      page is hero-over-section, and that never falls below +13% - carried in
      that band by the gradient and the vertical space as much as by size. */
+  /* No overflow:hidden, unlike .hero. The homepage hero needs it to crop the
+     watermark that hangs off its right edge; this one has no watermark, and
+     clipping here cut off anything a hero control opens downwards - the store
+     dropdown on the Identity page was being sliced at the section boundary. */
   .page-hero{
-    position:relative;overflow:hidden;
+    position:relative;
     background:radial-gradient(1050px 660px at 72% 16%,
       var(--wash) 0%,var(--bg-2) 34%,var(--bg-1) 64%,var(--bg-0) 100%);
   }
@@ -246,7 +250,12 @@
      .node-form overrides all four of these for its own smaller button. */
   .btn{
     display:inline-block;text-decoration:none;font-weight:400;font-size:14.5px;
-    padding:11px 22px;border:0;border-radius:9px;cursor:pointer;font-family:inherit;
+    /* A transparent border, not border:0. .btn-ghost carries a real 1px one, so
+       with no border here the filled buttons sit 2px shorter than the outlined
+       ones. Side by side in a flex row that was hidden - the shorter one simply
+       stretched - but the moment a button is nested in a wrapper (the store
+       dropdown) the stretch lands on the wrapper and the mismatch shows. */
+    padding:11px 22px;border:1px solid transparent;border-radius:9px;cursor:pointer;font-family:inherit;
     appearance:none;-webkit-appearance:none;
     transition:transform .15s,box-shadow .15s;
   }
