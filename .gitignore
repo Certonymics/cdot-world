@@ -1,5 +1,10 @@
 .DS_Store
 .preview-test.html
+# Editor tooling. launch.json is the shared dev-server config and is tracked;
+# everything else here (settings.json and friends) is per-user. Ignoring the
+# CONTENTS rather than the directory itself, so the negation below can apply.
+.claude/*
+!.claude/launch.json
 NetworkMap.tsx
 node_modules
 dist

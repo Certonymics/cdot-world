@@ -1,5 +1,23 @@
 ---
-const tagline = "Secure identity and payments";
+const tagline = "Secure identity, communication and payments";
+
+/* Top nav. An item with `children` renders as a dropdown, anything else as a
+   plain link - so adding or removing a menu is a data change, not a markup one. */
+const navItems = [
+  {
+    label: "Product",
+    children: [
+      { label: "c.ID", href: "/product/c-id" },
+      { label: "c.Email", href: "/product/c-email" },
+      { label: "c.Chat", href: "/product/c-chat" },
+      { label: "c.Pay", href: "/product/c-pay" },
+      { label: "c.Vault", href: "/product/c-vault" },
+    ],
+  },
+  { label: "Network", href: "/network" },
+  { label: "FAQ", href: "/faq" },
+  { label: "About", href: "/about" },
+];
 ---
 <header>
   <div class="wrap nav">
@@ -8,13 +26,39 @@ const tagline = "Secure identity and payments";
       <span class="tag">{tagline}</span>
     </a>
     <nav id="main-nav">
-      <a class="link" href="#mission">Mission</a>
-      <a class="link" href="#network">Network</a>
-      <a class="link" href="#uses">Use cases</a>
-      <a class="link" href="#contact">Contact</a>
+      {navItems.map((item) =>
+        item.children ? (
+          <div class="has-menu">
+            {/* A button, not a link: it has no destination of its own, and the
+                five products are the only things under it. */}
+            <button
+              class="menu-btn"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`menu-${item.label.toLowerCase()}`}
+            >
+              {item.label}
+              <svg class="chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 9.5l6 6 6-6" />
+              </svg>
+            </button>
+            {/* Always in the DOM - hidden with display, not removed - so the
+                product links stay crawlable and are there for a keyboard user
+                the moment the menu opens. */}
+            <div class="menu" id={`menu-${item.label.toLowerCase()}`}>
+              <div class="menu-panel">
+                {item.children.map((c) => (
+                  <a class="menu-item" href={c.href}>{c.label}</a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a class="link" href={item.href}>{item.label}</a>
+        )
+      )}
     </nav>
     <div class="nav-controls">
-      <a class="cemail-btn" href="https://c.email/" target="_blank" rel="noopener noreferrer">c.Email</a>
       <!-- Which icon shows is decided in CSS, because the theme has three
            states (explicit light, explicit dark, and "follow the OS" where no
            data-theme attribute exists at all). The label is set by script,
@@ -49,13 +93,59 @@ const tagline = "Secure identity and payments";
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       btn.classList.toggle('is-open', open);
     });
-    /* Close on nav link tap so the menu doesn't hang open on mobile. */
+    /* Close on nav link tap so the menu doesn't hang open on mobile. This
+       catches the product links too - they are <a>s inside the same nav. */
     nav.querySelectorAll('a').forEach(function(a){
       a.addEventListener('click', function(){
         nav.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
         btn.classList.remove('is-open');
       });
+    });
+  }
+
+  /* --- dropdowns -------------------------------------------------------- */
+  /* Open state lives in a class, and CSS decides what that means per
+     breakpoint: a floating panel on desktop, and on mobile nothing at all -
+     there the submenu is permanently expanded under its label, because a
+     tap-to-open second level inside an already-tapped-open nav is fiddly. */
+  var menus = Array.prototype.slice.call(document.querySelectorAll('.has-menu'));
+  if (menus.length) {
+    /* Pointer devices get hover; touch would otherwise fire a phantom
+       mouseenter on the tap that opened the menu. */
+    var canHover = window.matchMedia('(hover:hover)').matches;
+
+    var setOpen = function(el, open){
+      el.classList.toggle('is-open', open);
+      el.querySelector('.menu-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    var closeAll = function(except){
+      menus.forEach(function(m){ if (m !== except) setOpen(m, false); });
+    };
+
+    menus.forEach(function(m){
+      m.querySelector('.menu-btn').addEventListener('click', function(e){
+        /* Without this the document handler below would close it again in the
+           same click. */
+        e.stopPropagation();
+        var open = !m.classList.contains('is-open');
+        closeAll(m);
+        setOpen(m, open);
+      });
+      if (canHover) {
+        m.addEventListener('mouseenter', function(){ closeAll(m); setOpen(m, true); });
+        m.addEventListener('mouseleave', function(){ setOpen(m, false); });
+      }
+    });
+
+    document.addEventListener('click', function(){ closeAll(); });
+    document.addEventListener('keydown', function(e){
+      if (e.key !== 'Escape') return;
+      /* Send focus back to the button that opened it, or the close leaves the
+         keyboard user's position inside a panel that no longer exists. */
+      var open = menus.filter(function(m){ return m.classList.contains('is-open'); })[0];
+      if (open) open.querySelector('.menu-btn').focus();
+      closeAll();
     });
   }
 

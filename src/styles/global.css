@@ -24,11 +24,10 @@
     background:rgba(var(--veil-rgb),.55);
     border-bottom:1px solid var(--line);
   }
-  .nav{display:flex;align-items:center;justify-content:space-between;height:104px}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:80px}
   @media(max-width:640px){.nav{height:72px}}
   .brand{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-decoration:none;min-width:0}
-  .brand svg.logomark{height:50px;width:121px;display:block;flex-shrink:0}
-  @media(max-width:640px){.brand svg.logomark{height:36px;width:87px}}
+  .brand svg.logomark{height:36px;width:87px;display:block;flex-shrink:0}
   .brand .tag{font-size:11px;font-weight:500;color:var(--brand-text);letter-spacing:.06em;line-height:1.2}
   .nav a.link{color:var(--ink-dim);text-decoration:none;font-size:14.5px;margin-left:26px;transition:color .2s}
   .nav a.link:hover{color:var(--ink)}
@@ -36,21 +35,40 @@
      brand|links and started distributing brand|links|controls - which threw the
      links 294px inward, into the middle of the header. margin-left:auto absorbs
      all the free space instead, putting the link group back hard against the
-     controls on the right, whatever the child count. */
-  .nav nav{margin-left:auto}
+     controls on the right, whatever the child count.
+
+     flex, because the Product dropdown is a block-level wrapper and would
+     otherwise fall out of the inline run that the plain links sit in. */
+  .nav nav{display:flex;align-items:center;margin-left:auto}
   /* Negative right margin lets the toggle sit in the corner itself, inside the
      wrap's padding, so the links give up as little of their old position as
      possible: 38px rather than 294px. */
   .nav-controls{display:flex;align-items:center;gap:12px;flex-shrink:0;
     margin-left:26px;margin-right:-8px}
 
-  /* c.Email. An outbound link, but it sits in the nav row and reads as one of
-     the nav items, so it takes their treatment rather than a button's. Spacing
-     comes from .nav-controls' gap, not the nav links' margin-left. */
-  .cemail-btn{color:var(--ink-dim);text-decoration:none;font-size:14.5px;
-    white-space:nowrap;transition:color .2s}
-  .cemail-btn:hover{color:var(--ink)}
-  @media(max-width:640px){.cemail-btn{display:none}}
+  /* Dropdown nav */
+  .has-menu{position:relative;margin-left:26px}
+  .menu-btn{
+    display:inline-flex;align-items:center;gap:5px;
+    background:none;border:0;padding:0;font-family:inherit;font-size:14.5px;
+    color:var(--ink-dim);cursor:pointer;transition:color .2s;
+  }
+  .menu-btn:hover,.has-menu.is-open .menu-btn{color:var(--ink)}
+  .chev{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+  .has-menu.is-open .chev{transform:rotate(180deg)}
+  /* The 12px gap under the button is padding on the panel wrapper, not a
+     margin: it has to stay part of the menu's own hit area, or the pointer
+     crosses dead space on the way down and mouseleave shuts the menu. */
+  .menu{display:none;position:absolute;left:0;top:100%;padding-top:12px;
+    min-width:186px;z-index:30}
+  .has-menu.is-open .menu{display:block}
+  .menu-panel{background:var(--bg-1);border:1px solid var(--line);border-radius:12px;
+    padding:6px;box-shadow:var(--shadow-card)}
+  .menu-item{display:block;padding:9px 12px;border-radius:8px;color:var(--ink-dim);
+    text-decoration:none;font-size:14.5px;white-space:nowrap;
+    transition:background-color .2s,color .2s}
+  .menu-item:hover{background:rgba(var(--accent-rgb),.10);color:var(--ink)}
 
   /* Theme toggle */
   .theme-toggle{
@@ -91,6 +109,10 @@
       display:none;
       position:fixed;top:72px;left:0;right:0;z-index:19;
       flex-direction:column;
+      /* Undoes the align-items:center the desktop row needs. Down here that
+         would shrink-wrap each item to its text and centre it, which drops the
+         full-width tap targets and the left edge the items line up on. */
+      align-items:stretch;
       background:rgba(var(--veil-rgb),.97);
       border-bottom:1px solid var(--line);
       padding:8px 0 16px;
@@ -98,6 +120,19 @@
     .nav nav.is-open{display:flex}
     .nav a.link{margin-left:0;font-size:14.5px;padding:12px 24px}
     .nav a.link:hover{background:var(--hover-veil)}
+    /* The dropdown flattens: its label becomes a heading with the five items
+       listed under it, permanently open. There is no hover on touch, and a
+       second tap-to-open level inside an already-opened nav is worse than
+       simply showing them. */
+    .has-menu{margin-left:0}
+    /* text-align because a <button> centres its label by default, which would
+       leave "Product" off the left edge its own items line up on. */
+    .menu-btn{width:100%;padding:12px 24px;text-align:left}
+    .chev{display:none}
+    .menu{display:block;position:static;padding-top:0;min-width:0}
+    .menu-panel{background:none;border:0;border-radius:0;padding:0;box-shadow:none}
+    .menu-item{padding:10px 24px 10px 40px}
+    .menu-item:hover{background:var(--hover-veil)}
   }
   h1,h2,.sub,.lead{overflow-wrap:break-word}
 
@@ -107,7 +142,7 @@
   @media(max-width:640px){
     .hero{min-height:auto;background:radial-gradient(90vw 70vw at 85% 18%,var(--bg-2) 0%,var(--bg-1) 42%,var(--bg-0) 100%)}
   }
-  .hero .wrap{position:relative;z-index:2;width:100%;padding-top:172px;padding-bottom:80px}
+  .hero .wrap{position:relative;z-index:2;width:100%;padding-top:148px;padding-bottom:80px}
   @media(max-width:640px){.hero .wrap{padding-top:128px;padding-bottom:56px}}
   .watermark{
     position:absolute;top:50%;right:-12%;z-index:1;
@@ -177,7 +212,8 @@
      so every focusable thing answers the same way. */
   .btn:focus-visible,
   .nav a.link:focus-visible,
-  .cemail-btn:focus-visible,
+  .menu-btn:focus-visible,
+  .menu-item:focus-visible,
   .foot-link:focus-visible,
   .burger:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
   /* Pressing cancels the hover lift, so the button reads as going down under the
@@ -190,18 +226,18 @@
   #problem{padding-top:32px}
   @media(max-width:640px){#problem{padding-top:20px}}
   /* The header is fixed, so a nav link that scrolls a section to y=0 puts the
-     top of that section behind it. Sections carry 96px of their own top padding
-     and the header is 104px, so the heading was landing 8px under its bottom
-     edge - clipped, on every single nav click.
-
-     Not the full header height: that would be counted on top of the padding the
-     section already has, leaving 200px of dead space above the heading. 32px is
-     the remainder that puts the heading about 24px clear of the header, and it
-     happens to work out the same on mobile (72px header, 64px padding). */
-  section[id]{scroll-margin-top:32px}
+     top of that section behind it. Not the full header height, though: that
+     would be counted on top of the padding the section already carries, leaving
+     a screen of dead space above the heading. Each value below is the remainder
+     that lands the heading about 24px clear of the header, so it has to be
+     re-derived whenever the header height changes:
+       desktop  80px header + 96px section padding ->  8px
+       mobile   72px header + 64px section padding -> 32px */
+  section[id]{scroll-margin-top:8px}
+  @media(max-width:640px){section[id]{scroll-margin-top:32px}}
   /* #problem has almost no top padding - it continues #mission's argument - so
      it needs to supply the clearance itself if it is ever linked to directly. */
-  #problem{scroll-margin-top:96px}
+  #problem{scroll-margin-top:72px}
   @media(max-width:640px){#problem{scroll-margin-top:76px}}
 
   /* Ambient washes. The hero's radial gradient is the page's signature, and
@@ -491,8 +527,11 @@
 
   /* Footer */
   footer{border-top:1px solid var(--line);padding:38px 0;background:var(--bg-0)}
-  .foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-  .foot p{color:var(--ink-faint);font-size:13.5px}
+  /* font-size sits on the container, not on the elements: the footer holds a
+     mix of <a>, <span> and <div>, and hanging the size off any one of them
+     means it silently reverts the moment an item changes tag. */
+  .foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:13.5px}
+  .foot p{color:var(--ink-faint)}
   /* Four siblings under space-between: the gaps between them come out equal
      whatever each item's own width is, which is why none of these carry flex:1.
      Giving them equal WIDTHS instead would centre each in its own column and
@@ -500,7 +539,6 @@
      like the same size. */
   .foot-mark{height:32px;width:78px;display:block}
   .foot-copy{margin:0;color:var(--ink-dim)}
-  .foot-stack{display:flex;flex-direction:column;gap:4px}
   .foot-link{color:var(--ink-dim);text-decoration:none;transition:color .2s}
   .foot-link:hover{color:var(--cyan)}
   /* Narrow: stack, and let the row gap do the spacing. */
@@ -523,6 +561,13 @@
   }
 
   /* 404 */
-  .notfound{min-height:70vh;display:flex;align-items:center;padding-top:140px}
+  /* Interior pages. Top padding clears the fixed header on the same basis the
+     hero's does - header height plus breathing room - since neither sits in
+     normal flow under it. */
+  .page{padding-top:148px;padding-bottom:96px;min-height:60vh}
+  .page h1{font-size:clamp(32px,7vw,52px)}
+  @media(max-width:640px){.page{padding-top:128px;padding-bottom:64px}}
+
+  .notfound{min-height:70vh;display:flex;align-items:center;padding-top:116px}
   .notfound h1{font-size:clamp(32px,7vw,56px)}
   @media(max-width:640px){.notfound{padding-top:110px}}
