@@ -1,0 +1,20 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const title = "Page not found — cDot";
+const description = "That page does not exist. Return to cdot.world.";
+---
+
+<Layout title={title} description={description}>
+  <section class="notfound">
+    <div class="wrap">
+      <p class="eyebrow">404</p>
+      <h1>That page doesn&rsquo;t exist.</h1>
+      <p class="sub">The link may be out of date, or the address mistyped.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="/">Back to cDot</a>
+        <a class="btn btn-ghost" href="/#contact">Get in touch</a>
+      </div>
+    </div>
+  </section>
+</Layout>
