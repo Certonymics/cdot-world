@@ -1,0 +1,10 @@
+{
+  "name": "cdot-world",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler pages deploy . --project-name=cdot-world --branch=main --commit-dirty=true"
+  },
+  "devDependencies": {
+    "wrangler": "^4.119.0"
+  }
+}

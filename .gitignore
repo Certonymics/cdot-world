@@ -1,3 +1,5 @@
 .DS_Store
 .preview-test.html
 NetworkMap.tsx
+.wrangler/
+node_modules/
