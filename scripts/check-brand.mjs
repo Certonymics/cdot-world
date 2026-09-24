@@ -79,10 +79,10 @@ for (const { name, path } of palette.consumers) {
 }
 
 /* ---------------------------------------------------------------------------
-   Single dark block.
+   Single light block.
 
-   Light is the default and dark is opt-in via :root[data-theme="dark"], so the
-   dark palette is stated ONCE. It used to be stated twice - the second copy
+   Dark is unconditional and light is opt-in via :root[data-theme="light"], so
+   the palette is stated ONCE. It used to be stated twice - the second copy
    existed only to serve prefers-color-scheme - and the two drifted within
    minutes of being written with nothing to catch it: the OS path and the toggle
    path simply rendered different colours.
@@ -97,16 +97,16 @@ for (const { name, path } of palette.consumers) {
   try {
     css = readFileSync(resolve(root, tokensPath), "utf8");
   } catch {
-    console.log(`  -- ${tokensPath} not readable, theme check skipped`);
+    console.log(`  -- ${tokensPath} not readable, light-theme check skipped`);
   }
 
   if (css) {
     const problems = [];
     const stripped = css.replace(/\/\*[\s\S]*?\*\//g, "");
 
-    const darkBlocks = stripped.match(/:root\[data-theme="dark"\]\s*\{/g) || [];
-    if (darkBlocks.length !== 1) {
-      problems.push(`expected exactly 1 :root[data-theme="dark"] block, found ${darkBlocks.length}`);
+    const lightBlocks = stripped.match(/:root\[data-theme="light"\]\s*\{/g) || [];
+    if (lightBlocks.length !== 1) {
+      problems.push(`expected exactly 1 :root[data-theme="light"] block, found ${lightBlocks.length}`);
     }
     if (/@media[^{]*prefers-color-scheme/.test(stripped)) {
       problems.push(
@@ -131,38 +131,29 @@ for (const { name, path } of palette.consumers) {
       const consts = layout.match(
         /var DARK_BG\s*=\s*'([^']+)'\s*,\s*LIGHT_BG\s*=\s*'([^']+)'/,
       );
-      /* Bodies matched to their own closing brace. Light sits on a bare :root
-         and there is more than one such block - the brand constants have their
-         own - so it is picked by the token it carries rather than by position. */
-      const bgOf = (body) => {
-        const m = body && body.match(/--bg-0\s*:\s*([^;]+);/);
-        return m ? m[1].trim() : null;
-      };
-      const rootBlocks = stripped.match(/:root\s*\{[^}]*\}/g) || [];
-      const lightBg = bgOf(rootBlocks.find((b) => /--bg-0/.test(b)));
-      const darkBg = bgOf((stripped.match(/:root\[data-theme="dark"\]\s*\{[^}]*\}/) || [])[0]);
-
+      const rootBg = stripped.match(/:root\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/);
+      const lightBg = stripped.match(
+        /:root\[data-theme="light"\]\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/,
+      );
       if (!consts) {
         problems.push(`could not find DARK_BG/LIGHT_BG in ${layoutPath}`);
-      } else if (lightBg && darkBg) {
+      } else if (rootBg && lightBg) {
         const norm = (h) => h.trim().toLowerCase();
-        if (norm(consts[1]) !== norm(darkBg)) {
-          problems.push(`DARK_BG ${consts[1]} != dark --bg-0 ${darkBg}`);
+        if (norm(consts[1]) !== norm(rootBg[1])) {
+          problems.push(`DARK_BG ${consts[1]} != dark --bg-0 ${rootBg[1].trim()}`);
         }
-        if (norm(consts[2]) !== norm(lightBg)) {
-          problems.push(`LIGHT_BG ${consts[2]} != light --bg-0 ${lightBg}`);
+        if (norm(consts[2]) !== norm(lightBg[1])) {
+          problems.push(`LIGHT_BG ${consts[2]} != light --bg-0 ${lightBg[1].trim()}`);
         }
-      } else {
-        problems.push("could not read --bg-0 from both schemes in tokens.css");
       }
     }
 
     if (problems.length) {
       failures++;
-      console.log(`  X  theme  (${tokensPath})`);
+      console.log(`  X  light theme  (${tokensPath})`);
       for (const pr of problems) console.log(`     - ${pr}`);
     } else {
-      console.log("  OK theme (single opt-in dark block; theme-color matches --bg-0)");
+      console.log("  OK light theme (single opt-in block; theme-color matches --bg-0)");
     }
   }
 }

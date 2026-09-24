@@ -13,12 +13,8 @@ interface Props {
   description: string;
   ogTitle?: string;
   ogDescription?: string;
-  /* For pages that are not destinations - currently only 404. Suppresses the
-     canonical as well as adding the directive: a 404 naming itself canonical
-     is asserting that the missing URL is the right one to index. */
-  noindex?: boolean;
 }
-const { title, description, ogTitle, ogDescription, noindex = false } = Astro.props;
+const { title, description, ogTitle, ogDescription } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
 /* Structured data. A @graph rather than a single Organization node: the three
@@ -155,25 +151,25 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<!-- Matches --bg-0 so mobile browser chrome does not disagree with the page.
-     Kept in step with the theme by the script below; the value here is the
-     light default, used until that script runs. -->
-<meta name="theme-color" content="#FFFFFF" id="theme-color" />
+<!-- Matches --bg-0 so mobile browser chrome does not paint light against the
+     dark page. Kept in step with the theme by the script below; the value here
+     is the dark default, used until that script runs. -->
+<meta name="theme-color" content="#040b18" id="theme-color" />
 
 <!--
   Theme. This script is deliberately BLOCKING and deliberately the first script
   in the document: it has to set data-theme before the browser paints, or a
-  visitor who chose dark gets a flash of the light page on every single
+  visitor who chose light gets a flash of the dark page on every single
   navigation. Moving it below the stylesheet, deferring it, or making it a
   module all reintroduce that flash.
 
-  LIGHT IS THE UNCONDITIONAL DEFAULT. The site does not follow
-  prefers-color-scheme - tokens.css carries the reasoning, in short that
-  honouring it means stating a whole palette twice and the two copies drift.
-  Dark is opt-in via the toggle, and the attribute is written only for that
-  explicit choice: with nothing stored there is no attribute at all and the
-  base :root palette (light) applies, which is also what JavaScript-disabled
-  visitors get.
+  DARK IS THE UNCONDITIONAL DEFAULT. The site does not follow
+  prefers-color-scheme: light is the more common OS default, especially on
+  Windows and managed machines, so honouring it meant most first-time visitors
+  never saw the design the site was built around. Light is opt-in via the
+  toggle, and the attribute is written only for that explicit choice - with
+  nothing stored there is no attribute and the base :root palette (dark) applies,
+  which is also what JavaScript-disabled visitors get.
 -->
 <script is:inline>
 (function(){
@@ -189,8 +185,8 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
     } catch (e) { return null; }   /* private mode / storage disabled */
   }
 
-  /* No prefers-color-scheme fallback: unset means light, always. */
-  function effective(){ return stored() || 'light'; }
+  /* No prefers-color-scheme fallback: unset means dark, always. */
+  function effective(){ return stored() || 'dark'; }
 
   function paint(){
     var s = stored();
@@ -214,9 +210,7 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 </script>
 <title>{title}</title>
 <meta name="description" content={description} />
-{noindex
-  ? <meta name="robots" content="noindex, follow" />
-  : <link rel="canonical" href={canonical} />}
+<link rel="canonical" href={canonical} />
 <meta property="og:title" content={ogTitle ?? title} />
 <meta property="og:description" content={ogDescription ?? description} />
 <meta property="og:url" content={canonical} />
@@ -226,7 +220,7 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 <meta property="og:image" content={new URL('/assets/og.png', Astro.site).href} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="cDot - secure identity, communication and payments" />
+<meta property="og:image:alt" content="cDot - secure identity and payments" />
 <!-- The only twitter:* tag worth setting: X falls back to the og:* tags for
      title, description and image, but needs this to use the large card. -->
 <meta name="twitter:card" content="summary_large_image" />
