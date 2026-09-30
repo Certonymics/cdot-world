@@ -37,7 +37,7 @@ The network (three chains, interoperable by design):
    permissions.
 3. T-Layer - trading chain: a high-performance decentralised exchange, offering stablecoin swaps and
    perpetual futures in a predictable execution environment. 30,000 tx/s through native
-   multithreaded operations, finality <1s, a node-permissioned overlay on the C-layer, private and
+   multithreaded operations, finality <1s, a node-permissioned overlay on the C-Layer, private and
    accountable, native NASDAQ-like matching engine.
 
 Use cases - instant, low-cost settlement for any use case: global payments and payroll,

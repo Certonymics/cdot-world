@@ -82,12 +82,25 @@ const ogDescription =
         <div class="specs">
           <span>30,000 tx/s, native multithreading</span>
           <span>Finality &lt;1s</span>
-          <span>Node-permissioned overlay on C-layer</span>
+          <span>Node-permissioned overlay on C-Layer</span>
           <span>Private and accountable</span>
           <span>Native NASDAQ-like matching engine</span>
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- The live map gets its own section rather than closing out #network: the
+     header's "C-Layer" item points here, and a nav destination that lands
+     mid-section has nothing at the top of the viewport to say where you are.
+     A heading of its own fixes that and gives the map a caption it lacked. -->
+<section id="c-layer">
+  <div class="wrap">
+    <h2>Decentralised identity for a secure internet</h2>
+    <p class="lead">The C-Layer is a distributed blockchain of independent nodes across the world, with no single point of failure.</p>
     <div class="maplive">
       <div class="mapcard">
         <div class="mapvp" id="mapvp">
@@ -123,6 +136,20 @@ const ogDescription =
       </div>
       <p class="mapcount" id="mapcount">Connecting to the C-Layer&hellip;</p>
       <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
+    </div>
+    <div class="node-signup">
+      <p class="lead">Anyone can run a node — join the network to secure the C-Layer and earn CDOT tokens.</p>
+      <form class="node-form" id="clayerForm" name="clayer-nodes">
+        <!-- A placeholder is not a label: it vanishes on first keystroke and many
+             screen readers skip it entirely. Visually hidden, still announced. -->
+        <label class="sr-only" for="clayer-email">Email address</label>
+        <input id="clayer-email" type="email" name="email" autocomplete="email"
+               placeholder="name@company.com" required>
+        <!-- Honeypot: hidden from people, filled in by bots. -->
+        <input class="cf-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn btn-primary" type="submit">Register your interest</button>
+      </form>
+      <p class="node-status" id="clayer-status" role="status" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -275,5 +302,78 @@ const ogDescription =
      Served from public/ rather than inlined to keep the page's prose dominant
      in its markup; `defer` so the elements it queries have parsed. -->
 <script src="/assets/map.js" defer></script>
+
+<!-- C-Layer node signup. Ported verbatim from cdot.app, which ports it in turn
+     from c.email-website: all three run the same form against the same sheet,
+     so a signup from any of them lands in one place. Keep them in step. -->
+<script is:inline>
+(function(){
+  /* The Apps Script web app that records signups. Public by design: it only
+     ever appends a row and exposes no way to read the sheet back, so shipping
+     it to the browser costs nothing worse than the odd junk row. A SEPARATE
+     deployment from the contact form above. */
+  const CLAYER_SIGNUP_URL =
+    'https://script.google.com/macros/s/AKfycbzoWtxvKHs5oFSKra8olCmpMUGENdc9qlsNGvpeP9UCwYY8nMjMBafhFOvyDpqpkz0KvQ/exec';
+
+  const form = document.getElementById('clayerForm');
+  const statusEl = document.getElementById('clayer-status');
+  if (!form || !statusEl) return;
+  const button = form.querySelector('button[type="submit"]');
+  let sending = false;
+
+  function fail(message){
+    statusEl.textContent = message || 'Something went wrong. Please try again.';
+    statusEl.classList.add('is-error');
+    sending = false;
+    button.disabled = false;
+    button.textContent = 'Register your interest';
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (sending) return;
+
+    sending = true;
+    button.disabled = true;
+    button.textContent = 'Registering…';
+    statusEl.textContent = '';
+    statusEl.classList.remove('is-error');
+
+    const data = new FormData(form);
+    try {
+      /* No Content-Type header on purpose. Setting one makes this a preflighted
+         request, and Apps Script does not answer the OPTIONS probe, so the whole
+         submission fails before it starts. Sent as text/plain it is a "simple
+         request" and goes straight through; doPost reads the raw body regardless. */
+      /* Without a timeout a stalled connection leaves the button disabled on
+         "Registering…" forever, with no way to retry. */
+      const response = await fetch(CLAYER_SIGNUP_URL, {
+        signal: AbortSignal.timeout(15000),
+        method: 'POST',
+        body: JSON.stringify({ email: data.get('email'), website: data.get('website') })
+      });
+      const result = await response.json().catch(function(){ return null; });
+      /* Only confirm what the server actually confirmed. */
+      if (!response.ok || !result || !result.ok) return fail(result && result.error);
+
+      /* The form goes away on success, so there is no live Register button left
+         under a thank-you message inviting a second submission. */
+      form.hidden = true;
+      statusEl.textContent = 'Thanks — we’ll be in touch!';
+      /* Only fail() used to put the label back, so a successful submission left
+         the button reading "Registering…" forever. Normally invisible, since
+         the form is hidden on the line above - but not always: `hidden` loses
+         to any display rule on .node-form, the two paint in the same frame so a
+         slow machine shows the stale label first, and a screen reader walking
+         back over the region still announces it. Reset it on both paths. */
+      sending = false;
+      button.disabled = false;
+      button.textContent = 'Register your interest';
+    } catch (err) {
+      fail();
+    }
+  });
+})();
+</script>
 
 </Layout>
