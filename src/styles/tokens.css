@@ -112,8 +112,22 @@
     --line:rgba(var(--accent-rgb),.16);
     --card:rgba(var(--accent-rgb),.05);
 
-    /* Geist Mono, for figures and technical values. Variable, so any weight in
-       100-900 is available from one file. */
+    /* TYPEFACES
+       ---------
+       These are the pair named in brand/palette.json: Inter for running text,
+       Darker Grotesque for display. They are deliberately NOT the Geist/Host
+       Grotesk pair used by cdot.app - the two sites share the mark, the blue
+       and the mono, and diverge on voice.
+
+       Darker Grotesque is a condensed display face with a small x-height: at a
+       given font-size it reads noticeably smaller and lighter than Host
+       Grotesk did, so every rule that uses it also carries a size and weight
+       bump. Do not "fix" those numbers back down to the old ones. */
+    --font-sans:"Inter Variable","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-display:"Darker Grotesque Variable","Darker Grotesque",var(--font-sans);
+
+    /* Figures and technical values. Variable, so any weight in 100-900 is
+       available from one file. Placeholder until the replacement mono lands. */
     --font-mono:"Geist Mono Variable","Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
 
