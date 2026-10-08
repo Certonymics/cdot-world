@@ -243,16 +243,11 @@
   if(window.ResizeObserver) new ResizeObserver(measure).observe(vp);
   else addEventListener('resize',measure);
 
-  /* Repaint both canvases when the theme changes. The dots are baked pixels, so
-     unlike everything else on the page they do not follow the cascade - without
-     this the continents keep the previous theme's colour until the next resize.
-     data-theme is the only trigger needed: dark is unconditional and light is
-     opt-in through the toggle, so the OS preference never changes the palette. */
-  function repaintForTheme(){ paintLand(); paintMini(); }
-  if(window.MutationObserver){
-    new MutationObserver(repaintForTheme).observe(document.documentElement,
-      {attributes:true,attributeFilter:['data-theme']});
-  }
+  /* The canvases used to be repainted on a data-theme change here. The site is
+     dark-only now, so the palette cannot change after load and the observer had
+     nothing left to watch. If a second theme ever returns, this is the piece to
+     bring back: the dots are baked pixels and do not follow the cascade, so
+     without it the continents keep the old colour until the next resize. */
 
   /* Node markers + selection */
   function showPanel(n){
