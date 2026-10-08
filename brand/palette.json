@@ -25,8 +25,10 @@
     "500": "#99CDFF"
   },
   "fonts": {
-    "sans": "Inter",
-    "display": "Darker Grotesque"
+    "sans": "Geist",
+    "display": "Host Grotesk",
+    "mono": "Geist Mono",
+    "note": "Corrected from Inter / Darker Grotesque, which no consumer has ever shipped - cdot.world and cdot.app both load Geist and Host Grotesk via @fontsource-variable. This file is the canonical definition, so it described fonts nobody used. The pair is shared across both sites on purpose: they are one product seen from two sides, and light versus dark is what distinguishes them."
   },
   "consumers": [
     { "name": "cdot-world (this repo)", "path": "src/styles/tokens.css" },
