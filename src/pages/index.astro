@@ -1,12 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-const title = "cDot: Secure identity and payments";
+/* These track the header tagline and the hero, which are what a visitor sees
+   first - a search result or a shared card that reads differently from the page
+   behind it looks like a different product. NOTE: public/assets/og.png still has
+   the OLD tagline ("Secure identity and payments") baked in as pixels, so the
+   card art and the card text now disagree. Regenerate the image to close it. */
+const title = "cDot: Secure identity, communication and payments";
 const description =
-  "cDot is the network designed for private payments, verified identity, programmable money, and autonomous agents.";
-const ogTitle = "cDot — Secure identity and payments";
+  "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join today by downloading the app or running a node.";
+const ogTitle = "cDot — Secure identity, communication and payments";
 const ogDescription =
-  "cDot is the blockchain network built for secure, private, and instant payments. A regulatable framework for private payments, and a purpose-built system for the future of money.";
+  "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Built on the C-Layer: the blockchain for secure, decentralised identity, run by independent nodes worldwide.";
 ---
 
 <Layout title={title} description={description} ogTitle={ogTitle} ogDescription={ogDescription}>
@@ -16,8 +21,8 @@ const ogDescription =
     <img src="/assets/Calque_1.svg" alt="" width="283" height="338" decoding="async">
   </div>
   <div class="wrap">
-    <h1>The infrastructure for <span class="glow">identity and money movement</span> at scale</h1>
-    <p class="sub">cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join the internet as it should have been.</p>
+    <h1>The infrastructure for <span class="glow">the&nbsp;internet as it should have been</span>.</h1>
+    <p class="sub">cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join today by downloading the app or running a node.</p>
     <div class="hero-ctas">
       <a class="btn btn-primary" href="#c-layer">Run a node</a>
       <!-- Outbound, so it takes the same target/rel treatment as the other
@@ -29,26 +34,26 @@ const ogDescription =
 
 <section id="mission">
   <div class="wrap">
-    <h2>Where value is exchanged between people, businesses, and machines.</h2>
-    <p class="lead">cDot is the blockchain network built for secure, private, and instant payments between any two verified parties. Using cryptographic pseudonyms of real verified identities, cDot ensures every transaction is both private and accountable.</p>
-    <p class="lead">cDot is an alternative to the inefficiencies and privacy costs of traditional finance, a regulatable framework for private payments, and a purpose-built system for the future of money.</p>
+    <h2>Secure, private, and scalable.</h2>
+    <p class="lead">cDot is the blockchain network built for secure, private, and instant interactions between verified parties — whether in the form of email, messaging, payments, or trades.</p>
+    <p class="lead">Using cryptographic pseudonyms of real verified identities, cDot ensures every communication or transaction is both private and accountable.</p>
 
-    <h2 class="h2-sub">Stablecoins enable instant, borderless, programmable transactions. Today's blockchains aren't designed for them.</h2>
-    <p class="lead">Existing systems are either fully general or optimised for trading, and none were built to integrate identity with payments. Payments at scale don't just need speed and low cost — they need verifiable identity on both sides of a transaction. As AI agents increasingly transact on behalf of people and businesses, stablecoin payments also need native agent identity to remain accountable, auditable, and trusted.</p>
-    <p class="lead">No single general-purpose chain can serve all these purposes. Combining decentralised identity, stablecoin payments, and agent permissions, cDot exists to close the gap. Secure design and invisible cryptography means every transaction settles instantly, every participant — human or agent — is verified and accountable, while every real-world identity and transaction stays private.</p>
+    <h2 class="h2-sub">Where value is exchanged between people, businesses, and machines.</h2>
+    <p class="lead">Stablecoins enable instant, borderless, programmable transactions — but today's blockchains aren't designed for them. Existing systems are either fully general or optimised for trading, and none were built to integrate identity with payments.</p>
+    <p class="lead">Transactions at scale don't just need speed and low cost. They need verifiable identity on both sides, including a system for identity that can account for the AI agents increasingly transacting on behalf of people and businesses. With decentralised identity, stablecoin payments, and agent permissions, cDot exists to close the gap.</p>
     <!-- Formerly the standalone "Use cases" section, folded in here. The prose
          runs unbroken above and the pill list closes the section: it is a list
          of examples for the argument, so it reads as the argument's conclusion
          rather than an interruption partway through it. -->
     <div class="uses">
-      <span class="use">Global payments and payroll</span>
-      <span class="use">Remittances</span>
+      <span class="use">Encrypted email and chat</span>
+      <span class="use">Anonymous age verification</span>
+      <span class="use">Verifiable credentials</span>
+      <span class="use">Global payments</span>
       <span class="use">Embedded finance</span>
       <span class="use">Microtransactions</span>
-      <span class="use">Machine-to-machine commerce</span>
-      <span class="use">On- and off-ramping</span>
+      <span class="use">Agentic payments</span>
       <span class="use" title="Never lose your self custodied crypto">Asset recovery</span>
-      <span class="use">Bank accounts</span>
     </div>
   </div>
 </section>
@@ -59,8 +64,8 @@ const ogDescription =
      "one network" and then sat apart from the thing it was describing. -->
 <section id="c-layer">
   <div class="wrap">
-    <h2>Decentralised identity for a secure internet.</h2>
-    <p class="lead">cDot is built on the C-Layer: the blockchain for secure decentralised identity, with no single point of failure. Anyone can run a node — secure cDot and earn redeemable points.</p>
+    <h2>The identity layer for the next generation of the internet.</h2>
+    <p class="lead">cDot is built on the C-Layer: the blockchain for secure, decentralised identity, with no single point of failure. Anyone can run a node — sign up to secure the network and earn points redeemable for CDOT tokens.</p>
     <!-- Signup sits ABOVE the map. The map is evidence for the invitation, not a
          preamble to it: a reader who is already sold should not have to scroll
          past a world map to find the field. Its own copy line was folded into

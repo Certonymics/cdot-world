@@ -147,15 +147,26 @@
       color:transparent;text-shadow:none;
     }
   }
-  /* text-wrap:pretty, not balance: the sub is body-length copy, where balance
-     would even every line and is capped at a few lines anyway. pretty leaves
-     the lines above alone and only protects the last one, which is the orphan
-     that was showing ("been." on a line of its own). Browsers without it fall
-     back to the normal wrap. */
+  /* text-wrap:balance. This was `pretty`, which only guards against a SINGLE
+     word on the last line - it does nothing for a short two- or three-word tail
+     like "running a node.", which is what the sub ended up with. The sub is a
+     three-line standfirst, comfortably inside the line cap where balance works
+     (it is ignored past ~6 lines, so it can never hurt a long paragraph), and
+     evening the lines is what the eye wants from a block this short. Browsers
+     without it fall back to the normal wrap. */
   .sub{
-    margin-top:22px;max-width:640px;font-size:clamp(15.5px,3.4vw,17.5px);color:var(--ink-dim);
-    text-wrap:pretty;
+    /* 720px, up from 640: at 640 the copy needs three lines, and balance can
+       only even out the lines it is given. Anything from ~680px up lands on two
+       lines of 675px and 644px, so this is not a tuned value - it just has to
+       be wide enough to allow two. Below that the sub wraps to as many lines as
+       the screen needs, which is right on a phone. */
+    margin-top:22px;max-width:720px;font-size:clamp(15.5px,3.4vw,17.5px);color:var(--ink-dim);
+    text-wrap:balance;
   }
+  /* The C-Layer standfirst gets the same treatment, scoped to this one rather
+     than to .lead as a whole: the other .lead paragraphs are body copy of four
+     or five lines, where balancing would narrow every one of them to no benefit. */
+  #c-layer > .wrap > .lead:first-of-type{text-wrap:balance}
   .hero-ctas{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
   @media(max-width:480px){
     .hero-ctas{flex-direction:column;align-items:stretch}
@@ -267,7 +278,11 @@
      parts of one story, not a heading and a subheading. */
   .h2-sub{margin-top:84px}
   @media(max-width:640px){.h2-sub{margin-top:60px}}
-  .lead{margin-top:20px;max-width:780px;color:var(--ink-dim);font-size:clamp(15.5px,3.4vw,17.5px)}
+  /* text-wrap:pretty on every body paragraph: it keeps a lone word off the last
+     line ("gap." was stranded under the closing Mission paragraph) and leaves the
+     lines above it alone, so it costs nothing on prose that already sets well.
+     The C-Layer standfirst overrides this with balance, below. */
+  .lead{margin-top:20px;max-width:780px;color:var(--ink-dim);font-size:clamp(15.5px,3.4vw,17.5px);text-wrap:pretty}
   .lead a{color:var(--blue);text-decoration:none}
   .lead a:hover{text-decoration:underline}
   .lead + .lead{margin-top:14px}
@@ -531,7 +546,12 @@
      their own, so the top margin is a touch wider than a paragraph break - it
      marks the shift from prose to list - and there is no bottom margin, since
      the section's own padding ends things. */
-  .uses{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;max-width:820px}
+  /* 860px, not 820: the first four pills measure 824px with their gaps, so the
+     old cap left them 4px short and the row wrapped 3-4-1 whatever the copy said.
+     36px of slack means a pill can gain a few characters without tipping it back.
+     This is a layout width, not a measure for reading, so it has no business
+     matching the 780px used for prose. */
+  .uses{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;max-width:860px}
   .use{
     border:1px solid var(--line);border-radius:999px;padding:10px 20px;
     font-size:15px;color:var(--ink-dim);background:rgba(var(--accent-rgb),.04);
