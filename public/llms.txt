@@ -8,10 +8,12 @@ nodes worldwide. Coming soon is the full family of three purpose-built blockchai
 for what it does best: decentralised identity, stablecoin settlement, and trading, operating as one
 trusted network.
 
-Mission: cDot is secure, private, and scalable. It is the blockchain network built for secure,
+Mission: cDot is secure, private, scalable, and community-driven. It is the blockchain network built for secure,
 private, and instant interactions between verified parties - whether in the form of email,
 messaging, payments, or trades. Using cryptographic pseudonyms of real verified identities, cDot
-ensures every communication or transaction is both private and accountable.
+ensures every communication or transaction is both private and accountable. With SDKs and open-source
+code on their way, cDot is a community-driven project led by the vision of an open, decentralised,
+innovative internet.
 
 The problem: cDot is where value is exchanged between people, businesses, and machines. Stablecoins
 enable instant, borderless, programmable transactions - but today's blockchains aren't designed for

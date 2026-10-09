@@ -34,9 +34,10 @@ const ogDescription =
 
 <section id="mission">
   <div class="wrap">
-    <h2>Secure, private, and scalable.</h2>
+    <h2>Secure, private, scalable, and community-driven.</h2>
     <p class="lead">cDot is the blockchain network built for secure, private, and instant interactions between verified parties — whether in the form of email, messaging, payments, or trades.</p>
     <p class="lead">Using cryptographic pseudonyms of real verified identities, cDot ensures every communication or transaction is both private and accountable.</p>
+    <p class="lead">With SDKs and open-source code on their way, cDot is a community-driven project led by the vision of an open, decentralised, innovative internet.</p>
 
     <h2 class="h2-sub">Where value is exchanged between people, businesses, and machines.</h2>
     <p class="lead">Stablecoins enable instant, borderless, programmable transactions — but today's blockchains aren't designed for them. Existing systems are either fully general or optimised for trading, and none were built to integrate identity with payments.</p>
@@ -65,7 +66,12 @@ const ogDescription =
 <section id="c-layer">
   <div class="wrap">
     <h2>The identity layer for the next generation of the internet.</h2>
-    <p class="lead">cDot is built on the C-Layer: the blockchain for secure, decentralised identity, with no single point of failure. Anyone can run a node — sign up to secure the network and earn points redeemable for CDOT tokens.</p>
+    <!-- The last four words are joined with &nbsp; on purpose. At the full 780px
+         measure the sentence would otherwise end on a lone "CDOT tokens.", and
+         capping the width to avoid that made the paragraph visibly narrower than
+         every other one on the page. Binding the tail fixes the widow without
+         touching the measure. Re-check this if the copy changes. -->
+    <p class="lead">cDot is built on the C-Layer: the blockchain for secure, decentralised identity, with no single point of failure. Anyone can run a node — sign up to secure the network and earn points redeemable&nbsp;for&nbsp;CDOT&nbsp;tokens.</p>
     <!-- Signup sits ABOVE the map. The map is evidence for the invitation, not a
          preamble to it: a reader who is already sold should not have to scroll
          past a world map to find the field. Its own copy line was folded into
