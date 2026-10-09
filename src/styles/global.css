@@ -163,10 +163,6 @@
     margin-top:22px;max-width:720px;font-size:clamp(15.5px,3.4vw,17.5px);color:var(--ink-dim);
     text-wrap:balance;
   }
-  /* The C-Layer standfirst gets the same treatment, scoped to this one rather
-     than to .lead as a whole: the other .lead paragraphs are body copy of four
-     or five lines, where balancing would narrow every one of them to no benefit. */
-  #c-layer > .wrap > .lead:first-of-type{text-wrap:balance}
   .hero-ctas{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
   @media(max-width:480px){
     .hero-ctas{flex-direction:column;align-items:stretch}
@@ -395,7 +391,7 @@
   /* Live C-Layer map (native, dark) */
   /* The map now opens a section of its own, so it sits under a heading rather
      than 56px below the chain cards. */
-  .maplive{margin-top:40px}
+  .maplive{margin-top:32px}
   .mapcard{
     position:relative;border:1px solid rgba(var(--accent-rgb),.28);border-radius:18px;overflow:hidden;
     background:linear-gradient(160deg,rgba(var(--accent-rgb),.06),rgba(var(--veil-rgb),.4) 60%);
@@ -508,7 +504,7 @@
      the standfirst. That line is now folded into the standfirst itself, so the
      space has to be stated here instead - and .node-form's own top margin is
      zeroed so the two do not compound. */
-  .node-signup{margin-top:30px}
+  .node-signup{margin-top:32px}
   .node-signup .node-form{margin-top:0}
   .node-form{display:flex;gap:16px;max-width:576px;margin-top:22px}
   .node-form input[type="email"]{
