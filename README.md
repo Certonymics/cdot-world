@@ -24,6 +24,9 @@ npm run dev      # http://localhost:4321
 | `npm run preview` | Serve the built `dist/` |
 | `npm run brand:check` | Verify the brand tokens against `brand/palette.json` and the sibling repos |
 | `npm run check:sync` | After a build: verify the page, meta tags, JSON-LD and `llms.txt` still agree (see "One source of truth") |
+| `npm run check:seo` | After a build: verify robots.txt, the sitemap, head tags, JSON-LD, company details and `llms.txt` (see "SEO and the relationships between our sites") |
+| `npm run check:live` | Ask the live web: is the deployed site current, do our links resolve, does certonymity.com still describe us the same way |
+| `npm run og` | Regenerate the social-share image from the current tagline (needs Chrome; run when the tagline changes) |
 | `npm run deploy` | Build, then publish `dist/` to production with wrangler. **See the warning under "Deploying".** |
 
 `dist/` is plain static HTML/CSS/JS — deployable to any static host.
@@ -72,9 +75,12 @@ host's build configuration before the code.
 src/
   layouts/Layout.astro        <head>, JSON-LD, header + footer shell
   data/network.mjs            THE CHAINS' FACTS - specs, status, descriptions (see below)
+  data/company.mjs            THE COMPANY'S FACTS and how the sites relate (see below)
+  lib/lastmod.mjs             date of the last content commit (dateModified + sitemap)
   pages/
     index.astro               the page body + one inline script (both forms)
-    llms.txt.ts               generates /llms.txt (the chain section is built from data/)
+    llms.txt.ts               generates /llms.txt (chains, company, related sites: all from data/)
+    sitemap.xml.ts            generates /sitemap.xml from the pages that exist
     404.astro                 not-found page; noindex, no canonical
   components/
     Header.astro              logo lockup + tagline + nav + mobile menu script
@@ -92,8 +98,13 @@ scripts/
   check-brand.mjs             `npm run brand:check`
   build-headers.mjs           writes the Content-Security-Policy after the build
   check-sync.mjs              `npm run check:sync`: do the messaging surfaces agree?
+  check-seo.mjs               `npm run check:seo`: robots, sitemap, head, JSON-LD, company facts
+  check-live.mjs              `npm run check:live`: the deployed site and our links
+  make-og.mjs                 `npm run og`: renders public/assets/og.png from the tagline
   contact-form.gs             source of the contact-form Apps Script (not built)
+brand/og.source.json          which tagline og.png was made from (checked by check:seo)
 .github/workflows/ci.yml      automatic checks on every PR
+.github/workflows/live-check.yml  weekly check of the live site and our links
 ```
 
 To add a page, drop a `.astro` file in `src/pages/` and wrap it in `Layout`.
@@ -266,24 +277,32 @@ curl -sI https://<preview-or-production-url>/_astro/<any-hashed-file> | grep -i 
 
 `.github/workflows/ci.yml` runs on every pull request and on pushes to `main` and
 `astro-port`: `npm ci`, `npm run brand:check`, `npm run build`, a check that the
-policy was actually written, and an informational `npm audit` that reports but
+policy was actually written, `check:sync` (messaging) and `check:seo` (everything
+around it), and an informational `npm audit` that reports but
 never fails the job. It does not deploy. It is also what lets a Dependabot update
 PR show a pass or fail before anyone merges it.
 
+`.github/workflows/live-check.yml` runs weekly (and on demand) and asks the live
+web instead: see "SEO and the relationships between our sites". Its failures mean
+something out there broke - a dead link, a deploy that never went out - not that a
+pull request is wrong.
+
 ## Crawler policy
 
-`public/robots.txt` deliberately splits two things people conflate: retrieval
-and training. Search/citation agents (`OAI-SearchBot`, `ChatGPT-User`,
-`Claude-SearchBot`, `Claude-User`, `PerplexityBot`) are **allowed**, so
-assistants can read the page and link back to it. Training crawlers and opt-out
-tokens (`GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended`,
-`Applebot-Extended`, `Meta-ExternalAgent`, `Bytespider`) are **disallowed**.
+`public/robots.txt` allows every crawler, **including the ones that gather model
+training data**. This is a public project site whose purpose is to be found and
+built on, so nothing is withheld. It used to split retrieval from training
+(allowing `OAI-SearchBot`, `Claude-SearchBot` and similar, but disallowing
+`GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended`, `Applebot-Extended`,
+`Meta-ExternalAgent` and `Bytespider`); that opt-out was removed on purpose.
+`check:seo` fails if any named AI crawler is blocked again, so a re-added line is a
+conscious change rather than an accident. Remember robots.txt is a request, not
+enforcement, in either direction.
 
-Two things to keep straight if you edit it. `Google-Extended` and
-`Applebot-Extended` are not crawlers and have no effect on Google or Apple
-search ranking - Googlebot and Applebot are separate and still allowed. And
-robots.txt is a request, not enforcement: it states intent and well-behaved
-operators honour it, but nothing stops a scraper.
+The file points at `/sitemap.xml`. A robots.txt only governs the host that serves
+it, so it cannot be "linked" to the other sites': certonymity.com, c.email and
+cdot.app each publish their own, and all of them now state the same allow-all
+policy.
 
 ## External dependencies
 
@@ -304,17 +323,15 @@ display headings, and Geist Mono for figures and technical values.
 
 ## Known gaps
 
-- **`og.png` is generated, not designed.** `public/assets/og.png` was composed
-  from the logo SVG with cairosvg (see git history) so link previews work now.
-  It is deliberately plain - logo, tagline, strapline on the brand gradient. A
-  designed replacement is welcome; keep it 1200x630 and the tags will pick it up.
-- **`og.png` still carries the old tagline** ("Secure identity and payments") as
-  pixels, so link-preview art and text disagree until it is regenerated.
-- **`sameAs` is partial.** The Organization lists its LinkedIn page and
-  certonymity.com. Add X / GitHub / Companies House / community channels when
-  they exist and are confirmed - a wrong `sameAs` can merge your entity with
-  someone else's, which is worse than none. `cdot.app` is deliberately *not* in
-  it: that is a different thing (the product), expressed with `relatedLink`.
+- **`og.png` is generated, not designed.** `npm run og` renders it from the logo
+  and the current tagline in headless Chrome. It is deliberately plain - logo,
+  tagline, strapline on the brand gradient. A designed replacement is welcome;
+  keep it 1200x630 and the tags will pick it up (and set `tagline` in
+  `brand/og.source.json` so `check:seo` knows what it says).
+- **`sameAs` is minimal.** The Organization lists only its LinkedIn page. Add X /
+  GitHub / community channels when they exist and are confirmed - a wrong `sameAs`
+  can merge your entity with someone else's, which is worse than none. No sibling
+  site belongs in it (see below); `check:seo` fails if one is added.
 - **Map, mobile:** the node markers are 10x10px touch targets (WCAG 2.2 wants 24),
   all individually focusable; the 2048x1024 texture is decoded to ~8 MB on the
   device to produce a land/ocean mask that could ship pre-baked at a fraction of
@@ -327,7 +344,7 @@ display headings, and Geist Mono for figures and technical values.
 ## Structured data
 
 `Layout.astro` emits a JSON-LD `@graph`: the `Organization` (Certonymity Ltd, with
-`sameAs` and a `contactPoint`), a `WebSite`, a `SoftwareApplication` for cDot, one
+its Companies House number, `sameAs` and a `contactPoint`), a `WebSite`, a `SoftwareApplication` for cDot, one
 `SoftwareApplication` per chain linked to the parent by `isPartOf` / `hasPart`,
 and a `WebPage` (omitted on the 404). Each chain carries its specifications as
 `PropertyValue` entries with a numeric `value` and a `unitText`, so throughput and
@@ -368,3 +385,57 @@ When it fails after you edit the page, the usual fix is to bring the same wordin
 into `src/pages/llms.txt.ts`. A sentence that belongs only in `llms.txt` (like the
 "built by the team behind c.Email" line) goes in `LLMS_ONLY` in the script, with a
 reason.
+
+## SEO and the relationships between our sites
+
+Four sites, one company:
+
+| Site | What it is | In the graph as |
+|---|---|---|
+| certonymity.com | The company, Certonymity Ltd | the `Organization` (`@id` `https://certonymity.com/#organization`) |
+| **cdot.world** (this) | The cDot **network**: concept, mission, foundation, SDKs, the C-Layer | `WebSite` + `SoftwareApplication` `#cdot` and one node per chain |
+| cdot.app | The cDot **app**, the product built on the network. *Not live yet.* | `relatedLink` from our `WebPage`; its own graph says `isBasedOn` our `#cdot` |
+| c.email | The company's first product, built on the cDot framework | named in `llms.txt` |
+
+They are different things, so none is `sameAs` another (`sameAs` means "is the
+same entity" and a wrong one can merge entities that are not one). What ties them
+together is **one Organization node with the same `@id` on every site** (the
+company's own, as certonymity.com publishes it), `publisher`/`provider` pointing at
+it, `relatedLink` between sites, and the relationships spelled out in prose in
+`/llms.txt` ("How the cDot sites and Certonymity relate").
+
+**`src/data/company.mjs` is the one place** the company's legal name, number,
+registered office, email, LinkedIn, tagline and the sibling sites (with whether each
+is live) are written. The footer, contact box, JSON-LD, `llms.txt` and the checks all
+read it. To launch the app site, set `sites.app.live = true` there: `llms.txt` drops
+"not yet released" and `check:live` starts treating `cdot.app` as a real link.
+
+What updates itself: the sitemap (from the pages that exist, with `<lastmod>` from
+the last content commit), the WebPage `dateModified`, the footer's copyright year,
+`llms.txt`'s company and related-site sections, and the JSON-LD organisation. What is
+checked rather than generated (`npm run check:seo`, in CI): robots.txt policy and
+sitemap pointer; every indexable page in the sitemap and nothing noindex; title,
+description, canonical, og/twitter tags and the 1200x630 image on every page; one
+`<h1>`, no skipped heading levels, no duplicate ids, every `#anchor` resolving,
+`rel=noopener` on new-tab links; JSON-LD ids unique with no dangling references;
+the company facts everywhere they appear; and that the social image was made from
+the current tagline (otherwise: `npm run og`).
+
+**Email addresses are wrapped in `<!--email_off-->`.** Cloudflare's email
+obfuscation otherwise rewrites a plain address to "[email protected]" for any
+client without JavaScript, which includes most crawlers and AI agents, so the page
+would have advertised no contact address to them. `check:seo` fails on any address
+outside the wrapper.
+
+**FAQ.** The questions and answers live in `src/data/faq.mjs`. The accordion, the
+`FAQPage` structured data and the FAQ section of `/llms.txt` are all built from it,
+and `check:seo` fails if the three differ or an answer is empty. Answers are small
+HTML strings; `%EMAIL%` stands for the company address (shielded from Cloudflare's
+obfuscation on the page, plain in the markup).
+
+**Things outside this repo.** `certonymity.com` currently lists
+`sameAs: https://cdot.world/#certonymity`, a node this site no longer defines (the
+Organization is now the shared company `@id`), and describes the cDot *app* as being
+at cdot.world; `check:live` reports both as warnings each week until they are
+updated there. cdot.app's schema uses its own organisation `@id`
+(`https://cdot.app/#certonymity`) and should adopt `ORG_ID` too.

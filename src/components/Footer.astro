@@ -1,15 +1,24 @@
 ---
+import { company, sites, registrationLine } from "../data/company.mjs";
+
+/* The year is the build's, so it moves on the first deploy of a new year. */
+const year = new Date().getFullYear();
 ---
 <footer>
-  <div class="wrap foot">
-    <svg class="foot-mark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
-    <a class="foot-link" href="mailto:info@certonymity.com">info@certonymity.com</a>
-    <div class="foot-stack">
-      <a class="foot-link" href="https://c.email/" target="_blank" rel="noopener noreferrer">c.Email</a>
+  <div class="wrap">
+    <div class="foot">
+      <svg class="foot-mark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
+      <!--email_off--><a class="foot-link" href={`mailto:${company.email}`}>{company.email}</a><!--/email_off-->
+      <div class="foot-stack">
+        <a class="foot-link" href={sites.cemail.url} target="_blank" rel="noopener noreferrer">c.Email</a>
+      </div>
+      <div class="foot-copy">
+        <span>© {year} </span><a class="foot-link" href={sites.company.url} target="_blank" rel="noopener noreferrer">{company.legalName}</a>
+      </div>
     </div>
-    <div class="foot-copy">
-      <span>© 2026 </span><a class="foot-link" href="https://certonymity.com/" target="_blank" rel="noopener noreferrer">Certonymity Ltd</a>
-      <span class="foot-reg">Registered company no. 16871742, England and Wales</span>
+    <div class="foot-legal">
+      <p>{registrationLine}</p>
+      <p>cDot is technical infrastructure. Any regulated activities, including banking and payments, are performed by licensed partners.</p>
     </div>
   </div>
 </footer>

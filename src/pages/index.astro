@@ -1,16 +1,18 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { chains, chipsOf, joinList, STATUS } from "../data/network.mjs";
+import { company, tagline } from "../data/company.mjs";
+import { faq, pageHtml } from "../data/faq.mjs";
 
 /* These track the header tagline and the hero, which are what a visitor sees
    first - a search result or a shared card that reads differently from the page
    behind it looks like a different product. NOTE: public/assets/og.png still has
    the OLD tagline ("Secure identity and payments") baked in as pixels, so the
    card art and the card text now disagree. Regenerate the image to close it. */
-const title = "cDot: Secure identity, communication and payments";
+const title = `cDot: ${tagline}`;
 const description =
   "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join today: download the app or run a node.";
-const ogTitle = "cDot — Secure identity, communication and payments";
+const ogTitle = `cDot — ${tagline}`;
 const ogDescription =
   "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Built on the C-Layer: the blockchain for secure, decentralised identity, run by independent nodes worldwide.";
 ---
@@ -35,12 +37,12 @@ const ogDescription =
 
 <section id="mission">
   <div class="wrap">
-    <h2>Secure, private, scalable, and community-driven.</h2>
+    <h2>Secure, scalable, and community-driven</h2>
     <p class="lead">cDot is the blockchain network built for encrypted, trusted, and instant interactions between verified parties — whether in the form of email, messaging, payments or trades.</p>
     <p class="lead">Get the cDot app to use encrypted email and chat, generate privacy-preserving identity proofs, and make private payments.</p>
     <p class="lead">With SDKs and open-source code available soon for anyone to build with, our vision is for a community-driven ecosystem of innovative, privacy-protecting apps using our building blocks of secure identity, communication and payments. A new internet, built on cDot.</p>
 
-    <h2 class="h2-sub">Where value is exchanged between people, businesses, and machines.</h2>
+    <h2 class="h2-sub">Where value is exchanged between people, businesses, and machines</h2>
     <p class="lead">Stablecoins enable instant, borderless, programmable transactions — but today's blockchains aren't designed for them. Existing systems are either fully general or optimised for trading, and none were built to integrate identity with payments.</p>
     <p class="lead">Transactions at scale don't just need speed and low cost. They need verifiable identity on both sides, including a system for identity that can account for the AI agents increasingly transacting on behalf of people and businesses. With decentralised identity, stablecoin payments, and agent permissions, cDot exists to close the gap.</p>
     <!-- Formerly the standalone "Use cases" section, folded in here. The prose
@@ -66,7 +68,7 @@ const ogDescription =
      "one network" and then sat apart from the thing it was describing. -->
 <section id="c-layer">
   <div class="wrap">
-    <h2>The identity layer for the next generation of the internet.</h2>
+    <h2>The identity layer for the next generation of the internet</h2>
     <!-- The last four words are joined with &nbsp; on purpose. At the full 780px
          measure the sentence would otherwise end on a lone "CDOT tokens.", and
          capping the width to avoid that made the paragraph visibly narrower than
@@ -127,7 +129,7 @@ const ogDescription =
       <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
     </div>
 
-    <h2 class="h2-sub">One network, three specialised chains.</h2>
+    <h2 class="h2-sub">One network, three specialised chains</h2>
     <p class="lead">Coming soon: the full family of three purpose-built blockchains, each engineered for what it does best: decentralised identity, stablecoin settlement, and trading, operating as one trusted network.</p>
     <!-- Below 860px this becomes a horizontal snap-scroll row (see global.css).
          tabindex + label because the cards hold no focusable elements, so the
@@ -156,9 +158,28 @@ const ogDescription =
 
 <div class="divider"></div>
 
+<section id="faq">
+  <div class="wrap">
+    <h2>FAQ</h2>
+    <div class="faq">
+      {faq.map((item) => (
+        <details class="faq-item">
+          <summary>
+            <span>{item.q}</span>
+            <span class="faq-mark" aria-hidden="true"></span>
+          </summary>
+          <div class="faq-a" set:html={pageHtml(item.a)} />
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <section id="contact">
   <div class="wrap">
-    <h2>Want to know more? Get in touch.</h2>
+    <h2>Contact us</h2>
     <form id="contactForm" method="post">
     <div class="contact-grid">
         <div class="contact-fields">
@@ -177,12 +198,12 @@ const ogDescription =
         </div>
       <noscript>
         <p class="cf-status is-error">This form needs JavaScript. Please email
-        <a href="mailto:info@certonymity.com">info@certonymity.com</a> instead.</p>
+        <!--email_off--><a href={`mailto:${company.email}`}>{company.email}</a><!--/email_off--> instead.</p>
       </noscript>
       <div class="addr">
         <p>cDot — built by Certonymity</p>
-        <p><a href="mailto:info@certonymity.com">info@certonymity.com</a></p>
-        <p>Certonymity Ltd<br>86-87 Campden Street<br>London<br>W8 7EN</p>
+        <p><!--email_off--><a href={`mailto:${company.email}`}>{company.email}</a><!--/email_off--></p>
+        <p>{company.legalName}<br>{company.address.street}<br>{company.address.locality}<br>{company.address.postcode}</p>
       </div>
     </div>
     <button class="btn btn-primary cf-submit" type="submit">Send message</button>
@@ -190,7 +211,7 @@ const ogDescription =
     <p class="privacy-note">
       We use your email address and message only to reply to your enquiry. They are never sold or used for
       marketing. To see, correct or delete your data, email{" "}
-      <a href="mailto:info@certonymity.com">info@certonymity.com</a>.
+      <!--email_off--><a href={`mailto:${company.email}`}>{company.email}</a><!--/email_off-->.
     </p>
   </div>
 </section>
