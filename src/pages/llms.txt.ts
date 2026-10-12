@@ -14,6 +14,8 @@
 --------------------------------------------------------------------------- */
 
 import { chains, llmsEntry, llmsIntro } from "../data/network.mjs";
+import { company, sites, addressLine } from "../data/company.mjs";
+import { faq, textBlocks } from "../data/faq.mjs";
 
 /* Hard-wraps to the width the rest of the file uses, indenting continuation
    lines to sit under the text of a numbered entry. */
@@ -33,10 +35,50 @@ function wrap(text: string, width = 100, indent = "   "): string {
   return lines.join("\n");
 }
 
+/* The FAQ, from src/data/faq.mjs: each question as a heading, answers as plain
+   text (list items as "- " lines, links as "text (url)"). */
+const faqText = faq
+  .map((f) =>
+    [
+      `### ${f.q}`,
+      ...textBlocks(f.a).map((b) =>
+        typeof b === "string" ? wrap(b, 100, "") : b.list.map((i) => wrap(`- ${i}`, 100, "  ")).join("\n"),
+      ),
+    ].join("\n\n"),
+  )
+  .join("\n\n");
+
+/* Said only while the app site is not live; flip `live` in company.mjs at launch. */
+const notYet = sites.app.live ? "" : " Not yet released.";
+
 const network = [
   wrap(llmsIntro(), 100, ""),
   "",
   ...chains.map((c, i) => wrap(llmsEntry(c, i))),
+].join("\n");
+
+/* The relationship and company sections. Built here, not written inline, so they
+   follow src/data/company.mjs and wrap like the rest of the file. */
+const bullet = (text: string) => wrap(`- ${text}`, 100, "  ");
+const relationships = [
+  "## How the cDot sites and Certonymity relate",
+  "",
+  bullet(`Certonymity Ltd (${sites.company.url}) is the company that builds cDot and c.Email.`),
+  bullet("This site, cdot.world, is the cDot network itself: the concept, the mission, the C-Layer and the open-source work and SDKs behind it."),
+  bullet(`cDot app (${sites.app.url}) is ${sites.app.role}.${notYet}`),
+  bullet(`c.Email (${sites.cemail.url}) is ${sites.cemail.role}.`),
+  "",
+  "## Related",
+  "",
+  bullet(`[cDot app](${sites.app.url}): ${sites.app.role}.${notYet} Its own llms.txt: ${sites.app.llms}`),
+  bullet(`[Certonymity Ltd](${sites.company.url}): ${sites.company.role}. Its own llms.txt: ${sites.company.llms}`),
+  bullet(`[c.Email](${sites.cemail.url}): ${sites.cemail.role}. Its own llms.txt: ${sites.cemail.llms}`),
+  bullet(`[Certonymity on LinkedIn](${company.linkedin}): company profile.`),
+  "",
+  "## Company",
+  "",
+  bullet(`${company.legalName}, registered in ${company.jurisdiction}, company number ${company.number}.`),
+  bullet(`Registered office: ${addressLine}.`),
 ].join("\n");
 
 const body = `# cDot
@@ -50,7 +92,7 @@ nodes worldwide. Coming soon is the full family of three purpose-built blockchai
 for what it does best: decentralised identity, stablecoin settlement, and trading, operating as one
 trusted network.
 
-Mission: cDot is secure, private, scalable, and community-driven. It is the blockchain network built
+Mission: cDot is secure, scalable, and community-driven. It is the blockchain network built
 for encrypted, trusted, and instant interactions between verified parties - whether in the form of
 email, messaging, payments or trades. Get the cDot app to use encrypted email and chat, generate
 privacy-preserving identity proofs, and make private payments. With SDKs and open-source code
@@ -75,18 +117,16 @@ your self custodied crypto). Secure design and invisible cryptography means ever
 settles instantly, every participant (human or agent) is verified and accountable, while every
 real-world identity and transaction stays private.
 
+## FAQ
+
+${faqText}
+
 ## Pages
 
 - [cDot](https://cdot.world/): the single landing page - mission, the problem, the three
   chains and their specifications, use cases, and contact.
 
-## Related
-
-- [cDot app](https://cdot.app/): the product built on the network - features, how-tos and guides.
-  This site (cdot.world) covers the network itself: the concept, the mission, and the open-source
-  work and SDKs behind it.
-- [Certonymity on LinkedIn](https://www.linkedin.com/company/certonymity/): company profile.
-- [Certonymity Ltd](https://certonymity.com/): the company behind cDot.
+${relationships}
 
 ## Data
 
@@ -95,8 +135,7 @@ real-world identity and transaction stays private.
 
 ## Contact
 
-- [info@certonymity.com](mailto:info@certonymity.com): general enquiries.
-- Certonymity Ltd, 86-87 Campden Street, London W8 7EN, United Kingdom.
+- [${company.email}](mailto:${company.email}): general enquiries.
 `;
 
 export function GET() {

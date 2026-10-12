@@ -1,5 +1,4 @@
 ---
-import { execSync } from "node:child_process";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/host-grotesk";
 import "@fontsource-variable/geist-mono";
@@ -9,6 +8,9 @@ import LogoSymbol from "../components/LogoSymbol.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { chains, soonChains, joinList, ldDescription, ldProperties } from "../data/network.mjs";
+import { company, sites, ORG_ID, tagline } from "../data/company.mjs";
+import { faq, ldHtml } from "../data/faq.mjs";
+import { lastModified as getLastModified } from "../lib/lastmod.mjs";
 
 interface Props {
   title: string;
@@ -31,21 +33,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
    string. The chains' figures and launch status come from src/data/network.mjs,
    the same file the page cards and /llms.txt are built from - change them THERE,
    not here. */
-/* dateModified for the WebPage node: the date of the last commit that touched
-   the site's content, not the build time. A build-time stamp would claim the page
-   changed on every deploy, which is the one thing a freshness signal must not do.
-   Scoped to src/ and public/ so a lockfile bump does not count. Falls back to
-   the build time only if git is unavailable (a tarball build, say), where there
-   is nothing better to say. */
-let lastModified = new Date().toISOString();
-try {
-  const d = execSync("git log -1 --format=%cI -- src public", {
-    stdio: ["ignore", "pipe", "ignore"],
-  }).toString().trim();
-  if (d) lastModified = d;
-} catch {}
+/* dateModified for the WebPage node - see src/lib/lastmod.mjs. */
+const lastModified = getLastModified();
 
-const ORG_ID = "https://cdot.world/#certonymity";
 const SITE_ID = "https://cdot.world/#website";
 const PAGE_ID = "https://cdot.world/#webpage";
 const CDOT_ID = "https://cdot.world/#cdot";
@@ -72,36 +62,42 @@ const layer = (chain) => ({
 const graph = [
   {
     "@type": "Organization",
+    /* The company's own node: the same @id certonymity.com publishes (see
+       src/data/company.mjs), so this graph and that one are about ONE
+       organisation. `url` is the company's site, not this one - this site is the
+       network the company builds, not the company. */
     "@id": ORG_ID,
-    name: "Certonymity Ltd",
-    legalName: "Certonymity Ltd",
-    alternateName: "Certonymity",
-    url: "https://cdot.world/",
+    name: company.legalName,
+    legalName: company.legalName,
+    alternateName: company.name,
+    url: sites.company.url,
     logo: "https://cdot.world/assets/logo-512.png",
-    email: "info@certonymity.com",
+    email: company.email,
+    identifier: {
+      "@type": "PropertyValue",
+      propertyID: "Companies House company number",
+      value: company.number,
+    },
     address: {
       "@type": "PostalAddress",
-      streetAddress: "86-87 Campden Street",
-      addressLocality: "London",
-      postalCode: "W8 7EN",
-      addressCountry: "GB",
+      streetAddress: company.address.street,
+      addressLocality: company.address.locality,
+      postalCode: company.address.postcode,
+      addressCountry: company.address.country,
     },
     description:
       "Certonymity Ltd builds cDot, the network for verified identity, encrypted communication, instant payments, and programmable money.",
     /* sameAs asserts IDENTITY - "this is the same organisation" - so it holds
        only profiles that are Certonymity itself, and only ones that exist.
-       Deliberately NOT here: cdot.app (a different thing: the product, where
-       this site is the network), and c.email / certonym.org (older versions of
-       that product, being retired). A wrong sameAs is worse than none, because
+       Deliberately NOT here: certonymity.com (that is `url` above), cdot.app (a
+       different thing: the product, where this site is the network), and c.email
+       (the company's first product). A wrong sameAs is worse than none, because
        it can merge your entity with someone else's. */
-    sameAs: [
-      "https://www.linkedin.com/company/certonymity/",
-      "https://certonymity.com/",
-    ],
+    sameAs: [company.linkedin],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "general enquiries",
-      email: "info@certonymity.com",
+      email: company.email,
       availableLanguage: "en",
     },
   },
@@ -147,8 +143,24 @@ if (!noindex) {
     isPartOf: { "@id": SITE_ID },
     about: { "@id": CDOT_ID },
     dateModified: lastModified,
-    relatedLink: ["https://cdot.app/"],
+    relatedLink: [sites.app.url],
   });
+  /* The FAQ, from src/data/faq.mjs - the same list the accordion on the page and
+     /llms.txt are built from. Home page only: that is where the questions are. */
+  if (Astro.url.pathname === "/") {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": "https://cdot.world/#faq",
+      url: `${canonical}#faq`,
+      isPartOf: { "@id": PAGE_ID },
+      inLanguage: "en-GB",
+      mainEntity: faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: ldHtml(f.a) },
+      })),
+    });
+  }
 }
 
 const orgSchema = { "@context": "https://schema.org", "@graph": graph };
@@ -168,8 +180,8 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
    contact form and the network map - and that map plots real nodes reporting
    in from real machines, not a decorative loop.
 
-   robots.txt draws a line: retrieval and citation are welcome,
-   training is not.
+   robots.txt welcomes every crawler, and /llms.txt is a plain-text summary
+   of the network written for them.
 -->
 <html lang="en-GB">
 <head>
@@ -195,7 +207,7 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 <meta property="og:image" content={new URL('/assets/og.png', Astro.site).href} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="cDot - secure identity, communication and payments" />
+<meta property="og:image:alt" content={`cDot - ${tagline.toLowerCase()}`} />
 <!-- The only twitter:* tag worth setting: X falls back to the og:* tags for
      title, description and image, but needs this to use the large card. -->
 <meta name="twitter:card" content="summary_large_image" />

@@ -65,6 +65,14 @@ jobs:
       - name: Messaging is in sync
         run: npm run check:sync
 
+      # Everything around the messaging: robots.txt, the sitemap, head tags, the
+      # JSON-LD, the company details and the relationships between our sites, all
+      # checked against src/data/*.mjs. Fails with the file and rule to fix. The
+      # social image is checked here too: if the tagline changes, it says to run
+      # `npm run og`.
+      - name: SEO, structured data and company details
+        run: npm run check:seo
+
       # Informational. Advisories in build tooling are worth seeing on every run,
       # but they should not stop a change that does not touch dependencies, so this
       # step reports and never fails the job.

@@ -1,5 +1,5 @@
 ---
-const tagline = "Secure identity, communication and payments";
+import { tagline } from "../data/company.mjs";
 ---
 <header>
   <div class="wrap nav">
@@ -7,13 +7,15 @@ const tagline = "Secure identity, communication and payments";
       <svg class="logomark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
       <span class="tag">{tagline}</span>
     </a>
+    <!-- Absolute (/#section), not #section: on the 404 page a bare #section points at
+         an anchor that is not there. On the home page it is the same-page jump it always was. -->
     <nav id="main-nav">
-      <a class="link" href="#mission">Mission</a>
-      <a class="link" href="#c-layer">C-Layer</a>
-      <a class="link" href="#contact">Contact</a>
+      <a class="link" href="/#mission">Mission</a>
+      <a class="link" href="/#c-layer">Network</a>
+      <a class="link" href="/#faq">FAQ</a>
+      <a class="link" href="/#contact">Contact</a>
     </nav>
     <div class="nav-controls">
-      <a class="cemail-btn" href="https://c.email/" target="_blank" rel="noopener noreferrer">c.Email</a>
       <button class="burger" id="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
         <span></span><span></span><span></span>
       </button>
