@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "brand:check": "node scripts/check-brand.mjs",
+    "check:sync": "node scripts/check-sync.mjs",
     "deploy": "astro build && wrangler pages deploy dist --project-name=cdot-world --branch=main --commit-dirty=true"
   },
   "dependencies": {

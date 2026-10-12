@@ -68,8 +68,12 @@
   @media(max-width:640px){.cemail-btn{display:none}}
 
   /* Burger button — hidden on desktop */
-  .burger{display:none;flex-direction:column;justify-content:space-between;width:22px;height:16px;
-    background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
+  /* 44x44, drawn around the same 22x16 icon. It was 22x16 - the primary mobile
+     control, and below WCAG 2.2's 24px minimum target (2.5.8) by a wide margin.
+     The padding is what makes the box bigger while the lines stay put, and the
+     negative margin gives back the 10px it would otherwise push the icon left. */
+  .burger{display:none;flex-direction:column;justify-content:space-between;width:44px;height:44px;
+    background:none;border:none;cursor:pointer;padding:14px 11px;margin-right:-10px;flex-shrink:0}
   .burger span{display:block;height:2px;border-radius:2px;background:var(--ink-dim);
     transition:transform .25s,opacity .25s}
   .burger.is-open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -80,7 +84,7 @@
        less room, so the tagline drops a step in size and the rule's breathing
        space halves. flex-direction is already row - only the metrics change. */
     .brand{gap:9px}
-    .brand .tag{font-size:10px;letter-spacing:.04em;max-width:112px;padding-left:9px}
+    .brand .tag{font-size:11px;letter-spacing:.03em;max-width:116px;padding-left:9px}
     /* Burger visible, nav links hidden by default */
     .burger{display:flex}
     .nav nav{
@@ -178,6 +182,11 @@
     color:#fff;background:var(--brand-strong);
     box-shadow:var(--glow-btn);
   }
+  /* These two were inline style="" attributes. They are classes now so the page's
+     Content-Security-Policy can forbid inline styles outright: build-headers.mjs
+     fails the build if a style attribute comes back. */
+  .cf-submit{margin-top:18px}
+  .logo-sprite{position:absolute}
   .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow-btn-hover)}
   .btn-ghost{color:var(--ink);border:1px solid rgba(var(--accent-rgb),.35)}
   .btn-ghost:hover{border-color:var(--cyan);transform:translateY(-1px)}
@@ -284,15 +293,6 @@
   .lead + .lead{margin-top:14px}
   .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
 
-  /* Pull quote */
-  .pull{
-    margin:44px 0 0;padding:26px 30px;border-left:3px solid var(--blue);
-    background:linear-gradient(90deg,rgba(var(--brand-rgb),.08),transparent 70%);
-    border-radius:0 12px 12px 0;max-width:780px;
-  }
-  @media(max-width:640px){.pull{padding:20px 18px;margin-top:32px}}
-  .pull p{font-size:clamp(16.5px,4.2vw,19px);font-weight:600;line-height:1.5;color:var(--ink)}
-
   /* Chains */
   .chains{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:48px}
   /* The row carries tabindex="0" because nothing inside a card is focusable:
@@ -360,7 +360,7 @@
      emphasis. */
   .chain-soon{
     flex-shrink:0;
-    font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    font-size:12px;letter-spacing:.07em;text-transform:uppercase;
     color:var(--ink-faint);
     border:1px solid var(--line);border-radius:999px;
     padding:3px 9px;white-space:nowrap;
@@ -373,7 +373,7 @@
   .chain .specs span{
     border:1px solid var(--line);border-radius:8px;padding:5px 10px;
     font-family:var(--font-mono);
-    font-size:11.8px;font-weight:600;letter-spacing:-.01em;
+    font-size:12.5px;font-weight:600;letter-spacing:-.01em;
     font-variant-numeric:tabular-nums;
     color:var(--cyan);background:rgba(var(--accent-rgb),.06);
     white-space:nowrap;
@@ -509,7 +509,7 @@
   .node-form{display:flex;gap:16px;max-width:576px;margin-top:22px}
   .node-form input[type="email"]{
     flex:1;min-width:0;
-    background:rgba(var(--accent-rgb),.05);border:1px solid var(--line);
+    background:rgba(var(--accent-rgb),.05);border:1px solid var(--field-border);
     border-radius:8px;padding:.5rem 1rem;color:var(--ink);font-size:.8rem;
     font-family:inherit;transition:border-color .2s;
   }
@@ -529,6 +529,11 @@
        back out, leaving the reader pinching to escape. 16px is the threshold,
        so the .8rem above is overridden here and only here. */
     .node-form input[type="email"]{font-size:16px}
+    /* 44px, up from 39 and 33: the field and the button are the page's one
+       conversion point, and on a phone they are thumb targets. The button text
+       steps up from 12.8px to match the 16px field beside it. */
+    .node-form input[type="email"],.node-form .btn{min-height:44px}
+    .node-form .btn{font-size:15px}
   }
 
   /* Visually hidden, still announced. For labels that would be redundant to
@@ -571,7 +576,7 @@
   .field{margin-bottom:18px}
   .field label{display:block;font-size:13.5px;color:var(--ink-dim);margin-bottom:7px;letter-spacing:.02em}
   .field input,.field textarea{
-    width:100%;background:rgba(var(--accent-rgb),.05);border:1px solid var(--line);
+    width:100%;background:rgba(var(--accent-rgb),.05);border:1px solid var(--field-border);
     border-radius:10px;padding:12px 14px;color:var(--ink);font-size:15.5px;
     font-family:inherit;transition:border-color .2s;
   }
@@ -589,7 +594,9 @@
   }
   .addr p{color:var(--ink-dim);font-size:15.5px;line-height:1.7;margin-bottom:16px}
   .addr p:last-child{margin-bottom:0}
-  .addr a{color:var(--cyan);text-decoration:none}
+  /* Same padding-and-cancelling-margin trick as .foot-link: a bigger tap target
+     with no change to the layout. It was 20px tall. */
+  .addr a{color:var(--cyan);text-decoration:none;display:inline-block;padding:5px 0;margin:-5px 0}
   .addr a:hover{text-decoration:underline}
 
   /* Footer */
@@ -604,7 +611,11 @@
   .foot-mark{height:32px;width:78px;display:block}
   .foot-copy{margin:0;color:var(--ink-dim)}
   .foot-stack{display:flex;flex-direction:column;gap:4px}
-  .foot-link{color:var(--ink-dim);text-decoration:none;transition:color .2s}
+  /* The padding grows the tappable area to ~36px and the equal negative margin
+     cancels it out of the layout, so nothing in the footer moves. These were
+     21-26px tall. */
+  .foot-link{color:var(--ink-dim);text-decoration:none;transition:color .2s;
+    display:inline-block;padding:5px 0;margin:-5px 0}
   .foot-link:hover{color:var(--cyan)}
   /* Narrow: stack, and let the row gap do the spacing. */
   @media(max-width:560px){

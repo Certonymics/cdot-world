@@ -223,7 +223,7 @@
      map sits well below the fold, so fetching it on load would compete for
      bandwidth with the CSS and fonts the hero needs to paint - and visitors who
      never scroll this far would pay for it regardless. Observing fires
-     immediately when the map is already in view (e.g. a /#network deep link). */
+     immediately when the map is already in view (e.g. a /#c-layer deep link). */
   if('IntersectionObserver' in window){
     const io=new IntersectionObserver((entries,obs)=>{
       if(entries.some(e=>e.isIntersecting)){ obs.disconnect(); loadTexture(); }
