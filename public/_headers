@@ -1,0 +1,39 @@
+# HTTP response headers for Cloudflare Pages. Copied into dist/ by the build.
+# Format: a path pattern, then indented "Name: value" lines. Comments are kept up
+# here, at the start of a line, on purpose: an indented "#" inside a rule can be
+# read as a malformed header.
+#
+# These headers only take effect on Cloudflare. `npm run dev` and `npm run preview`
+# do not apply this file.
+#
+# THE CONTENT-SECURITY-POLICY LINE IS A PLACEHOLDER. scripts/build-headers.mjs runs
+# after `astro build`, hashes every inline script in the built HTML, and swaps the
+# finished policy in. Do not paste a policy over it by hand: the hashes change
+# whenever an inline script does, and a stale hash silently blocks that script.
+#
+# What each header is for:
+#   Strict-Transport-Security  Use HTTPS for this domain for a year, so a first
+#                              request over plain HTTP on a hostile network cannot
+#                              be intercepted and downgraded. Deliberately NOT
+#                              includeSubDomains and NOT preload: both are very
+#                              hard to undo and neither is needed here.
+#   X-Frame-Options            Stops other sites framing this one to trick visitors
+#                              into clicking things. frame-ancestors in the CSP does
+#                              the same for modern browsers; this covers older ones.
+#   Permissions-Policy         Switches off browser features the site never uses, so
+#                              nothing injected could ask for them either.
+#   Content-Security-Policy    Lists exactly where scripts, styles, fonts and
+#                              connections may come from. Anything else is refused.
+#   Cache-Control on /_astro/  Those files carry a content hash in their name, so a
+#                              changed file always gets a new URL and an old one can
+#                              be cached for good. Without this Cloudflare re-checks
+#                              them every 4 hours.
+
+/*
+  Strict-Transport-Security: max-age=31536000
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Content-Security-Policy: __CSP__
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

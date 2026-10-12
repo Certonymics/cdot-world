@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { chains, chipsOf, joinList, STATUS } from "../data/network.mjs";
 
 /* These track the header tagline and the hero, which are what a visitor sees
    first - a search result or a shared card that reads differently from the page
@@ -8,7 +9,7 @@ import Layout from "../layouts/Layout.astro";
    card art and the card text now disagree. Regenerate the image to close it. */
 const title = "cDot: Secure identity, communication and payments";
 const description =
-  "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join today by downloading the app or running a node.";
+  "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join today: download the app or run a node.";
 const ogTitle = "cDot — Secure identity, communication and payments";
 const ogDescription =
   "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Built on the C-Layer: the blockchain for secure, decentralised identity, run by independent nodes worldwide.";
@@ -21,7 +22,7 @@ const ogDescription =
     <img src="/assets/Calque_1.svg" alt="" width="283" height="338" decoding="async">
   </div>
   <div class="wrap">
-    <h1>The infrastructure for <span class="glow">the&nbsp;internet as it should have been</span>.</h1>
+    <h1>The operating system for a <span class="glow">secure, private&nbsp;internet</span></h1>
     <p class="sub">cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. Join today by downloading the app or running a node.</p>
     <div class="hero-ctas">
       <a class="btn btn-primary" href="#c-layer">Run a node</a>
@@ -35,9 +36,9 @@ const ogDescription =
 <section id="mission">
   <div class="wrap">
     <h2>Secure, private, scalable, and community-driven.</h2>
-    <p class="lead">cDot is the blockchain network built for secure, private, and instant interactions between verified parties — whether in the form of email, messaging, payments, or trades.</p>
-    <p class="lead">Using cryptographic pseudonyms of real verified identities, cDot ensures every communication or transaction is both private and accountable.</p>
-    <p class="lead">With SDKs and open-source code on their way, cDot is a community-driven project led by the vision of an open, decentralised, innovative internet.</p>
+    <p class="lead">cDot is the blockchain network built for encrypted, trusted, and instant interactions between verified parties — whether in the form of email, messaging, payments or trades.</p>
+    <p class="lead">Get the cDot app to use encrypted email and chat, generate privacy-preserving identity proofs, and make private payments.</p>
+    <p class="lead">With SDKs and open-source code available soon for anyone to build with, our vision is for a community-driven ecosystem of innovative, privacy-protecting apps using our building blocks of secure identity, communication and payments. A new internet, built on cDot.</p>
 
     <h2 class="h2-sub">Where value is exchanged between people, businesses, and machines.</h2>
     <p class="lead">Stablecoins enable instant, borderless, programmable transactions — but today's blockchains aren't designed for them. Existing systems are either fully general or optimised for trading, and none were built to integrate identity with payments.</p>
@@ -77,7 +78,7 @@ const ogDescription =
          past a world map to find the field. Its own copy line was folded into
          the standfirst above rather than repeated here. -->
     <div class="node-signup">
-      <form class="node-form" id="clayerForm" name="clayer-nodes">
+      <form class="node-form" id="clayerForm" name="clayer-nodes" method="post">
         <!-- A placeholder is not a label: it vanishes on first keystroke and many
              screen readers skip it entirely. Visually hidden, still announced. -->
         <label class="sr-only" for="clayer-email">Email address</label>
@@ -132,49 +133,23 @@ const ogDescription =
          tabindex + label because the cards hold no focusable elements, so the
          scroll container itself has to be reachable for a keyboard user to see
          past the first card. -->
-    <div class="chains" tabindex="0" role="group" aria-label="The three cDot chains: C-Layer, P-Layer and T-Layer">
-      <div class="chain">
-        <div class="chain-head">
-          <span class="chain-id">C-Layer</span>
+    <!-- Rendered from src/data/network.mjs, the one place the chains' facts are
+         written down: the same data feeds the JSON-LD in Layout.astro and
+         /llms.txt, so a spec or a launch status is changed once. -->
+    <div class="chains" tabindex="0" role="group" aria-label={`The three cDot chains: ${joinList(chains.map((c) => c.name))}`}>
+      {chains.map((c) => (
+        <div class="chain">
+          <div class="chain-head">
+            <span class="chain-id">{c.name}</span>
+            {c.status === "soon" && <span class="chain-soon">{STATUS.soon}</span>}
+          </div>
+          <h3>{c.title}</h3>
+          <p>{c.summary}</p>
+          <div class="specs">
+            {chipsOf(c).map((chip) => <span>{chip}</span>)}
+          </div>
         </div>
-        <h3>Identity and asset recovery chain</h3>
-        <p>A decentralised identity chain for people, businesses, and agents. Cryptographic pseudonyms of verified real identities provide privacy with accountability. Run by nodes around the world for maximum resilience and decentralisation.</p>
-        <div class="specs">
-          <span>15,000 tx/s, highly parallel</span>
-          <span>WASM smart contracts</span>
-          <span>20s finality</span>
-          <span>Permissionless</span>
-          <span>Public and pseudonymous</span>
-        </div>
-      </div>
-      <div class="chain">
-        <div class="chain-head">
-          <span class="chain-id">P-Layer</span>
-          <span class="chain-soon">Launching soon</span>
-        </div>
-        <h3>Settlement chain</h3>
-        <p>Engineered for high-throughput, low-cost global stablecoin settlement and truly programmable money, with native on- and off-ramping. Agentic transactions supported with verifiable, revocable permissions.</p>
-        <div class="specs">
-          <span>30,000 tx/s</span>
-          <span>Finality &lt;1s</span>
-          <span>Byzantine security 45%</span>
-        </div>
-      </div>
-      <div class="chain">
-        <div class="chain-head">
-          <span class="chain-id">T-Layer</span>
-          <span class="chain-soon">Launching soon</span>
-        </div>
-        <h3>Trading chain</h3>
-        <p>A high-performance decentralised exchange, offering stablecoin swaps and perpetual futures in a predictable execution environment.</p>
-        <div class="specs">
-          <span>30,000 tx/s, native multithreading</span>
-          <span>Finality &lt;1s</span>
-          <span>Node-permissioned overlay on C-Layer</span>
-          <span>Private and accountable</span>
-          <span>Native NASDAQ-like matching engine</span>
-        </div>
-      </div>
+      ))}
     </div>
   </div>
 </section>
@@ -184,7 +159,7 @@ const ogDescription =
 <section id="contact">
   <div class="wrap">
     <h2>Want to know more? Get in touch.</h2>
-    <form id="contactForm">
+    <form id="contactForm" method="post">
     <div class="contact-grid">
         <div class="contact-fields">
           <div class="field">
@@ -210,173 +185,187 @@ const ogDescription =
         <p>Certonymity Ltd<br>86-87 Campden Street<br>London<br>W8 7EN</p>
       </div>
     </div>
-    <button class="btn btn-primary" type="submit" style="margin-top:18px">Send message</button>
+    <button class="btn btn-primary cf-submit" type="submit">Send message</button>
     </form>
   </div>
 </section>
 
-
-<!-- Contact form. POSTs to the Google Apps Script in scripts/contact-form.gs,
-     which records the enquiry in a sheet and emails the team. That script is a
-     separate deployment from the c.Email one - see its header comment. -->
-<script is:inline>
-(function(){
-  /* Public by design - see the header comment in scripts/contact-form.gs.
-     Replace with the /exec URL of the deployed cDot contact-form script. */
-  const CONTACT_FORM_URL =
-    'https://script.google.com/macros/s/AKfycbzkT4I_iMLiBBKRZeKdSEU2ohJVpfOFd4UA-tk2ss4p2YddFDbvU1OFPnjHcr0RaOHdUA/exec';
-
-  const form = document.getElementById('contactForm');
-  const statusEl = document.getElementById('cf-status');
-  const button = form.querySelector('button[type="submit"]');
-  const fields = form.querySelectorAll('.contact-fields .field, .cf-honeypot');
-  let sending = false;
-
-  /* The status line stays in the DOM and is emptied rather than hidden: a
-     display:none live region is not monitored, so un-hiding and filling it in
-     one task announces unreliably. */
-  function show(message, isError){
-    statusEl.textContent = message;
-    statusEl.classList.toggle('is-error', !!isError);
-    /* Errors move focus, so a screen-reader user is not left waiting for an
-       announcement that may not arrive. */
-    if(isError) statusEl.focus();
-  }
-
-  /* On success the fields and the button go away entirely, so there is no live
-     Send button sitting under a thank-you message inviting a second submission. */
-  function succeed(message){
-    fields.forEach(function(el){ el.hidden = true; });
-    button.hidden = true;
-    show(message, false);
-  }
-
-  function fail(message){
-    show(message || 'Something went wrong. Please try again, or email us directly at info@certonymity.com.', true);
-    sending = false;
-    button.disabled = false;
-    button.textContent = 'Send message';
-  }
-
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    if (sending) return;
-
-    /* Better to say so than to POST into the void and report success. */
-    if (!CONTACT_FORM_URL) {
-      return fail('This form is not connected yet. Please email us directly at info@certonymity.com.');
-    }
-
-    /* Sending state lives on the button only. Putting it in the status line too
-       would shift the layout mid-submit, since the status sits in the field column. */
-    sending = true;
-    button.disabled = true;
-    button.textContent = 'Sending…';
-    statusEl.textContent = '';
-
-    try {
-      /* No Content-Type header on purpose. Setting one makes this a preflighted
-         request, and Apps Script does not answer the OPTIONS probe, so the whole
-         submission fails before it starts. Sent as text/plain it is a "simple
-         request" and goes straight through; doPost reads the raw body regardless. */
-      /* Without a timeout a stalled connection leaves the button disabled on
-         "Sending…" forever, with no way to retry. */
-      const response = await fetch(CONTACT_FORM_URL, {
-        signal: AbortSignal.timeout(15000),
-        method: 'POST',
-        body: JSON.stringify({
-          email: document.getElementById('cf-email').value.trim(),
-          message: document.getElementById('cf-msg').value.trim(),
-          website: form.querySelector('[name="website"]').value
-        })
-      });
-      const result = await response.json().catch(function(){ return null; });
-      /* Only confirm what the server actually confirmed. */
-      if (!response.ok || !result || !result.ok) return fail(result && result.error);
-
-      succeed('Thanks — your message is on its way. We’ll reply to the address you gave us.');
-    } catch (err) {
-      fail();
-    }
-  });
-})();
-</script>
 
 <!-- Live C-Layer map - implementation and rationale in public/assets/map.js.
      Served from public/ rather than inlined to keep the page's prose dominant
      in its markup; `defer` so the elements it queries have parsed. -->
 <script src="/assets/map.js" defer></script>
 
-<!-- C-Layer node signup. Ported verbatim from cdot.app, which ports it in turn
-     from c.email-website: all three run the same form against the same sheet,
-     so a signup from any of them lands in one place. Keep them in step. -->
+<!-- Form handlers: the contact form and the C-Layer node signup, in one block
+     because they share their transport. Each posts to its own Google Apps Script
+     deployment (scripts/contact-form.gs for the contact form; the signup is the
+     one cdot.app and c.email-website also use, so a signup from any of the three
+     lands in one sheet). The two scripts are SEPARATE deployments and share no
+     infrastructure.
+
+     NOTE for the signup: it began as a verbatim port from cdot.app and has since
+     diverged - the success path now resets the button label, and the fetch lives
+     in postJson() below. cdot.app still has the old inline version. Port these
+     changes there when it is next touched, so the three do not drift further. -->
 <script is:inline>
 (function(){
-  /* The Apps Script web app that records signups. Public by design: it only
-     ever appends a row and exposes no way to read the sheet back, so shipping
-     it to the browser costs nothing worse than the odd junk row. A SEPARATE
-     deployment from the contact form above. */
-  const CLAYER_SIGNUP_URL =
-    'https://script.google.com/macros/s/AKfycbzoWtxvKHs5oFSKra8olCmpMUGENdc9qlsNGvpeP9UCwYY8nMjMBafhFOvyDpqpkz0KvQ/exec';
+  /* The transport both forms share.
 
-  const form = document.getElementById('clayerForm');
-  const statusEl = document.getElementById('clayer-status');
-  if (!form || !statusEl) return;
-  const button = form.querySelector('button[type="submit"]');
-  let sending = false;
+     No Content-Type header on purpose. Setting one makes this a preflighted
+     request, and Apps Script does not answer the OPTIONS probe, so the whole
+     submission fails before it starts. Sent as text/plain it is a "simple
+     request" and goes straight through; doPost reads the raw body regardless.
 
-  function fail(message){
-    statusEl.textContent = message || 'Something went wrong. Please try again.';
-    statusEl.classList.add('is-error');
-    sending = false;
-    button.disabled = false;
-    button.textContent = 'Register your interest';
+     Without a timeout a stalled connection leaves the button disabled on its
+     "Sending..." label forever, with no way to retry.
+
+     Resolves { ok:true } only when the server explicitly confirmed, and
+     { ok:false, error } otherwise - so a caller can never report success the
+     server did not give. A network failure or timeout REJECTS, and callers catch
+     it. */
+  async function postJson(url, payload){
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(15000),
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(function(){ return null; });
+    if (!response.ok || !result || !result.ok) {
+      return { ok: false, error: result && result.error };
+    }
+    return { ok: true };
   }
 
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    if (sending) return;
+  /* --- Contact form ------------------------------------------------------- */
+  (function(){
+    /* Public by design - see the header comment in scripts/contact-form.gs.
+       Replace with the /exec URL of the deployed cDot contact-form script. */
+    const CONTACT_FORM_URL =
+      'https://script.google.com/macros/s/AKfycbzkT4I_iMLiBBKRZeKdSEU2ohJVpfOFd4UA-tk2ss4p2YddFDbvU1OFPnjHcr0RaOHdUA/exec';
 
-    sending = true;
-    button.disabled = true;
-    button.textContent = 'Registering…';
-    statusEl.textContent = '';
-    statusEl.classList.remove('is-error');
+    const form = document.getElementById('contactForm');
+    const statusEl = document.getElementById('cf-status');
+    if (!form || !statusEl) return;
+    const button = form.querySelector('button[type="submit"]');
+    const fields = form.querySelectorAll('.contact-fields .field, .cf-honeypot');
+    let sending = false;
 
-    const data = new FormData(form);
-    try {
-      /* No Content-Type header on purpose. Setting one makes this a preflighted
-         request, and Apps Script does not answer the OPTIONS probe, so the whole
-         submission fails before it starts. Sent as text/plain it is a "simple
-         request" and goes straight through; doPost reads the raw body regardless. */
-      /* Without a timeout a stalled connection leaves the button disabled on
-         "Registering…" forever, with no way to retry. */
-      const response = await fetch(CLAYER_SIGNUP_URL, {
-        signal: AbortSignal.timeout(15000),
-        method: 'POST',
-        body: JSON.stringify({ email: data.get('email'), website: data.get('website') })
-      });
-      const result = await response.json().catch(function(){ return null; });
-      /* Only confirm what the server actually confirmed. */
-      if (!response.ok || !result || !result.ok) return fail(result && result.error);
+    /* The status line stays in the DOM and is emptied rather than hidden: a
+       display:none live region is not monitored, so un-hiding and filling it in
+       one task announces unreliably. */
+    function show(message, isError){
+      statusEl.textContent = message;
+      statusEl.classList.toggle('is-error', !!isError);
+      /* Errors move focus, so a screen-reader user is not left waiting for an
+         announcement that may not arrive. */
+      if(isError) statusEl.focus();
+    }
 
-      /* The form goes away on success, so there is no live Register button left
-         under a thank-you message inviting a second submission. */
-      form.hidden = true;
-      statusEl.textContent = 'Thanks — we’ll be in touch!';
-      /* Only fail() used to put the label back, so a successful submission left
-         the button reading "Registering…" forever. Normally invisible, since
-         the form is hidden on the line above - but not always: `hidden` loses
-         to any display rule on .node-form, the two paint in the same frame so a
-         slow machine shows the stale label first, and a screen reader walking
-         back over the region still announces it. Reset it on both paths. */
+    /* On success the fields and the button go away entirely, so there is no live
+       Send button sitting under a thank-you message inviting a second submission. */
+    function succeed(message){
+      fields.forEach(function(el){ el.hidden = true; });
+      button.hidden = true;
+      show(message, false);
+    }
+
+    function fail(message){
+      show(message || 'Something went wrong. Please try again, or email us directly at info@certonymity.com.', true);
+      sending = false;
+      button.disabled = false;
+      button.textContent = 'Send message';
+    }
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      if (sending) return;
+
+      /* Better to say so than to POST into the void and report success. */
+      if (!CONTACT_FORM_URL) {
+        return fail('This form is not connected yet. Please email us directly at info@certonymity.com.');
+      }
+
+      /* Sending state lives on the button only. Putting it in the status line too
+         would shift the layout mid-submit, since the status sits in the field column. */
+      sending = true;
+      button.disabled = true;
+      button.textContent = 'Sending…';
+      statusEl.textContent = '';
+
+      try {
+        const result = await postJson(CONTACT_FORM_URL, {
+          email: document.getElementById('cf-email').value.trim(),
+          message: document.getElementById('cf-msg').value.trim(),
+          website: form.querySelector('[name="website"]').value
+        });
+        if (!result.ok) return fail(result.error);
+
+        succeed('Thanks — your message is on its way. We’ll reply to the address you gave us.');
+      } catch (err) {
+        fail();
+      }
+    });
+  })();
+
+  /* --- C-Layer node signup ------------------------------------------------ */
+  (function(){
+    /* The Apps Script web app that records signups. Public by design: it only
+       ever appends a row and exposes no way to read the sheet back, so shipping
+       it to the browser costs nothing worse than the odd junk row. A SEPARATE
+       deployment from the contact form above. */
+    const CLAYER_SIGNUP_URL =
+      'https://script.google.com/macros/s/AKfycbzoWtxvKHs5oFSKra8olCmpMUGENdc9qlsNGvpeP9UCwYY8nMjMBafhFOvyDpqpkz0KvQ/exec';
+
+    const form = document.getElementById('clayerForm');
+    const statusEl = document.getElementById('clayer-status');
+    if (!form || !statusEl) return;
+    const button = form.querySelector('button[type="submit"]');
+    let sending = false;
+
+    function fail(message){
+      statusEl.textContent = message || 'Something went wrong. Please try again.';
+      statusEl.classList.add('is-error');
       sending = false;
       button.disabled = false;
       button.textContent = 'Register your interest';
-    } catch (err) {
-      fail();
     }
-  });
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      if (sending) return;
+
+      sending = true;
+      button.disabled = true;
+      button.textContent = 'Registering…';
+      statusEl.textContent = '';
+      statusEl.classList.remove('is-error');
+
+      const data = new FormData(form);
+      try {
+        const result = await postJson(CLAYER_SIGNUP_URL, {
+          email: data.get('email'),
+          website: data.get('website')
+        });
+        if (!result.ok) return fail(result.error);
+
+        /* The form goes away on success, so there is no live Register button left
+           under a thank-you message inviting a second submission. */
+        form.hidden = true;
+        statusEl.textContent = 'Thanks — we’ll be in touch!';
+        /* Only fail() used to put the label back, so a successful submission left
+           the button reading "Registering…" forever. Normally invisible, since
+           the form is hidden on the line above - but not always: `hidden` loses
+           to any display rule on .node-form, the two paint in the same frame so a
+           slow machine shows the stale label first, and a screen reader walking
+           back over the region still announces it. Reset it on both paths. */
+        sending = false;
+        button.disabled = false;
+        button.textContent = 'Register your interest';
+      } catch (err) {
+        fail();
+      }
+    });
+  })();
 })();
 </script>
 

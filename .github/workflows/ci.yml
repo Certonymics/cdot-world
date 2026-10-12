@@ -1,0 +1,73 @@
+# Automatic checks. Runs on every pull request and on pushes to the two long-lived
+# branches, so a broken change is flagged before it is merged - including the
+# update proposals Dependabot opens, which would otherwise be merged blind.
+#
+# It does what a careful person would do by hand before merging: install exactly
+# what package-lock.json says, check the brand tokens, build the site, and confirm
+# the messaging still agrees across the page, meta tags, JSON-LD and llms.txt. The
+# build step also runs scripts/build-headers.mjs, which FAILS if the page contains
+# anything its Content-Security-Policy would block (an inline style="" attribute,
+# an inline onclick=, a script from another origin).
+#
+# It does not deploy anything. Publishing stays a separate, deliberate step.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, astro-port]
+
+# Read-only: nothing in this workflow needs to write to the repository, so it
+# is not given the ability to.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # The Node version comes from .nvmrc so CI and the README cannot disagree.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # `ci`, not `install`: installs exactly what the lockfile records and fails
+      # if package.json and the lockfile have drifted apart.
+      - name: Install dependencies
+        run: npm ci
+
+      # Sibling repos are not checked out here, so they are skipped (by design);
+      # this still verifies this repo's tokens and that no second theme has crept
+      # back in.
+      - name: Brand tokens
+        run: npm run brand:check
+
+      - name: Build
+        run: npm run build
+
+      # Belt and braces for the build step above: confirm the policy really was
+      # written and the placeholder is gone, because a build that silently ships
+      # the literal text __CSP__ would give no protection at all.
+      - name: Security headers were generated
+        run: |
+          grep -q "Content-Security-Policy: default-src" dist/_headers
+          ! grep -q "__CSP__" dist/_headers
+
+      # The places our messaging lives - the hero, the Mission copy, the title and
+      # meta tags, the JSON-LD and llms.txt - must still agree. This reads the
+      # built output, so it has to come after the build. It fails on any
+      # disagreement and says which file to change.
+      - name: Messaging is in sync
+        run: npm run check:sync
+
+      # Informational. Advisories in build tooling are worth seeing on every run,
+      # but they should not stop a change that does not touch dependencies, so this
+      # step reports and never fails the job.
+      - name: Dependency audit (informational)
+        continue-on-error: true
+        run: npm audit

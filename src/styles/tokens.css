@@ -105,6 +105,13 @@
     /* --- derived ---------------------------------------------------------- */
     --line:rgba(var(--accent-rgb),.16);
     --card:rgba(var(--accent-rgb),.05);
+    /* The edge of a form field. --line is .16 alpha, which is 1.31:1 against the
+       page - fine for the decorative hairlines it was made for, but WCAG 1.4.11
+       needs 3:1 for the boundary of an input, because on this dark ground the
+       border is often the only thing that says "type here". .55 measures 3.7:1
+       against the page and 3.4:1 against the field's own fill. Kept as its own
+       token so the decorative lines stay quiet. */
+    --field-border:rgba(var(--accent-rgb),.55);
 
     /* TYPEFACES
        ---------
