@@ -186,6 +186,9 @@
      Content-Security-Policy can forbid inline styles outright: build-headers.mjs
      fails the build if a style attribute comes back. */
   .cf-submit{margin-top:18px}
+  /* Small print under the contact form: the privacy notice for what it collects. */
+  .privacy-note{margin-top:28px;font-size:12px;line-height:1.6;color:var(--ink-dim)}
+  .privacy-note a{color:var(--cyan);text-decoration:underline;text-underline-offset:2px}
   .logo-sprite{position:absolute}
   .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow-btn-hover)}
   .btn-ghost{color:var(--ink);border:1px solid rgba(var(--accent-rgb),.35)}
@@ -609,7 +612,8 @@
      leave the gaps visibly uneven, since the mark and the address are nothing
      like the same size. */
   .foot-mark{height:32px;width:78px;display:block}
-  .foot-copy{margin:0;color:var(--ink-dim)}
+  .foot-copy{margin:0;color:var(--ink-dim);text-align:right}
+  .foot-reg{display:block;margin-top:4px;font-size:12px;color:var(--ink-dim)}
   .foot-stack{display:flex;flex-direction:column;gap:4px}
   /* The padding grows the tappable area to ~36px and the equal negative margin
      cancels it out of the layout, so nothing in the footer moves. These were
@@ -620,6 +624,7 @@
   /* Narrow: stack, and let the row gap do the spacing. */
   @media(max-width:560px){
     .foot{flex-direction:column;text-align:center}
+    .foot-copy{text-align:center}
   }
 
   /* Respect a reduced-motion preference: the node and badge pings are infinite
