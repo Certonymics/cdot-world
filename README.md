@@ -93,6 +93,7 @@ scripts/
   build-headers.mjs           writes the Content-Security-Policy after the build
   check-sync.mjs              `npm run check:sync`: do the messaging surfaces agree?
   contact-form.gs             source of the contact-form Apps Script (not built)
+.github/workflows/ci.yml      automatic checks on every PR
 ```
 
 To add a page, drop a `.astro` file in `src/pages/` and wrap it in `Layout`.
@@ -260,6 +261,14 @@ To check the headers on a deployed URL (a branch preview works):
 curl -sI https://<preview-or-production-url>/ | grep -iE 'strict-transport|content-security|x-frame|permissions'
 curl -sI https://<preview-or-production-url>/_astro/<any-hashed-file> | grep -i cache-control
 ```
+
+## Automatic checks
+
+`.github/workflows/ci.yml` runs on every pull request and on pushes to `main` and
+`astro-port`: `npm ci`, `npm run brand:check`, `npm run build`, a check that the
+policy was actually written, and an informational `npm audit` that reports but
+never fails the job. It does not deploy. It is also what lets a Dependabot update
+PR show a pass or fail before anyone merges it.
 
 ## Crawler policy
 
