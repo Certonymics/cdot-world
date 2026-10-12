@@ -20,7 +20,7 @@ npm run dev      # http://localhost:4321
 | Command | Does |
 |---|---|
 | `npm run dev` | Dev server with hot reload |
-| `npm run build` | Static build into `dist/` |
+| `npm run build` | Static build into `dist/`, then writes the security headers (see "Security headers") |
 | `npm run preview` | Serve the built `dist/` |
 | `npm run brand:check` | Verify the brand tokens against `brand/palette.json` and the sibling repos |
 | `npm run check:sync` | After a build: verify the page, meta tags, JSON-LD and `llms.txt` still agree (see "One source of truth") |
@@ -36,7 +36,7 @@ verbatim will 404. Whatever the host, it needs:
 
 | Setting | Value |
 |---|---|
-| Build command | `npm run build` |
+| Build command | `npm run build` — **not** `astro build` on its own: the headers step is part of the script |
 | Output directory | `dist` |
 | Node version | **22.12.0 or later** — pinned in `.nvmrc` |
 
@@ -85,10 +85,12 @@ src/
     global.css                everything else
 public/
   assets/                     logos, favicon, earth-texture.jpg, map.js
+  _headers                    Cloudflare response headers (CSP placeholder inside)
   robots.txt
 brand/palette.json            canonical brand definition
 scripts/
   check-brand.mjs             `npm run brand:check`
+  build-headers.mjs           writes the Content-Security-Policy after the build
   check-sync.mjs              `npm run check:sync`: do the messaging surfaces agree?
   contact-form.gs             source of the contact-form Apps Script (not built)
 ```
@@ -222,6 +224,42 @@ signup from any of the three lands in one sheet. Its source is not in this repo.
 The signup handler began as a verbatim port from cdot.app and has since diverged
 (it resets the button label on success, and uses `postJson()`); cdot.app still has
 the old inline version. Port the changes there when it is next touched.
+
+## Security headers
+
+`public/_headers` sets the response headers on Cloudflare Pages: HSTS (use HTTPS
+for a year), `X-Frame-Options: DENY` (no framing by other sites), a
+`Permissions-Policy` switching off features the site never uses, a
+`Content-Security-Policy`, and a one-year `immutable` cache on `/_astro/*` (those
+filenames carry a content hash, so they can never go stale). The file's header
+comment explains each one. **They only apply on Cloudflare** - `npm run dev` and
+`npm run preview` do not read it.
+
+**The Content-Security-Policy is generated, not written.** The page has inline
+scripts (the mobile menu, the forms), and a strict policy can only allow those by
+SHA-256 hash. `scripts/build-headers.mjs` runs after `astro build`, hashes each
+inline script in the built HTML, and replaces the `__CSP__` placeholder in
+`dist/_headers`. Edit an inline script and rebuild, and the policy follows; paste a
+policy in by hand and the first edit silently blocks that script.
+
+The same script **fails the build** if the page contains anything the policy
+would block: an inline `style="..."` attribute, a `<style>` block, an inline
+`onclick=`-style handler, or a `<script src>` from another origin. Use a class, a
+CSS rule, or `addEventListener` instead. That is deliberate: a form that breaks
+silently in production is much worse than a failed build.
+
+**If the page's JavaScript starts talking to a new outside origin, add it to
+`CONNECT_ORIGINS` in `build-headers.mjs`** or the browser will refuse the request.
+Today that is `script.google.com` (the forms), `script.googleusercontent.com`
+(where Google *redirects* the response - a redirect is checked at every hop, so
+leaving it out would break every submission), and `map.c-layer.certonym.org`.
+
+To check the headers on a deployed URL (a branch preview works):
+
+```bash
+curl -sI https://<preview-or-production-url>/ | grep -iE 'strict-transport|content-security|x-frame|permissions'
+curl -sI https://<preview-or-production-url>/_astro/<any-hashed-file> | grep -i cache-control
+```
 
 ## Crawler policy
 
