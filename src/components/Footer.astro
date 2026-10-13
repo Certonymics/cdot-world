@@ -3,20 +3,36 @@ import { company, sites, registrationLine } from "../data/company.mjs";
 
 /* The year is the build's, so it moves on the first deploy of a new year. */
 const year = new Date().getFullYear();
+
+/* Footer entries that exist as a name but not yet as a destination. When one goes
+   live, move it out of this list and give it an href like the others. */
+const soon = [
+  /* Press kit: a shared Drive folder exists
+     (https://drive.google.com/drive/folders/1OSPZVD3mimEL1NABBoptLuMaIQxL1dOj?usp=drive_link)
+     but is deliberately not linked yet. */
+  { id: "press-kit", label: "Press kit" },
+  { id: "whitepaper", label: "Whitepaper" },
+  { id: "community", label: "Community" },
+];
 ---
 <footer>
   <div class="wrap">
     <div class="foot">
       <svg class="foot-mark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
-      <!--email_off--><a class="foot-link" href={`mailto:${company.email}`}>{company.email}</a><!--/email_off-->
       <div class="foot-stack">
+        <!-- Not links yet: there is nothing to link to. Focusable so the label also
+             shows for keyboard and touch users, not only on mouse hover. -->
+        {soon.map((item) => (
+          <span class="foot-link foot-soon" tabindex="0" aria-describedby={`${item.id}-soon`}>
+            {item.label}
+            <span class="soon-tip" id={`${item.id}-soon`} role="tooltip">Coming soon</span>
+          </span>
+        ))}
         <a class="foot-link" href={sites.cemail.url} target="_blank" rel="noopener noreferrer">c.Email</a>
-      </div>
-      <div class="foot-copy">
-        <span>© {year} </span><a class="foot-link" href={sites.company.url} target="_blank" rel="noopener noreferrer">{company.legalName}</a>
       </div>
     </div>
     <div class="foot-legal">
+      <p>© {year} <a class="foot-link" href={sites.company.url} target="_blank" rel="noopener noreferrer">{company.legalName}</a></p>
       <p>{registrationLine}</p>
       <p>cDot is technical infrastructure. Any regulated activities, including banking and payments, are performed by licensed partners.</p>
     </div>

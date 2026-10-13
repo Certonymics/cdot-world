@@ -636,7 +636,6 @@
      leave the gaps visibly uneven, since the mark and the address are nothing
      like the same size. */
   .foot-mark{height:32px;width:78px;display:block}
-  .foot-copy{margin:0;color:var(--ink-dim);text-align:right}
   /* The small print: the quietest band at the very bottom, as on cdot.app. It
      holds the company registration line, then the regulatory note. */
   .foot-legal{
@@ -645,7 +644,22 @@
   }
   .foot-legal p{margin:0}
   .foot-legal p + p{margin-top:4px}
-  .foot-stack{display:flex;flex-direction:column;gap:4px}
+  .foot-stack{display:flex;flex-wrap:wrap;gap:4px 24px}
+  /* Whitepaper: a placeholder, not a link. The tip shows on hover and on keyboard
+     or touch focus. It sits above the word and does not move the layout. */
+  .foot-soon{position:relative;cursor:default}
+  .foot-link.foot-soon:hover{color:var(--ink-dim)} /* it is not a link, so no link hover colour */
+  .foot-soon:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+  .soon-tip{
+    position:absolute;left:50%;bottom:calc(100% + 8px);transform:translate(-50%,4px);
+    padding:5px 10px;border-radius:8px;white-space:nowrap;
+    font-size:12px;line-height:1.4;color:var(--ink);
+    background:var(--bg-2);border:1px solid var(--line);
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .15s ease,transform .15s ease,visibility .15s;
+  }
+  .foot-soon:hover .soon-tip,.foot-soon:focus .soon-tip{opacity:1;visibility:visible;transform:translate(-50%,0)}
+  @media (prefers-reduced-motion:reduce){.soon-tip{transition:none}}
   /* The padding grows the tappable area to ~36px and the equal negative margin
      cancels it out of the layout, so nothing in the footer moves. These were
      21-26px tall. */
@@ -655,7 +669,6 @@
   /* Narrow: stack, and let the row gap do the spacing. */
   @media(max-width:560px){
     .foot{flex-direction:column;text-align:center}
-    .foot-copy{text-align:center}
     .foot-legal{margin-left:auto;margin-right:auto;text-align:center}
   }
 
