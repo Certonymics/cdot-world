@@ -79,17 +79,22 @@ for (const { name, path } of palette.consumers) {
 }
 
 /* ---------------------------------------------------------------------------
-   Single light block.
+   Dark only.
 
-   Dark is unconditional and light is opt-in via :root[data-theme="light"], so
-   the palette is stated ONCE. It used to be stated twice - the second copy
-   existed only to serve prefers-color-scheme - and the two drifted within
-   minutes of being written with nothing to catch it: the OS path and the toggle
-   path simply rendered different colours.
+   The site ships ONE palette. The light theme, the header toggle, the stored
+   preference and the pre-paint script were all removed deliberately: cdot.app
+   is the light surface and cdot.world is the dark one, and that contrast is
+   the whole distinction between two sites that otherwise share a mark, a
+   palette and a typeface pair.
 
-   Re-adding a prefers-color-scheme block would reintroduce that, so this fails
-   if one appears. If following the OS is ever wanted again, the duplication has
-   to come back with a parity check alongside it.
+   So this no longer checks that a light block is well formed - it checks that
+   one has not come back. Both routes are covered: an explicit
+   :root[data-theme="light"] block, and a prefers-color-scheme media query.
+   Either would restate the palette in a second place, which is exactly how the
+   old duplicate drifted within minutes of being written, silently.
+
+   If a second theme is ever wanted again, this check is the thing to rewrite
+   first - with a parity check between the two copies, not without one.
 --------------------------------------------------------------------------- */
 {
   const tokensPath = "src/styles/tokens.css";
@@ -97,7 +102,7 @@ for (const { name, path } of palette.consumers) {
   try {
     css = readFileSync(resolve(root, tokensPath), "utf8");
   } catch {
-    console.log(`  -- ${tokensPath} not readable, light-theme check skipped`);
+    console.log(`  -- ${tokensPath} not readable, dark-only check skipped`);
   }
 
   if (css) {
@@ -105,8 +110,12 @@ for (const { name, path } of palette.consumers) {
     const stripped = css.replace(/\/\*[\s\S]*?\*\//g, "");
 
     const lightBlocks = stripped.match(/:root\[data-theme="light"\]\s*\{/g) || [];
-    if (lightBlocks.length !== 1) {
-      problems.push(`expected exactly 1 :root[data-theme="light"] block, found ${lightBlocks.length}`);
+    if (lightBlocks.length) {
+      problems.push(
+        `found ${lightBlocks.length} :root[data-theme="light"] block(s) - the site ` +
+        "is dark only. Nothing sets data-theme any more, so this is dead weight " +
+        "at best and a second source of truth at worst.",
+      );
     }
     if (/@media[^{]*prefers-color-scheme/.test(stripped)) {
       problems.push(
@@ -116,44 +125,37 @@ for (const { name, path } of palette.consumers) {
     }
 
     /* The address-bar colour is a <meta> tag, so it cannot read a custom
-       property: Layout.astro hardcodes both backgrounds. That duplication has
-       already drifted once - the light constant kept an older --bg-0 after the
-       palette was realigned, leaving the browser chrome a different white from
-       the page. */
+       property: Layout.astro hardcodes it. That is the one duplication of
+       --bg-0 left in the codebase, and it has drifted before. */
     const layoutPath = "src/layouts/Layout.astro";
     let layout = null;
     try {
       layout = readFileSync(resolve(root, layoutPath), "utf8");
     } catch {
-      problems.push(`${layoutPath} not readable, theme-color constants unchecked`);
+      problems.push(`${layoutPath} not readable, theme-color unchecked`);
     }
     if (layout) {
-      const consts = layout.match(
-        /var DARK_BG\s*=\s*'([^']+)'\s*,\s*LIGHT_BG\s*=\s*'([^']+)'/,
-      );
+      const meta = layout.match(/<meta\s+name="theme-color"\s+content="([^"]+)"/);
       const rootBg = stripped.match(/:root\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/);
-      const lightBg = stripped.match(
-        /:root\[data-theme="light"\]\s*\{[\s\S]*?--bg-0\s*:\s*([^;]+);/,
-      );
-      if (!consts) {
-        problems.push(`could not find DARK_BG/LIGHT_BG in ${layoutPath}`);
-      } else if (rootBg && lightBg) {
+      if (!meta) {
+        problems.push(`could not find the theme-color meta tag in ${layoutPath}`);
+      } else if (rootBg) {
         const norm = (h) => h.trim().toLowerCase();
-        if (norm(consts[1]) !== norm(rootBg[1])) {
-          problems.push(`DARK_BG ${consts[1]} != dark --bg-0 ${rootBg[1].trim()}`);
-        }
-        if (norm(consts[2]) !== norm(lightBg[1])) {
-          problems.push(`LIGHT_BG ${consts[2]} != light --bg-0 ${lightBg[1].trim()}`);
+        if (norm(meta[1]) !== norm(rootBg[1])) {
+          problems.push(
+            `theme-color ${meta[1]} != --bg-0 ${rootBg[1].trim()} - the browser ` +
+            "chrome will not match the page.",
+          );
         }
       }
     }
 
     if (problems.length) {
       failures++;
-      console.log(`  X  light theme  (${tokensPath})`);
+      console.log(`  X  dark only  (${tokensPath})`);
       for (const pr of problems) console.log(`     - ${pr}`);
     } else {
-      console.log("  OK light theme (single opt-in block; theme-color matches --bg-0)");
+      console.log("  OK dark only (no second theme; theme-color matches --bg-0)");
     }
   }
 }

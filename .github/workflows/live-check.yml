@@ -1,0 +1,34 @@
+# Weekly check of the LIVE web: does cdot.world serve what we publish, do the
+# links in it still resolve, and does certonymity.com still describe the
+# relationship the same way? See scripts/check-live.mjs.
+#
+# Separate from ci.yml on purpose: CI judges a change before it merges and must be
+# deterministic; this one asks the internet, which changes on its own. A failure
+# here means something out there broke (a dead link, a deploy that did not go
+# out), not that a pull request is wrong. Sibling-site disagreements are warnings
+# in the log and never fail the run.
+
+name: Live check
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # check:live reads dist/ for the links we publish, so build first.
+      - run: npm run build
+      - run: npm run check:live

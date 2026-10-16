@@ -4,17 +4,18 @@ import Layout from "../layouts/Layout.astro";
 // Served by functions/i/[handle].ts for a browser that is neither an Android
 // nor an iPhone with a store to send to; the handle is in the path.
 const title = "Chat with me on cDot";
-const description = "Get cDot and start an encrypted chat.";
+const description =
+  "Someone invited you to chat on cDot. Install the app on your phone, then open the invite link again to start an encrypted chat.";
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} noindex>
   <section class="invite">
     <div class="wrap">
       <p class="eyebrow">Invitation</p>
       <h1>Chat with <span id="handle">a friend</span> on cDot</h1>
       <p class="sub">Install cDot on your phone, then open this link again to start the chat.</p>
       <div class="hero-ctas">
-        <a class="btn btn-primary" id="play" href="https://play.google.com/store/apps/details?id=org.certonym.cdot">Get it on Google Play</a>
+        <a class="btn btn-primary" id="play" href="https://play.google.com/store/apps/details?id=org.certonym.cdot" rel="noopener">Get it on Google Play</a>
         <a class="btn btn-ghost" href="/">About cDot</a>
       </div>
     </div>
