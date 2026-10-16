@@ -10,7 +10,7 @@ import { lastModified } from "../lib/lastmod.mjs";
 
 /* Pages that must not be listed (they are noindex). Everything else in
    src/pages/*.astro is a destination. */
-const EXCLUDED = new Set(["404"]);
+const EXCLUDED = new Set(["404", "invite"]);
 
 const pages = Object.keys(import.meta.glob("./*.astro"))
   .map((p) => p.replace(/^\.\//, "").replace(/\.astro$/, ""))
