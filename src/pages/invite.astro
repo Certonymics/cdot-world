@@ -1,11 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
-// Served by functions/i/[handle].ts for a browser that is neither an Android
-// nor an iPhone with a store to send to; the handle is in the path.
+// Served by functions/i/[handle].ts for every browser except Android, which
+// is sent straight to Google Play; the handle is in the path. An iPhone lands
+// here too: iOS has no install referrer, so the App Store button copies the
+// invite link to the clipboard first and the app reads it once after
+// onboarding (the deferred invite).
 const title = "Chat with me on cDot";
 const description =
-  "Someone invited you to chat on cDot. Install the app on your phone, then open the invite link again to start an encrypted chat.";
+  "Someone invited you to chat on cDot. Install the app on your phone and it picks the invite up on first launch to start an encrypted chat.";
 ---
 
 <Layout title={title} description={description} noindex>
@@ -13,18 +16,24 @@ const description =
     <div class="wrap">
       <p class="eyebrow">Invitation</p>
       <h1>Chat with <span id="handle">a friend</span> on cDot</h1>
-      <p class="sub">Install cDot on your phone, then open this link again to start the chat.</p>
+      <p class="sub">Install cDot on your phone. The app picks this invite up on its first launch and opens the chat.</p>
       <div class="hero-ctas">
+        <a class="btn btn-primary" id="appstore" href="#" rel="noopener" hidden>Get it on the App Store</a>
         <a class="btn btn-primary" id="play" href="https://play.google.com/store/apps/details?id=org.certonym.cdot" rel="noopener">Get it on Google Play</a>
         <a class="btn btn-ghost" href="/">About cDot</a>
       </div>
     </div>
   </section>
   <script is:inline>
+    // The App Store listing for org.certonym.cdot. Empty until the app is in
+    // the App Store; the button stays hidden while it is.
+    const APP_STORE_URL = "";
+
     // The handle is the last path segment of /i/<handle>; functions/i/[handle].ts
     // serves this page at that path. The Play link gets the same install
     // referrer the Android redirect uses, so a desktop reader who installs
-    // from the web store still lands in the chat.
+    // from the web store still lands in the chat. Nothing is copied for
+    // Android: the referrer carries the handle.
     const segment = location.pathname.match(/^\/i\/([^/]+)$/)?.[1];
     if (segment) {
       try {
@@ -34,6 +43,23 @@ const description =
         const referrer = new URLSearchParams({ utm_source: "cdot_invite", invite: handle });
         play.href = `${play.href}&referrer=${encodeURIComponent(referrer.toString())}`;
       } catch {}
+    }
+
+    // The deferred invite for iOS: the tap copies the full invite link to the
+    // clipboard, then goes to the App Store. iOS Safari allows the write only
+    // inside a user gesture, which is why it happens in the click handler and
+    // not on load. The app reads the clipboard once after onboarding.
+    if (APP_STORE_URL && segment) {
+      const appstore = document.getElementById("appstore");
+      appstore.href = APP_STORE_URL;
+      appstore.hidden = false;
+      appstore.addEventListener("click", (event) => {
+        event.preventDefault();
+        const go = () => location.assign(APP_STORE_URL);
+        const link = location.origin + location.pathname;
+        if (navigator.clipboard?.writeText) navigator.clipboard.writeText(link).then(go, go);
+        else go();
+      });
     }
   </script>
 </Layout>

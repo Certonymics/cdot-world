@@ -121,11 +121,17 @@ full Matrix id for another homeserver). Three pieces make it work:
 
 - `functions/i/[handle].ts` is a Cloudflare Pages Function. Android gets a 302
   to Google Play with the handle in the install referrer, which the app reads
-  at first launch to open the chat; iPhone gets a 302 to the App Store once
-  `APP_STORE_URL` in that file is filled in (empty until the app is listed);
-  everything else is served the static invite page.
+  at first launch to open the chat. Everything else, iPhone included, is
+  served the static invite page.
 - `src/pages/invite.astro` is that page. It reads the handle off the path with
   one inline script and shows it; the Play button carries the same referrer.
+  iOS has no install referrer, so it gets a **deferred invite through the
+  clipboard**: tapping "Get it on the App Store" copies the full invite link
+  (`https://<host>/i/<handle>`) to the clipboard inside the tap, then goes to
+  the App Store; the app reads the clipboard once after onboarding. The
+  listing URL is `APP_STORE_URL` in that page's inline script, empty until the
+  app is in the App Store, and the button stays hidden while it is. Nothing is
+  copied for Google Play.
 - `public/.well-known/` holds the `apple-app-site-association` and
   `assetlinks.json` that let a phone with the app installed open `/i/*` in the
   app directly. `public/_headers` serves both as `application/json`.
@@ -140,7 +146,8 @@ existing `npm run deploy` is enough. Dev builds of the app claim
 project with that custom domain attached.
 
 To try it locally, build and run `npx wrangler pages dev dist`, then request
-`/i/quiet-falcon` with an Android and a desktop user agent.
+`/i/quiet-falcon` with an Android user agent (302 to Google Play) and with an
+iPhone or desktop one (the page).
 
 ## Brand tokens
 

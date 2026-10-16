@@ -690,4 +690,5 @@
   .notfound,.invite{min-height:70vh;display:flex;align-items:center;padding-top:140px}
   .notfound h1,.invite h1{font-size:clamp(32px,7vw,56px)}
   .invite h1 #handle{font-family:var(--font-mono);overflow-wrap:anywhere}
+  .invite .btn[hidden]{display:none}
   @media(max-width:640px){.notfound,.invite{padding-top:110px}}

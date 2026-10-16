@@ -1,15 +1,13 @@
 // The chat invite link, https://cdot.world/i/<handle>, for a phone without the
 // app (a phone with it opens the link in the app directly, as a universal link
 // claimed through /.well-known). Android goes to Google Play with the handle in
-// the install referrer, which the app reads at first launch to start the chat;
-// iOS goes to the App Store once the app is listed there. Anything else gets
-// the invite page, which shows the handle and the store link.
+// the install referrer, which the app reads at first launch to start the chat.
+// Everything else, iPhone included, gets the invite page: iOS has no install
+// referrer, so the page copies the invite link to the clipboard when the
+// App Store button is tapped and the app reads it once after onboarding.
 
 const PLAY_URL =
   "https://play.google.com/store/apps/details?id=org.certonym.cdot";
-// The App Store listing for org.certonym.cdot. Empty until the app is in the
-// App Store: an iPhone then lands on the invite page like a desktop browser.
-const APP_STORE_URL = "";
 
 // A bare localpart (quiet-falcon-4821) or a full Matrix id (@bob:matrix.org).
 const HANDLE = /^[^\s/]+$/;
@@ -39,9 +37,6 @@ export const onRequestGet: PagesFunction = async ({ request, params, env }) => {
       `${PLAY_URL}&referrer=${encodeURIComponent(referrer.toString())}`,
       302,
     );
-  }
-  if (APP_STORE_URL && /iphone|ipad|ipod/i.test(ua)) {
-    return Response.redirect(APP_STORE_URL, 302);
   }
   // The static invite page, built by Astro from src/pages/invite.astro; it
   // reads the handle off location.pathname.
