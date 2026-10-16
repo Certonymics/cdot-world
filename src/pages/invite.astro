@@ -1,0 +1,38 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// Served by functions/i/[handle].ts for a browser that is neither an Android
+// nor an iPhone with a store to send to; the handle is in the path.
+const title = "Chat with me on cDot";
+const description = "Get cDot and start an encrypted chat.";
+---
+
+<Layout title={title} description={description}>
+  <section class="invite">
+    <div class="wrap">
+      <p class="eyebrow">Invitation</p>
+      <h1>Chat with <span id="handle">a friend</span> on cDot</h1>
+      <p class="sub">Install cDot on your phone, then open this link again to start the chat.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" id="play" href="https://play.google.com/store/apps/details?id=org.certonym.cdot">Get it on Google Play</a>
+        <a class="btn btn-ghost" href="/">About cDot</a>
+      </div>
+    </div>
+  </section>
+  <script is:inline>
+    // The handle is the last path segment of /i/<handle>; functions/i/[handle].ts
+    // serves this page at that path. The Play link gets the same install
+    // referrer the Android redirect uses, so a desktop reader who installs
+    // from the web store still lands in the chat.
+    const segment = location.pathname.match(/^\/i\/([^/]+)$/)?.[1];
+    if (segment) {
+      try {
+        const handle = decodeURIComponent(segment);
+        document.getElementById("handle").textContent = handle.startsWith("@") ? handle : `@${handle}`;
+        const play = document.getElementById("play");
+        const referrer = new URLSearchParams({ utm_source: "cdot_invite", invite: handle });
+        play.href = `${play.href}&referrer=${encodeURIComponent(referrer.toString())}`;
+      } catch {}
+    }
+  </script>
+</Layout>

@@ -66,11 +66,40 @@ src/
     global.css                everything else
 public/
   assets/                     logos, favicon, earth-texture.jpg (map)
+  .well-known/                app link files for the chat invite (see below)
+  _headers                    Content-Type for the .well-known files
   llms.txt
+functions/
+  i/[handle].ts               Pages Function behind /i/<handle>
 ```
 
 To add a page, drop a `.astro` file in `src/pages/` and wrap it in `Layout`.
 Header and footer come along automatically.
+
+## The chat invite link
+
+`https://cdot.world/i/<handle>` is the link the cDot app sends when a user
+invites a friend (`<handle>` is a cdot.chat localpart, or a percent-encoded
+full Matrix id for another homeserver). Three pieces make it work:
+
+- `functions/i/[handle].ts` is a Cloudflare Pages Function. Android gets a 302
+  to Google Play with the handle in the install referrer, which the app reads
+  at first launch to open the chat; iPhone gets a 302 to the App Store once
+  `APP_STORE_URL` in that file is filled in (empty until the app is listed);
+  everything else is served the static invite page.
+- `src/pages/invite.astro` is that page. It reads the handle off the path with
+  one inline script and shows it; the Play button carries the same referrer.
+- `public/.well-known/` holds the `apple-app-site-association` and
+  `assetlinks.json` that let a phone with the app installed open `/i/*` in the
+  app directly. `public/_headers` serves both as `application/json`.
+
+`wrangler pages deploy dist` picks up `functions/` from the repo root, so the
+existing `npm run deploy` is enough. Dev builds of the app claim
+`dev.cdot.world`, which should be a `dev` branch deployment of the same Pages
+project with that custom domain attached.
+
+To try it locally, build and run `npx wrangler pages dev dist`, then request
+`/i/quiet-falcon` with an Android and a desktop user agent.
 
 ## Brand tokens
 
