@@ -165,9 +165,16 @@
     .hero-ctas{flex-direction:column;align-items:stretch}
     .hero-ctas .btn{text-align:center}
   }
+  /* Regular weight, not semibold. The label carries its emphasis from the fill
+     and the size of the target, so weight on top of both was a third shout.
+     Matches cdot.app. .node-form overrides all four of these for its own smaller
+     button. */
   .btn{
-    display:inline-block;text-decoration:none;font-weight:600;font-size:15.5px;
-    padding:13px 26px;border:0;border-radius:10px;cursor:pointer;font-family:inherit;
+    display:inline-block;text-decoration:none;font-weight:400;font-size:14.5px;
+    /* A transparent border, not border:0. .btn-ghost carries a real 1px one, so
+       with no border here the filled buttons sit 2px shorter than the outlined
+       ones. */
+    padding:11px 22px;border:1px solid transparent;border-radius:9px;cursor:pointer;font-family:inherit;
     appearance:none;-webkit-appearance:none;
     transition:transform .15s,box-shadow .15s;
   }
