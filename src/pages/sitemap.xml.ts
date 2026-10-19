@@ -7,6 +7,8 @@
    the WebPage's dateModified carries. `npm run check:seo` fails if this file
    lists a noindex page, omits an indexable one, or disagrees with robots.txt. */
 import { lastModified } from "../lib/lastmod.mjs";
+import { getArticles } from "../lib/sanity.js";
+import { blogLive } from "../data/blog.mjs";
 
 /* Pages that must not be listed (they are noindex). Everything else in
    src/pages/*.astro is a destination. */
@@ -17,13 +19,18 @@ const pages = Object.keys(import.meta.glob("./*.astro"))
   .filter((name) => !EXCLUDED.has(name))
   .sort();
 
-export function GET({ site }: { site: URL }) {
+export async function GET({ site }: { site: URL }) {
   const lastmod = lastModified();
-  const urls = pages
-    .map((name) => {
-      const path = name === "index" ? "/" : `/${name}/`;
-      return `  <url>\n    <loc>${new URL(path, site).href}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
-    })
+  const entries = pages.map((name) => ({ path: name === "index" ? "/" : `/${name}/`, lastmod }));
+  /* The Blog (src/data/blog.mjs): the index and every article, each dated by when
+     it was last edited in Sanity. Nothing is added while the Blog is off. */
+  if (blogLive) {
+    const articles = await getArticles();
+    entries.push({ path: "/blog/", lastmod: articles[0]?.modified ?? lastmod });
+    for (const a of articles) entries.push({ path: `/blog/${a.slug}/`, lastmod: a.modified });
+  }
+  const urls = entries
+    .map(({ path, lastmod }) => `  <url>\n    <loc>${new URL(path, site).href}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`)
     .join("\n");
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
   return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8" } });

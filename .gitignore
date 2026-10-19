@@ -5,3 +5,4 @@ NetworkMap.tsx
 node_modules
 dist
 .astro
+.sanity

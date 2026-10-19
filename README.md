@@ -76,6 +76,10 @@ src/
   layouts/Layout.astro        <head>, JSON-LD, header + footer shell
   data/network.mjs            THE CHAINS' FACTS - specs, status, descriptions (see below)
   data/company.mjs            THE COMPANY'S FACTS and how the sites relate (see below)
+  data/blog.mjs               the Blog's on/off switch and Sanity project (see "The Blog")
+  blog/                       the Blog's two page templates - NOT in pages/: added as routes only while it is on
+  lib/sanity.js               reads articles from Sanity at build time
+  lib/portable-text.js        renders an article body (Sanity Portable Text) to HTML
   lib/lastmod.mjs             date of the last content commit (dateModified + sitemap)
   pages/
     index.astro               the page body + one inline script (both forms)
@@ -105,6 +109,7 @@ scripts/
   check-live.mjs              `npm run check:live`: the deployed site and our links
   make-og.mjs                 `npm run og`: renders public/assets/og.png from the tagline
   contact-form.gs             source of the contact-form Apps Script (not built)
+studio/                       the Sanity Studio (where articles are written); deployed separately
 brand/og.source.json          which tagline og.png was made from (checked by check:seo)
 .github/workflows/ci.yml      automatic checks on every PR
 .github/workflows/live-check.yml  weekly check of the live site and our links
@@ -326,6 +331,58 @@ web instead: see "SEO and the relationships between our sites". Its failures mea
 something out there broke - a dead link, a deploy that never went out - not that a
 pull request is wrong.
 
+## The Blog
+
+**Wired, but switched off.** While `BLOG_LIVE_DEFAULT` in `src/data/blog.mjs` is
+`false` the site has no blog page, no `/blog/` URL, no sitemap or `llms.txt` entry,
+the build makes no request to Sanity, and the footer shows "Blog" as a "Coming
+soon" label. The two templates live in `src/blog/` (not `src/pages/`) and
+`astro.config.mjs` adds them as routes only when the switch is on, so nothing about
+them reaches the build otherwise. `check:seo` enforces both states (rule 9).
+
+**How it works** (the same design as cdot-app). Articles are written in a Sanity
+Studio (`studio/`) and read from the Sanity API **at build time**: pages are plain
+static HTML, no visitor's browser ever contacts Sanity, and no CORS origin is needed
+for cdot.world. The dataset is public-read, so there is no token and no secret in the
+repo. Images are downloaded at build time and re-served from `/_astro/`. Publishing
+in Sanity does not change this repo, so a **webhook** triggers a rebuild (below). A
+build that cannot reach Sanity, or gets zero articles, **fails on purpose** rather than
+deploy an empty Blog and silently drop its URLs from the sitemap
+(`ALLOW_EMPTY_CMS=1` overrides).
+
+What switches on with it: `/blog/` and `/blog/<slug>/` (with `Article` + breadcrumb
+JSON-LD, og:type article, a 1200x630 social image made from the cover), entries for
+each in `sitemap.xml` (dated by last edit in Sanity) and `llms.txt`, and the footer
+entry becomes a link.
+
+**Going live checklist**
+1. **Studio.** In `studio/`: put the project id in `sanity.config.js` and
+   `sanity.cli.js`, `npm install`, `npm run dev` to try it, `npm run deploy` to
+   publish it at `https://<studioHost>.sanity.studio`.
+2. **Project id.** Put the same id in `SANITY_PROJECT_ID` in `src/data/blog.mjs`.
+   (`check:seo` fails if the three differ.) The dataset must be public (the default).
+3. **Content.** Publish at least one article. Drafts are never read; only
+   **published** documents appear.
+4. **Preview first (optional).** In Cloudflare Pages > Settings > Variables, add
+   `BLOG_LIVE=1` to the **Preview** environment only. Preview deployments (any
+   branch) then show the Blog while production does not.
+5. **Webhook.** Cloudflare Pages > Settings > Builds > **Deploy hooks**: create one for
+   the production branch and copy its URL. In Sanity (manage > API > Webhooks) add a
+   webhook to that URL: trigger on create, update and delete, filter
+   `_type == "article"`, method POST, no secret needed. Now publishing rebuilds the site
+   (about a minute).
+6. **Switch on.** Set `BLOG_LIVE_DEFAULT` to `true`, run `npm run build` and
+   `npm run check:seo`, then merge to `main`.
+
+**The article schema is the contract.** The site reads the fields in
+`studio/schemaTypes/article.js` and renders only the body blocks defined there
+(normal, h2, h3, bold, italic, links, lists, callout, image). A new field or block
+needs a matching change in `src/lib/sanity.js` / `src/lib/portable-text.js`.
+
+**Blog copy to confirm.** The listing's headline/subtitle ("News, updates and guides
+from the team building the cDot network.") and meta description are placeholders in
+`src/blog/index.astro`.
+
 ## Crawler policy
 
 `public/robots.txt` allows every crawler, **including the ones that gather model
@@ -353,6 +410,8 @@ The site is self-hosted apart from one first-party API call:
 | `cdot.world` | Own canonical / `og:url` | No |
 | `www.w3.org`, `schema.org` | XML namespace + JSON-LD `@context` identifiers | No — never requested |
 | `script.google.com` | Contact-form and node-signup endpoints (two separate Apps Script deployments) | Yes — on submit only |
+| `<project>.api.sanity.io` | Blog articles (Sanity) | **Build time only, and only once the Blog is on** - never from a visitor's browser |
+| `cdn.sanity.io` | Blog article images | **Build time only, and only once the Blog is on** - downloaded and re-served from `/_astro/` |
 | `cdot.app`, `c.email`, `certonymity.com` | Outbound links to the sibling product sites and the company site | No — links only |
 
 No font CDN, no analytics, no tag manager, no third-party scripts or

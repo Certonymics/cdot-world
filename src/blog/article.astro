@@ -1,0 +1,121 @@
+---
+/* One blog article. Injected as /blog/[slug]/ by astro.config.mjs ONLY while the
+   Blog is on (src/data/blog.mjs). One static page per article in Sanity,
+   generated at build time. */
+import { Image, getImage } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import { getArticles, relatedTo, byline } from "../lib/sanity.js";
+import { renderBody } from "../lib/portable-text.js";
+import { ORG_ID } from "../data/company.mjs";
+import "../styles/blog.css";
+
+export async function getStaticPaths() {
+  const articles = await getArticles();
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article, related: relatedTo(articles, article.slug) },
+  }));
+}
+
+const { article, related } = Astro.props;
+const { cover } = article;
+const site = Astro.site;
+
+const title = `${article.title} — cDot`;
+/* The Studio requires an excerpt, but the data layer cannot promise it. */
+const description = article.excerpt || `${article.title}, from the cDot team.`;
+const url = new URL(`/blog/${article.slug}/`, site).href;
+const meta = byline(article);
+const html = await renderBody(article.body);
+
+/* Cover: 3:1, as uploaded in the Studio. Never larger than the source. */
+const heroW = cover?.url ? Math.min(cover.width ?? 0, 2064) : 0;
+const heroH = Math.round(heroW / 3);
+const heroWidths = [1032, 2064].filter((w) => w <= heroW);
+
+/* Social card: 1200x630 JPEG built from the cover and hosted here. Skipped for a
+   cover too small to fill it, which falls back to the site-wide card. */
+const og = cover?.url && (cover.width ?? 0) >= 1200 && (cover.height ?? 0) >= 630
+  ? await getImage({ src: cover.url, width: 1200, height: 630, format: "jpg" })
+  : null;
+const ogImage = og ? new URL(og.src, site).href : undefined;
+
+/* The article and its breadcrumb. The author and publisher are the company's
+   Organization node (the same @id the layout defines). */
+const extraSchema = [
+  {
+    "@type": "Article",
+    "@id": `${url}#article`,
+    headline: article.title,
+    description,
+    url,
+    mainEntityOfPage: url,
+    datePublished: article.published,
+    dateModified: article.modified,
+    inLanguage: "en-GB",
+    ...(ogImage && { image: ogImage }),
+    author: { "@id": ORG_ID },
+    publisher: { "@id": ORG_ID },
+  },
+  {
+    "@type": "BreadcrumbList",
+    "@id": `${url}#breadcrumb`,
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "cDot", item: new URL("/", site).href },
+      { "@type": "ListItem", position: 2, name: "Blog", item: new URL("/blog/", site).href },
+      { "@type": "ListItem", position: 3, name: article.title, item: url },
+    ],
+  },
+];
+---
+<Layout
+  title={title}
+  description={description}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt={cover?.alt || article.title}
+  modified={article.modified}
+  extraSchema={extraSchema}
+>
+
+<section class="blog-hero">
+  <div class="wrap">
+    <a class="blog-back" href="/blog/">&larr; Blog</a>
+    {meta && <p class="eyebrow">{meta}</p>}
+    <h1>{article.title}</h1>
+    {article.excerpt && <p class="sub">{article.excerpt}</p>}
+  </div>
+</section>
+
+{cover?.url && (
+  <div class="wrap article-cover">
+    <Image src={cover.url} width={heroW} height={heroH} widths={heroWidths}
+      sizes="(max-width: 1080px) 100vw, 1032px" format="webp" alt={cover.alt ?? ""} loading="eager" />
+  </div>
+)}
+
+<section class="article">
+  <div class="wrap article-grid">
+    <div class="article-main">
+      <div class="prose" set:html={html} />
+    </div>
+
+    {related.length > 0 && (
+      <aside class="related" aria-labelledby="related-label">
+        <p class="eyebrow" id="related-label">Related</p>
+        <ul>
+          {related.map((r) => (
+            <li>
+              <a href={`/blog/${r.slug}/`}>
+                <span class="rel-title">{r.title}</span>
+                {r.readTime && <span class="rel-meta">{r.readTime}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
+  </div>
+</section>
+
+</Layout>
