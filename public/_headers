@@ -37,3 +37,11 @@
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The app link files for the chat invite link (/i/<handle>). Apple's file has
+# no extension, so Pages would otherwise serve it as application/octet-stream.
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+
+/.well-known/assetlinks.json
+  Content-Type: application/json

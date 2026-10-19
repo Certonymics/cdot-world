@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["D8CFV48CPT.org.certonym.cdot", "D8CFV48CPT.org.certonym.cdot.dev"],
+        "components": [{ "/": "/i/*", "comment": "A chat invite link: /i/<handle>" }]
+      }
+    ]
+  }
+}
