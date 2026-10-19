@@ -1,0 +1,58 @@
+---
+/* Blog listing. Injected as /blog/ by astro.config.mjs ONLY while the Blog is on
+   (src/data/blog.mjs); while it is off this file is not part of the build.
+
+   The articles live in Sanity and are read at build time (src/lib/sanity.js), so
+   this is plain static HTML: no client-side fetch, no loading state. */
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import { getArticles, byline } from "../lib/sanity.js";
+import "../styles/blog.css";
+
+const title = "Blog — cDot";
+const description = "News, updates and guides from the team building the cDot network.";
+
+const articles = await getArticles();
+---
+<Layout title={title} description={description} pageType="CollectionPage">
+
+<section class="blog-hero">
+  <div class="wrap">
+    <h1>Blog</h1>
+    <p class="sub">News, updates and guides from the team building the cDot network.</p>
+  </div>
+</section>
+
+<section class="blog-list">
+  <div class="wrap">
+    {articles.length === 0 ? (
+      <p class="blog-empty">No articles yet — check back soon.</p>
+    ) : (
+      <div class="post-grid">
+        {articles.map((a) => {
+          const w = Math.min(a.cover?.width ?? 720, 720);
+          const h = Math.round((w * 7) / 16);
+          const meta = byline(a);
+          return (
+            <a class="post" href={`/blog/${a.slug}/`}>
+              <div class="post-media">
+                {a.cover?.url && (
+                  <Image src={a.cover.url} width={w} height={h} widths={[360, 720].filter((x) => x <= w)}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1023px) 50vw, 340px"
+                    format="webp" alt="" loading="lazy" />
+                )}
+              </div>
+              <div class="post-body">
+                {meta && <p class="post-meta">{meta}</p>}
+                <h2 class="post-title">{a.title}</h2>
+                {a.excerpt && <p class="post-excerpt">{a.excerpt}</p>}
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</section>
+
+</Layout>

@@ -16,6 +16,8 @@
 import { chains, llmsEntry, llmsIntro } from "../data/network.mjs";
 import { company, sites, addressLine } from "../data/company.mjs";
 import { faq, textBlocks } from "../data/faq.mjs";
+import { getArticles, formatDate } from "../lib/sanity.js";
+import { blogLive } from "../data/blog.mjs";
 
 /* Hard-wraps to the width the rest of the file uses, indenting continuation
    lines to sit under the text of a numbered entry. */
@@ -47,6 +49,18 @@ const faqText = faq
     ].join("\n\n"),
   )
   .join("\n\n");
+
+/* The Blog, once it is switched on (src/data/blog.mjs): the index and each
+   article, newest first. Empty - and the section absent - while it is off. */
+const articles = blogLive ? await getArticles() : [];
+const blogPages = articles.length
+  ? [
+      "- [Blog](https://cdot.world/blog/): news, updates and guides from the team building the cDot network.",
+      ...articles.map((a) =>
+        wrap(`- [${a.title}](https://cdot.world/blog/${a.slug}/)${a.excerpt ? `: ${a.excerpt.replace(/\s+/g, " ")}` : ""}${formatDate(a.date) ? ` (${formatDate(a.date)})` : ""}`, 100, "  "),
+      ),
+    ].join("\n")
+  : "";
 
 /* Said only while the app site is not live; flip `live` in company.mjs at launch. */
 const notYet = sites.app.live ? "" : " Not yet released.";
@@ -123,8 +137,8 @@ ${faqText}
 
 ## Pages
 
-- [cDot](https://cdot.world/): the single landing page - mission, the problem, the three
-  chains and their specifications, use cases, and contact.
+- [cDot](https://cdot.world/): ${blogLive ? "the landing page" : "the single landing page"} - mission, the problem, the three
+  chains and their specifications, use cases, and contact.${blogPages ? "\n" + blogPages : ""}
 
 ${relationships}
 

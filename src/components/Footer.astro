@@ -1,19 +1,22 @@
 ---
 import { company, sites, registrationLine } from "../data/company.mjs";
+import { blogLive, blogPath } from "../data/blog.mjs";
 
 /* The year is the build's, so it moves on the first deploy of a new year. */
 const year = new Date().getFullYear();
 
-/* Footer entries that exist as a name but not yet as a destination. When one goes
-   live, move it out of this list and give it an href like the others. */
-const soon = [
+/* Footer entries. One with an `href` is a link; one without is a "Coming soon"
+   label, because there is nothing to link to yet. When an entry goes live, give it
+   an href. (Blog gets its href by itself when the Blog is switched on in
+   src/data/blog.mjs.) */
+const links = [
   /* Press kit: a shared Drive folder exists
      (https://drive.google.com/drive/folders/1OSPZVD3mimEL1NABBoptLuMaIQxL1dOj?usp=drive_link)
      but is deliberately not linked yet. */
   { id: "press-kit", label: "Press kit" },
   { id: "whitepaper", label: "Whitepaper" },
   { id: "docs", label: "Docs" },
-  { id: "blog", label: "Blog" },
+  { id: "blog", label: "Blog", href: blogLive ? blogPath : undefined },
   { id: "community", label: "Community" },
 ];
 ---
@@ -22,9 +25,11 @@ const soon = [
     <div class="foot">
       <svg class="foot-mark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
       <div class="foot-stack">
-        <!-- Not links yet: there is nothing to link to. Focusable so the label also
+        <!-- A label with no href is not a link: focusable so the "Coming soon" tip also
              shows for keyboard and touch users, not only on mouse hover. -->
-        {soon.map((item) => (
+        {links.map((item) => item.href ? (
+          <a class="foot-link" href={item.href}>{item.label}</a>
+        ) : (
           <span class="foot-link foot-soon" tabindex="0" aria-describedby={`${item.id}-soon`}>
             {item.label}
             <span class="soon-tip" id={`${item.id}-soon`} role="tooltip">Coming soon</span>

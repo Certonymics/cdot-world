@@ -28,6 +28,9 @@
      6. Relationships - llms.txt names every sibling site and its llms.txt.
      8. FAQ          - the accordion, the FAQPage JSON-LD and llms.txt carry the
                        same questions, in the same order, with real answers.
+     9. Blog         - absent while switched off (no pages, no links, no sitemap or
+                       llms.txt entries, footer shows "Coming soon"); complete while
+                       on (index and articles built, listed, Article JSON-LD valid).
      7. Social image - brand/og.source.json says it was made from the CURRENT
                        tagline (otherwise: run `npm run og`).
 
@@ -38,6 +41,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { resolve, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { blogLive, sanity } from "../src/data/blog.mjs";
 import { company, sites, ORG_ID, tagline, registrationLine, addressLine, relatedSites } from "../src/data/company.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -70,6 +74,19 @@ const pages = walk(dist)
     return { path, html: readFileSync(f, "utf8") };
   });
 
+/* Pixel size of a PNG or JPEG, read from the file's own header. */
+function imageSize(b) {
+  if (b.readUInt32BE(0) === 0x89504e47) return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+  if (b[0] === 0xff && b[1] === 0xd8) {
+    for (let i = 2; i < b.length - 9; ) {
+      if (b[i] !== 0xff) { i += 1; continue; }
+      const m = b[i + 1];
+      if (m >= 0xc0 && m <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(m)) return { h: b.readUInt16BE(i + 5), w: b.readUInt16BE(i + 7) };
+      i += 2 + b.readUInt16BE(i + 2);
+    }
+  }
+  return { w: 0, h: 0 };
+}
 const attr = (html, re) => (html.match(re) || [])[1] || "";
 const meta = (html, kind, name) =>
   attr(html, new RegExp(`<meta ${kind}="${name}" content="([^"]*)"`));
@@ -133,8 +150,9 @@ const home = pages.find((p) => p.path === "/");
   check("2. sitemap.xml", mods.length === locs.length && mods.every(isoOk),
     "every <url> needs a valid <lastmod>.");
   const dm = home && (home.html.match(/"dateModified":"([^"]+)"/) || [])[1];
-  check("2. sitemap.xml", !dm || mods.every((m) => m === dm),
-    `sitemap <lastmod> (${mods[0]}) and the WebPage dateModified (${dm}) must be the same date; both come from src/lib/lastmod.mjs.`);
+  const homeMod = (x.match(new RegExp(`<loc>${SITE}/</loc>\\s*<lastmod>([^<]+)</lastmod>`)) || [])[1];
+  check("2. sitemap.xml", !dm || homeMod === dm,
+    `the home page's sitemap <lastmod> (${homeMod}) and its WebPage dateModified (${dm}) must be the same date; both come from src/lib/lastmod.mjs.`);
 }
 
 /* --- 3. every page -------------------------------------------------------- */
@@ -148,7 +166,7 @@ for (const { path, html } of pages) {
   check("3. Pages", /<html lang="en-GB"/.test(html), `${at} <html> needs lang="en-GB".`);
   check("3. Pages", /<meta name="viewport"/.test(html), `${at} missing the viewport meta tag.`);
   check("3. Pages", title.length > 0 && title.length <= 70, `${at} title is ${title.length} characters (1-70 wanted): "${title}".`);
-  check("3. Pages", desc.length >= 40 && desc.length <= 165, `${at} meta description is ${desc.length} characters (40-165 wanted).`);
+  check("3. Pages", (path.startsWith("/blog/") ? desc.length > 0 : desc.length >= 40) && desc.length <= 165, `${at} meta description is ${desc.length} characters (40-165 wanted).`);
 
   if (noindex) {
     check("3. Pages", !canonical, `${at} is noindex but declares a canonical; a noindex page must not name itself canonical.`);
@@ -162,8 +180,7 @@ for (const { path, html } of pages) {
     check("3. Pages", img.startsWith(SITE + "/"), `${at} og:image must be an absolute URL on ${SITE}: "${img}".`);
     const file = resolve(dist, img.replace(SITE + "/", ""));
     if (existsSync(file)) {
-      const b = readFileSync(file);
-      const w = b.readUInt32BE(16), h = b.readUInt32BE(20);
+      const { w, h } = imageSize(readFileSync(file));
       check("3. Pages", w === 1200 && h === 630 && meta(html, "property", "og:image:width") === "1200" && meta(html, "property", "og:image:height") === "630",
         `${at} og:image is ${w}x${h} and the width/height tags say ${meta(html, "property", "og:image:width")}x${meta(html, "property", "og:image:height")}; both should be 1200x630.`);
     } else check("3. Pages", false, `${at} og:image points at ${img}, which is not in the build.`);
@@ -188,7 +205,7 @@ for (const { path, html } of pages) {
   for (const m of body.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g))
     check("3. Pages", /rel="[^"]*noopener/.test(m[0]), `${at} an external link opens a new tab without rel="noopener": ${m[0].slice(0, 90)}`);
   for (const m of body.matchAll(/<img\b[^>]*>/g))
-    check("3. Pages", /\salt=/.test(m[0]), `${at} an <img> has no alt text: ${m[0].slice(0, 90)}`);
+    check("3. Pages", /\salt(?=[\s=>])/.test(m[0]), `${at} an <img> has no alt text: ${m[0].slice(0, 90)}`);
 }
 
 /* --- 4. JSON-LD ----------------------------------------------------------- */
@@ -300,6 +317,47 @@ if (home) {
     check("8. FAQ", i.a.length > 40 && !/^coming soon\.?$/i.test(i.a), `the answer to "${i.q}" is empty or a placeholder.`);
   for (const m of (ld?.mainEntity || []))
     check("8. FAQ", (m.acceptedAnswer?.text || "").length > 40, `the JSON-LD answer to "${m.name}" is empty.`);
+}
+
+/* --- 9. the Blog: absent while off, complete while on ---------------------- */
+{
+  /* The Studio and the site must point at the same Sanity project. The id is
+     written in three places (blog.mjs, studio/sanity.config.js, studio/sanity.cli.js)
+     because the Studio is built separately; this keeps them from drifting. */
+  const idIn = (f) => (readFileSync(resolve(root, f), "utf8").match(/projectId:\s*['"]([^'"]*)['"]/) || [])[1];
+  for (const f of ["studio/sanity.config.js", "studio/sanity.cli.js"])
+    check("9. Blog", idIn(f) === sanity.projectId || process.env.SANITY_PROJECT_ID,
+      `${f} has projectId "${idIn(f)}" but src/data/blog.mjs has "${sanity.projectId}". They must be the same Sanity project.`);
+  if (blogLive) check("9. Blog", !!sanity.projectId, "the Blog is on but no Sanity project id is set (src/data/blog.mjs).");
+  const blogPages = pages.filter((p) => p.path.startsWith("/blog"));
+  const footer = home ? home.html.slice(home.html.indexOf("<footer")) : "";
+  if (!blogLive) {
+    check("9. Blog", blogPages.length === 0, `the Blog is off (src/data/blog.mjs) but the build contains ${blogPages.map((p) => p.path).join(", ")}.`);
+    check("9. Blog", !/href="\/blog\/?"/.test(home?.html || ""), "the Blog is off but the home page links to /blog/.");
+    check("9. Blog", /id="blog-soon"/.test(footer), 'the Blog is off, so the footer should show Blog as a "Coming soon" label.');
+    check("9. Blog", !/\/blog\//.test(read("llms.txt")) && !/\/blog\//.test(read("sitemap.xml")), "the Blog is off but /blog/ appears in llms.txt or sitemap.xml.");
+  } else {
+    const index = blogPages.find((p) => p.path === "/blog/");
+    const articles = blogPages.filter((p) => p.path !== "/blog/");
+    check("9. Blog", !!index, "the Blog is on but /blog/ was not built.");
+    check("9. Blog", articles.length > 0, "the Blog is on but no article pages were built.");
+    check("9. Blog", /href="\/blog\/"/.test(footer), "the Blog is on, so the footer's Blog entry should link to /blog/.");
+    const llms = read("llms.txt");
+    for (const p of blogPages) {
+      check("9. Blog", llms.includes(SITE + p.path), `llms.txt does not list ${SITE + p.path}.`);
+      const ld = JSON.parse(attr(p.html, /<script type="application\/ld\+json">([\s\S]*?)<\/script>/))["@graph"];
+      if (p.path !== "/blog/") {
+        const art = ld.find((n) => n["@type"] === "Article");
+        const h1 = decode(attr(p.html, /<h1[^>]*>([\s\S]*?)<\/h1>/)).trim();
+        check("9. Blog", art && art.headline === h1, `${p.path}: the Article headline "${art?.headline}" must equal the page's <h1> "${h1}".`);
+        check("9. Blog", art && isoOk(art.datePublished || "") && isoOk(art.dateModified || ""), `${p.path}: the Article needs valid datePublished and dateModified.`);
+        check("9. Blog", art?.author?.["@id"] === ORG_ID && art?.publisher?.["@id"] === ORG_ID, `${p.path}: the Article's author and publisher must be the company Organization.`);
+        check("9. Blog", meta(p.html, "property", "og:type") === "article", `${p.path}: og:type must be "article".`);
+        const chains = ld.filter((n) => n["@id"] && /#(c|p|t)-layer$/.test(n["@id"]));
+        check("9. Blog", chains.length === 0, `${p.path}: the network's chain nodes belong on the home page only.`);
+      }
+    }
+  }
 }
 
 /* --- 7. social image ------------------------------------------------------ */

@@ -22,9 +22,24 @@ interface Props {
      asserting that the missing URL is the right one to index. Same contract as
      cdot.app's layout, deliberately. */
   noindex?: boolean;
+  /* Blog pages (src/blog/). An article sets og:type to "article", its own social
+     image and alt text, its own modified date and an Article node via
+     extraSchema; the blog index sets pageType to "CollectionPage". */
+  ogType?: "website" | "article";
+  ogImage?: string;
+  ogImageAlt?: string;
+  modified?: string;
+  pageType?: string;
+  extraSchema?: object[];
 }
-const { title, description, ogTitle, ogDescription, noindex = false } = Astro.props;
+const {
+  title, description, ogTitle, ogDescription, noindex = false,
+  ogType = "website", ogImage, ogImageAlt, modified, pageType = "WebPage", extraSchema = [],
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+/* The network and its chains are described on the home page only; other pages
+   (the blog, the 404) carry the organisation, the website and themselves. */
+const isHome = Astro.url.pathname === "/";
 
 /* Structured data. A @graph rather than a single Organization node: the three
    chains are the substance of the product, and as discrete SoftwareApplication
@@ -37,7 +52,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const lastModified = getLastModified();
 
 const SITE_ID = "https://cdot.world/#website";
-const PAGE_ID = "https://cdot.world/#webpage";
+const PAGE_ID = `${canonical}#webpage`; /* on the home page: https://cdot.world/#webpage */
 const CDOT_ID = "https://cdot.world/#cdot";
 
 /* One SoftwareApplication per chain, built from src/data/network.mjs - the same
@@ -111,6 +126,7 @@ const graph = [
     inLanguage: "en-GB",
     publisher: { "@id": ORG_ID },
   },
+  ...(isHome ? [
   {
     "@type": "SoftwareApplication",
     "@id": CDOT_ID,
@@ -126,6 +142,7 @@ const graph = [
     hasPart: chains.map((c) => ({ "@id": `https://cdot.world/#${c.id}` })),
   },
   ...chains.map(layer),
+  ] : []),
 ];
 
 /* The page node is skipped on the 404: it would assert that a missing URL is a
@@ -134,20 +151,20 @@ const graph = [
    (the app being built on this network) belongs in cdot.app's own graph. */
 if (!noindex) {
   graph.push({
-    "@type": "WebPage",
+    "@type": pageType,
     "@id": PAGE_ID,
     url: canonical,
     name: title,
     description,
     inLanguage: "en-GB",
     isPartOf: { "@id": SITE_ID },
-    about: { "@id": CDOT_ID },
-    dateModified: lastModified,
+    ...(isHome && { about: { "@id": CDOT_ID } }),
+    dateModified: modified ?? lastModified,
     relatedLink: [sites.app.url],
   });
   /* The FAQ, from src/data/faq.mjs - the same list the accordion on the page and
      /llms.txt are built from. Home page only: that is where the questions are. */
-  if (Astro.url.pathname === "/") {
+  if (isHome) {
     graph.push({
       "@type": "FAQPage",
       "@id": "https://cdot.world/#faq",
@@ -161,6 +178,7 @@ if (!noindex) {
       })),
     });
   }
+  graph.push(...extraSchema);
 }
 
 const orgSchema = { "@context": "https://schema.org", "@graph": graph };
@@ -201,13 +219,13 @@ const orgSchema = { "@context": "https://schema.org", "@graph": graph };
 <meta property="og:title" content={ogTitle ?? title} />
 <meta property="og:description" content={ogDescription ?? description} />
 <meta property="og:url" content={canonical} />
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <meta property="og:site_name" content="cDot" />
 <meta property="og:locale" content="en_GB" />
-<meta property="og:image" content={new URL('/assets/og.png', Astro.site).href} />
+<meta property="og:image" content={ogImage ?? new URL('/assets/og.png', Astro.site).href} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content={`cDot - ${tagline.toLowerCase()}`} />
+<meta property="og:image:alt" content={ogImageAlt ?? `cDot - ${tagline.toLowerCase()}`} />
 <!-- The only twitter:* tag worth setting: X falls back to the og:* tags for
      title, description and image, but needs this to use the large card. -->
 <meta name="twitter:card" content="summary_large_image" />
