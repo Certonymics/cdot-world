@@ -660,6 +660,13 @@
   }
   .foot-soon:hover .soon-tip,.foot-soon:focus .soon-tip{opacity:1;visibility:visible;transform:translate(-50%,0)}
   @media (prefers-reduced-motion:reduce){.soon-tip{transition:none}}
+  /* Narrow: the links wrap into rows and an item can sit at the screen edge, so a
+     label centred on the item would clip. Centre it on the whole row instead. */
+  @media(max-width:560px){
+    .foot-stack{position:relative;justify-content:center}
+    .foot-soon{position:static}
+    .soon-tip{left:50%;bottom:calc(100% + 8px)}
+  }
   /* The padding grows the tappable area to ~36px and the equal negative margin
      cancels it out of the layout, so nothing in the footer moves. These were
      21-26px tall. */

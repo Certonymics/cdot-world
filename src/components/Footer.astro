@@ -12,6 +12,8 @@ const soon = [
      but is deliberately not linked yet. */
   { id: "press-kit", label: "Press kit" },
   { id: "whitepaper", label: "Whitepaper" },
+  { id: "docs", label: "Docs" },
+  { id: "blog", label: "Blog" },
   { id: "community", label: "Community" },
 ];
 ---
@@ -28,7 +30,6 @@ const soon = [
             <span class="soon-tip" id={`${item.id}-soon`} role="tooltip">Coming soon</span>
           </span>
         ))}
-        <a class="foot-link" href={sites.cemail.url} target="_blank" rel="noopener noreferrer">c.Email</a>
       </div>
     </div>
     <div class="foot-legal">
