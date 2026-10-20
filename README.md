@@ -240,6 +240,28 @@ The map is keyboard operable: `#mapvp` is focusable, arrows pan, `+`/`-` zoom,
 `0` resets. Focusing a node while zoomed in re-centres it, since a focus ring
 drawn outside the viewport is invisible.
 
+### How many nodes the map shows
+
+The registry returns one row per heartbeat, not per node (about 130 rows per node a
+day), so the map asks for the 200 newest rows and collapses them to unique IPs;
+`limit` is honoured up to at least 5000, so this is a window, not a count. Then:
+
+- **Cap: 100 nodes placed** (`CAP` in `map.js`). It was 30. It exists so a registry
+  that grew without limit cannot cause hundreds of lookups per visit; the count line
+  says "N of M" whenever fewer than all M are shown. The 200-row window is the second
+  ceiling: it covers every node only while the network is under roughly 150 nodes, so
+  raise `limit` with `CAP`.
+- **Browser cache.** Each node's location is kept in `localStorage`
+  (`cdot-map-geo-v1`) for 7 days. A repeat visit places the whole map with no
+  lookups. Entries for nodes the registry no longer lists, and expired entries, are
+  dropped on every load. If storage is blocked or full the map looks everything up
+  each time. It holds public node locations only - nothing about the visitor.
+- **Rate-limit guard.** On a 429 from the location service the map waits 1.5 s and
+  retries once; if it is still refused it stops asking and keeps what it has.
+- **Count line.** "N of M nodes shown" until every node is placed, then "M nodes
+  online". M is every node the registry lists, so a failed lookup is never silently
+  counted as a smaller network.
+
 ## Forms
 
 There are two, both handled by one inline script at the bottom of `index.astro`
@@ -434,10 +456,12 @@ display headings, and Geist Mono for figures and technical values.
   all individually focusable; the 2048x1024 texture is decoded to ~8 MB on the
   device to produce a land/ocean mask that could ship pre-baked at a fraction of
   the size.
-- **Map, backend:** every page view makes 31 requests to the node registry - one
-  list call, then up to 30 geolocation lookups in sequence, uncached. A
-  rate-limited backend means a handful of concurrent visitors can empty the map.
-  The real fix is server-side (return coordinates, or an aggregate endpoint).
+- **Map, backend:** a first visit makes one list call, then one geolocation lookup
+  per node in sequence (about 40 today), because the registry returns IP addresses
+  rather than coordinates. See "How many nodes the map shows" - the browser cache
+  and rate-limit guard mean repeat visits cost nothing and a refusing service is
+  not hammered, but the first visit still pays. The real fix is server-side (return
+  coordinates, or an aggregate endpoint).
 
 ## Structured data
 
