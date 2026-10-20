@@ -2,9 +2,11 @@
    Live C-Layer node map.
 
    Vanilla port of the c.Email NetworkMapCore component
-   (c.email-website/src/components/NetworkMapCore.jsx), kept behaviourally
-   identical but restyled dark and rewritten without React/Tailwind, which this
-   site does not use. Keep the two in step when either changes.
+   (c.email-website/src/components/NetworkMapCore.jsx), restyled dark and
+   rewritten without React/Tailwind, which this site does not use. Behaviourally
+   the same EXCEPT the live-data block below, which caches locations, guards
+   against rate-limiting and places up to 100 nodes: keep the two in step on
+   everything else.
 
    Served from public/ rather than inlined so the page's prose dominates its
    markup - some extractors weigh the text-to-script ratio, and this script is
@@ -284,9 +286,36 @@
   }
 
   /* Live data. Same two-step as c.Email: registry for the node list, then ipinfo
-     per unique IP to place it. */
+     per unique IP to place it. Unlike c.Email's component this one caches where
+     each node is, guards against rate-limiting and places up to CAP nodes - so
+     the two are no longer identical in this block. */
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   const fallback='One network, run by the cDot community around the world.';
+
+  /* The most nodes placed. High enough that today's network (and a good deal more)
+     fits - a node the map leaves off is a node the community cannot see itself on -
+     but still a ceiling, so a registry that grew without limit cannot cause
+     hundreds of lookups on every page view. The count line says "N of M" whenever
+     fewer than all M are shown. */
+  const CAP=100;
+
+  /* Where each node is, remembered in the visitor's browser for a week. A node's
+     location barely changes, so every visit after the first places the whole map
+     without a single lookup. Each entry is { lat, lng, city, country, t }. Entries
+     for nodes the registry no longer lists are dropped on every load, and if
+     storage is blocked or full the map simply looks everything up each time. */
+  const CACHE_KEY='cdot-map-geo-v1', CACHE_TTL=7*24*60*60*1000;
+  function loadCache(){
+    try{
+      const o=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');
+      return o&&typeof o==='object'&&!Array.isArray(o)?o:{};
+    }catch(e){ return {}; }
+  }
+  function saveCache(c){ try{ localStorage.setItem(CACHE_KEY,JSON.stringify(c)); }catch(e){} }
+  const usable=(c,now)=>c&&typeof c==='object'
+    &&Number.isFinite(c.lat)&&Number.isFinite(c.lng)&&Number.isFinite(c.t)
+    &&Math.abs(c.lat)<=90&&Math.abs(c.lng)<=180&&now-c.t<CACHE_TTL;
+
   (async()=>{
     try{
       /* Timeout matters as much as error handling here: if the registry hangs
@@ -305,28 +334,57 @@
       });
 
       const allIps=[...new Set(data.map(d=>d.client_ip).filter(Boolean))];
-      const CAP=30;
-      const ips=allIps.slice(0,CAP);   /* geolocating every node would be slow */
+      const total=allIps.length;
+      const ips=allIps.slice(0,CAP);
+
+      /* Keep only what is still wanted: a node the registry has dropped, or an
+         entry past its week, goes. Written back straight away so a visit that is
+         closed mid-load still leaves a tidy cache. */
+      const old=loadCache(), now=Date.now(), cache={};
+      for(const ip of allIps) if(usable(old[ip],now)) cache[ip]=old[ip];
+      saveCache(cache);
+
+      /* "N of M nodes shown" until every node is placed, then "M nodes online".
+         M is every node the registry lists, not just the ones we try, so a
+         lookup that fails is never miscounted as a smaller network. */
+      const show=n=>{
+        nodes.push(n); addNode(n);
+        const cs=new Set(nodes.map(x=>x.country)).size;
+        const lead=nodes.length<total
+          ? '<b>'+nodes.length+'</b> of <b>'+total+'</b> nodes shown'
+          : '<b>'+total+'</b> nodes online';
+        countEl.innerHTML=lead+' across <b>'+cs+'</b> countries.';
+      };
+      /* Per-request timeout so one unresolvable IP cannot stall the rest. */
+      const lookup=ip=>fetch(REGISTRY_ORIGIN+'/ipinfo/json/'+ip+'?fields=status,country,city,lat,lon',
+                             {signal:AbortSignal.timeout(5000)});
+
       for(let i=0;i<ips.length;i++){
-        const ip=ips[i];
+        const ip=ips[i], hit=cache[ip];
+        if(hit){
+          show({lat:hit.lat,lng:hit.lng,ip:ip,version:ipToVersion.get(ip)||'Unknown',
+                city:hit.city||'Unknown',country:hit.country||'Unknown'});
+          continue;
+        }
         try{
-          /* Per-request timeout so one unresolvable IP cannot stall the rest. */
-          const r=await fetch(REGISTRY_ORIGIN+'/ipinfo/json/'+ip+'?fields=status,country,city,lat,lon',
-                              {signal:AbortSignal.timeout(5000)});
+          let r=await lookup(ip);
+          /* Rate-limited: wait, try once more, and if the service is still
+             refusing stop asking and keep what we have rather than hammer it. */
+          if(r.status===429){
+            await wait(1500);
+            r=await lookup(ip);
+            if(r.status===429) break;
+          }
           if(r.ok){
             const g=await r.json();
             if(g.status==='success'&&g.lat!=null&&g.lon!=null){
-              const n={lat:parseFloat(g.lat),lng:parseFloat(g.lon),ip:ip,
-                       version:ipToVersion.get(ip)||'Unknown',
-                       city:g.city||'Unknown',country:g.country||'Unknown'};
-              nodes.push(n); addNode(n);
-              const cs=new Set(nodes.map(x=>x.country)).size;
-              /* Say "of N" when the registry reports more than we plot, rather
-                 than implying the network is only ever 30 nodes. */
-              const shown=allIps.length>CAP
-                ? '<b>'+nodes.length+'</b> of <b>'+allIps.length+'</b> nodes shown'
-                : '<b>'+nodes.length+'</b> nodes online';
-              countEl.innerHTML=shown+' across <b>'+cs+'</b> countries.';
+              const lat=parseFloat(g.lat), lng=parseFloat(g.lon);
+              if(Number.isFinite(lat)&&Number.isFinite(lng)){
+                cache[ip]={lat:lat,lng:lng,city:g.city||'',country:g.country||'',t:Date.now()};
+                saveCache(cache);
+                show({lat:lat,lng:lng,ip:ip,version:ipToVersion.get(ip)||'Unknown',
+                      city:g.city||'Unknown',country:g.country||'Unknown'});
+              }
             }
           }
           if(i<ips.length-1) await wait(100);
