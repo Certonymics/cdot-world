@@ -5,7 +5,7 @@ import { blogLive, blogPath } from "../data/blog.mjs";
 /* The year is the build's, so it moves on the first deploy of a new year. */
 const year = new Date().getFullYear();
 
-/* Footer entries. One with an `href` is a link; one without is a "Coming soon"
+/* Footer entries. One with an `href` is a link (`external` opens it in a new tab); one without is a "Coming soon"
    label, because there is nothing to link to yet. When an entry goes live, give it
    an href. (Blog gets its href by itself when the Blog is switched on in
    src/data/blog.mjs.) */
@@ -15,7 +15,7 @@ const links = [
      but is deliberately not linked yet. */
   { id: "press-kit", label: "Press kit" },
   { id: "whitepaper", label: "Whitepaper" },
-  { id: "docs", label: "Docs" },
+  { id: "docs", label: "Docs", href: sites.docs.url, external: true },
   { id: "blog", label: "Blog", href: blogLive ? blogPath : undefined },
   { id: "community", label: "Community" },
 ];
@@ -28,7 +28,7 @@ const links = [
         <!-- A label with no href is not a link: focusable so the "Coming soon" tip also
              shows for keyboard and touch users, not only on mouse hover. -->
         {links.map((item) => item.href ? (
-          <a class="foot-link" href={item.href}>{item.label}</a>
+          <a class="foot-link" href={item.href} {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{item.label}</a>
         ) : (
           <span class="foot-link foot-soon" tabindex="0" aria-describedby={`${item.id}-soon`}>
             {item.label}

@@ -14,6 +14,8 @@
        |                    foundation work, open-source/SDKs, the C-Layer.
        |-- cdot.app         the cDot app: the product built ON the network.
        |                    (Not live yet.)
+       |-- docs.cdot.world  documentation for node-runners and developers on
+       |                    the network. Its own site, with its own llms.txt.
        `-- c.email          the company's first product, built on the cDot
                             framework. Its own site.
 
@@ -71,6 +73,13 @@ export const sites = {
     live: false,
     role: "the product built on the network - features, how-tos and guides",
   },
+  docs: {
+    name: "cDot Docs",
+    url: "https://docs.cdot.world/",
+    llms: "https://docs.cdot.world/llms.txt",
+    live: true,
+    role: "documentation for node-runners and developers on the cDot network",
+  },
   cemail: {
     name: "c.Email",
     url: "https://c.email/",
@@ -81,7 +90,7 @@ export const sites = {
 };
 
 /* Sibling sites that are products or the company - everything but this site. */
-export const relatedSites = [sites.app, sites.company, sites.cemail];
+export const relatedSites = [sites.app, sites.company, sites.cemail, sites.docs];
 
 /* "86-87 Campden Street, London W8 7EN, United Kingdom" */
 export const addressLine = `${company.address.street}, ${company.address.locality} ${company.address.postcode}, ${company.address.countryName}`;
