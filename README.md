@@ -243,7 +243,7 @@ drawn outside the viewport is invisible.
 ### How many nodes the map shows
 
 The registry returns one row per heartbeat, not per node (about 130 rows per node a
-day), so the map asks for the 200 newest rows and collapses them to unique IPs;
+day), so the map asks for the 200 newest rows and collapses them to one entry per node;
 `limit` is honoured up to at least 5000, so this is a window, not a count. Then:
 
 - **Cap: 100 nodes placed** (`CAP` in `map.js`). It was 30. It exists so a registry
@@ -457,8 +457,8 @@ display headings, and Geist Mono for figures and technical values.
   device to produce a land/ocean mask that could ship pre-baked at a fraction of
   the size.
 - **Map, backend:** a first visit makes one list call, then one geolocation lookup
-  per node in sequence (about 40 today), because the registry returns IP addresses
-  rather than coordinates. See "How many nodes the map shows" - the browser cache
+  per node in sequence (about 40 today), because the registry returns no
+  coordinates. See "How many nodes the map shows" - the browser cache
   and rate-limit guard mean repeat visits cost nothing and a refusing service is
   not hammered, but the first visit still pays. The real fix is server-side (return
   coordinates, or an aggregate endpoint).
@@ -518,6 +518,7 @@ Four sites, one company:
 | **cdot.world** (this) | The cDot **network**: concept, mission, foundation, SDKs, the C-Layer | `WebSite` + `SoftwareApplication` `#cdot` and one node per chain |
 | cdot.app | The cDot **app**, the product built on the network. *Not live yet.* | `relatedLink` from our `WebPage`; its own graph says `isBasedOn` our `#cdot` |
 | c.email | The company's first product, built on the cDot framework | named in `llms.txt` |
+| docs.cdot.world | Documentation for node-runners and developers on the network | named in `llms.txt` (with its own `llms.txt` linked); the footer's Docs link |
 
 They are different things, so none is `sameAs` another (`sameAs` means "is the
 same entity" and a wrong one can merge entities that are not one). What ties them
