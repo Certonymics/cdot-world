@@ -5,8 +5,9 @@
    (c.email-website/src/components/NetworkMapCore.jsx), restyled dark and
    rewritten without React/Tailwind, which this site does not use. Behaviourally
    the same EXCEPT the live-data block below, which caches locations, guards
-   against rate-limiting and places up to 100 nodes: keep the two in step on
-   everything else.
+   against rate-limiting and places up to 100 nodes, and which never shows a
+   node's IP address (the details panel has no IP row and the markers do not
+   carry one): keep the two in step on everything else.
 
    Served from public/ rather than inlined so the page's prose dominates its
    markup - some extractors weigh the text-to-script ratio, and this script is
@@ -255,10 +256,9 @@
   function showPanel(n){
     selected=n;
     document.getElementById('np-loc').textContent=n.city+', '+n.country;
-    document.getElementById('np-ip').textContent=n.ip;
     document.getElementById('np-ver').textContent=n.version;
     panel.hidden=false;
-    for(const el of layer.children) el.classList.toggle('is-active',el._ip===n.ip);
+    for(const el of layer.children) el.classList.toggle('is-active',el._node===n);
   }
   function clearPanel(){
     selected=null; panel.hidden=true;
@@ -274,7 +274,7 @@
     el.style.left=p.x+'%'; el.style.top=p.y+'%';
     el.style.transform=`scale(${1/view.s})`;
     el.setAttribute('aria-label','Node in '+n.city+', '+n.country);
-    el._ip=n.ip;
+    el._node=n;   /* which node this marker is - the node object, never its IP */
     /* Ignore the click that ends a drag. */
     el.addEventListener('click',()=>{ if(moved>5) return; showPanel(n); });
     /* A node focused while zoomed in can sit outside the viewport, so bring it
@@ -362,7 +362,7 @@
       for(let i=0;i<ips.length;i++){
         const ip=ips[i], hit=cache[ip];
         if(hit){
-          show({lat:hit.lat,lng:hit.lng,ip:ip,version:ipToVersion.get(ip)||'Unknown',
+          show({lat:hit.lat,lng:hit.lng,version:ipToVersion.get(ip)||'Unknown',
                 city:hit.city||'Unknown',country:hit.country||'Unknown'});
           continue;
         }
@@ -382,7 +382,7 @@
               if(Number.isFinite(lat)&&Number.isFinite(lng)){
                 cache[ip]={lat:lat,lng:lng,city:g.city||'',country:g.country||'',t:Date.now()};
                 saveCache(cache);
-                show({lat:lat,lng:lng,ip:ip,version:ipToVersion.get(ip)||'Unknown',
+                show({lat:lat,lng:lng,version:ipToVersion.get(ip)||'Unknown',
                       city:g.city||'Unknown',country:g.country||'Unknown'});
               }
             }
