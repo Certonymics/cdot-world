@@ -10,10 +10,6 @@ const year = new Date().getFullYear();
    an href. (Blog gets its href by itself when the Blog is switched on in
    src/data/blog.mjs.) */
 const links = [
-  /* Press kit: a shared Drive folder exists
-     (https://drive.google.com/drive/folders/1OSPZVD3mimEL1NABBoptLuMaIQxL1dOj?usp=drive_link)
-     but is deliberately not linked yet. */
-  { id: "press-kit", label: "Press kit" },
   { id: "whitepaper", label: "Whitepaper" },
   { id: "docs", label: "Docs", href: sites.docs.url, external: true },
   { id: "blog", label: "Blog", href: blogLive ? blogPath : undefined },
