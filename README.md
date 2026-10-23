@@ -76,6 +76,7 @@ src/
   layouts/Layout.astro        <head>, JSON-LD, header + footer shell
   data/network.mjs            THE CHAINS' FACTS - specs, status, descriptions (see below)
   data/company.mjs            THE COMPANY'S FACTS and how the sites relate (see below)
+  data/forms.mjs              which backend the contact form posts to (Google or Cloudflare)
   data/blog.mjs               the Blog's on/off switch and Sanity project (see "The Blog")
   blog/                       the Blog's two page templates - NOT in pages/: added as routes only while it is on
   lib/sanity.js               reads articles from Sanity at build time
@@ -100,6 +101,9 @@ public/
   robots.txt
 functions/
   i/[handle].ts               Pages Function behind the chat invite link /i/<handle>
+  api/contact.js              Pages Function: the contact form endpoint (logic in _lib/contact.mjs)
+  _lib/contact.mjs            its logic - plain module so Node can test it
+migrations/                   D1 database schema for the contact form
 brand/palette.json            canonical brand definition
 scripts/
   check-brand.mjs             `npm run brand:check`
@@ -107,6 +111,7 @@ scripts/
   check-sync.mjs              `npm run check:sync`: do the messaging surfaces agree?
   check-seo.mjs               `npm run check:seo`: robots, sitemap, head, JSON-LD, company facts
   check-live.mjs              `npm run check:live`: the deployed site and our links
+  test-contact.mjs            `npm run test:forms`: the contact form's server side
   make-og.mjs                 `npm run og`: renders public/assets/og.png from the tagline
   contact-form.gs             source of the contact-form Apps Script (not built)
 studio/                       the Sanity Studio (where articles are written); deployed separately
@@ -274,7 +279,13 @@ than appended to the URL.
 
 ### Contact form
 
-The form POSTs to a Google Apps Script web app whose source is versioned at
+**Two backends exist; Google is the one that is live.** `src/data/forms.mjs` chooses
+which one the form posts to (`CONTACT_BACKEND_DEFAULT`, or the `CONTACT_BACKEND`
+environment variable, which wins). `"google"` is the Apps Script described just below.
+`"cloudflare"` is this site's own `/api/contact`, described in "Contact form
+(Cloudflare)" further down - built and tested, not yet connected to anything.
+
+The Google version: the form POSTs to a Google Apps Script web app whose source is versioned at
 `scripts/contact-form.gs`; that file's header comment carries the full setup and
 redeploy procedure. It is a **separate deployment from c.Email's** identical-looking
 form, with its own script and spreadsheet, so editing one cannot break the other.
@@ -294,6 +305,72 @@ new version* or the live endpoint keeps running the old code; and the mail scope
 must be granted by running `testEmail` in the editor once, which a web request
 cannot trigger itself. Skip it and enquiries save to the sheet while nobody is
 notified.
+
+### Contact form (Cloudflare)
+
+`functions/api/contact.js` (logic in `functions/_lib/contact.mjs`) is a Cloudflare
+Pages Function that does what the Apps Script does without Google: it saves each
+enquiry in a **D1** database (D1 is SQLite), emails the team, and refuses abuse (a
+hidden spam field; at most 5 per email and 40 in total per hour; same-origin only;
+size and format checks). Entries are in `contact_entries`
+(`migrations/0001_contact_entries.sql`).
+
+**What it does when things go wrong** - the policy is in the file's header comment:
+- *Database not connected:* the visitor is told (503) to email instead. A form that
+  says "sent" and loses the message is the one failure that is not allowed.
+- *Email fails:* the entry is saved, the visitor still sees success (their message
+  is safe), the row is flagged `notified = 0`, and each later submission retries up to
+  3 unsent ones, giving up after 5 attempts per entry.
+- Errors shown to visitors are generic, and the enquiry itself is never logged.
+
+`npm run test:forms` (also in CI) runs 22 tests of the handler against a real SQLite
+database, with a stand-in for the email binding. It was also exercised end to end
+once, through the real form in a browser, against a local harness.
+**It has NOT been run on Cloudflare itself**: Cloudflare's local runtime does not
+run on macOS older than 13.5, so the first test on a preview deployment is the first
+time the real database and email bindings are used.
+
+**Switching it on** (the account steps are done in the Cloudflare dashboard):
+1. **Database.** Storage & Databases > D1 > create a database (e.g. `cdot-world-forms`).
+   In its Console, paste `migrations/0001_contact_entries.sql` and run it.
+2. **Bind it.** Workers & Pages > this Pages project > Settings > Bindings > add a
+   **D1 database** binding named `DB`, for both Production and Preview.
+3. **Email.** In Cloudflare, set up the sending domain (cdot.world) and verify
+   `info@certonymity.com` as a destination address (a link is sent to that inbox).
+   Then add a `send_email` binding named `EMAIL`. **Open question:** Cloudflare's
+   documentation describes `send_email` for Workers and does not say it works in
+   Pages Functions. If the Pages project will not accept it, the fallback is a tiny
+   separate Worker that sends the email, called from this function. Until
+   `EMAIL` is bound, entries are saved and flagged `notified = 0`.
+4. **Variables (optional)**, as Pages environment variables: `NOTIFY_TO` (default
+   `info@certonymity.com`), `MAIL_FROM` (default `forms@cdot.world`), and
+   `RETENTION_DAYS` (delete entries older than this as submissions arrive; **unset =
+   keep everything**, and values under 30 are ignored).
+5. **Try it on a preview first.** Set `CONTACT_BACKEND=cloudflare` on the Preview
+   environment only, push a branch, submit the form on the preview URL, and check the
+   entry appears in D1 and the email arrives with the visitor as reply-to.
+6. **Switch production:** set `CONTACT_BACKEND_DEFAULT` to `"cloudflare"` in
+   `src/data/forms.mjs`. **Roll back** by setting it to `"google"` - the Apps Script
+   is untouched until you retire it.
+7. **Retire Google** only once you are happy: move any old entries across (see below),
+   delete the Sheet, switch off the Apps Script deployment, and remove
+   `script.google.com` and `script.googleusercontent.com` from `connect-src` in
+   `scripts/build-headers.mjs` (the node-signup form still uses them until it moves too).
+
+**Reading and managing entries** (D1 console, or `npx wrangler d1 execute <name> --remote
+--command "..."`):
+- newest first: `SELECT created_at, email, message, notified FROM contact_entries ORDER BY created_at DESC LIMIT 50;`
+- not yet notified: `SELECT id, created_at, email FROM contact_entries WHERE notified = 0;`
+- **a deletion request** (the privacy notice promises this): `DELETE FROM contact_entries WHERE lower(email) = lower('them@example.com');`
+
+**Bringing old entries across.** Export the Google Sheet as CSV and insert the rows
+with `source = 'google-sheet'`. Keep the CSV out of git and delete it afterwards; review
+and drop old entries first rather than migrating everything.
+
+**Not built yet:** a spam check beyond the hidden field and rate limits (Cloudflare
+Turnstile is the planned addition, and needs a CSP change), an admin page, and the
+node-signup form (still Google). The message is not encrypted in the browser; it
+reaches the server and your inbox as plain text, exactly as with Google.
 
 ### C-Layer node signup
 

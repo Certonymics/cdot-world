@@ -73,6 +73,11 @@ jobs:
       - name: SEO, structured data and company details
         run: npm run check:seo
 
+      # The contact form's server side (functions/_lib/contact.mjs), run against a
+      # real in-memory SQLite database - D1 is SQLite. Needs no Cloudflare account.
+      - name: Contact form tests
+        run: npm run test:forms
+
       # Informational. Advisories in build tooling are worth seeing on every run,
       # but they should not stop a change that does not touch dependencies, so this
       # step reports and never fails the job.

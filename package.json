@@ -11,6 +11,7 @@
     "check:sync": "node scripts/check-sync.mjs",
     "check:seo": "node scripts/check-seo.mjs",
     "check:live": "node scripts/check-live.mjs",
+    "test:forms": "node --test scripts/test-contact.mjs",
     "og": "node scripts/make-og.mjs",
     "deploy": "astro build && wrangler pages deploy dist --project-name=cdot-world --branch=main --commit-dirty=true"
   },

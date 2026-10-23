@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import { chains, chipsOf, joinList, STATUS } from "../data/network.mjs";
 import { company, tagline } from "../data/company.mjs";
 import { faq, pageHtml } from "../data/faq.mjs";
+import { contactEndpoint } from "../data/forms.mjs";
 
 /* These track the header tagline and the hero, which are what a visitor sees
    first - a search result or a shared card that reads differently from the page
@@ -180,7 +181,7 @@ const ogDescription =
 <section id="contact">
   <div class="wrap">
     <h2>Contact us</h2>
-    <form id="contactForm" method="post">
+    <form id="contactForm" method="post" data-endpoint={contactEndpoint}>
     <div class="contact-grid">
         <div class="contact-fields">
           <div class="field">
@@ -264,14 +265,13 @@ const ogDescription =
 
   /* --- Contact form ------------------------------------------------------- */
   (function(){
-    /* Public by design - see the header comment in scripts/contact-form.gs.
-       Replace with the /exec URL of the deployed cDot contact-form script. */
-    const CONTACT_FORM_URL =
-      'https://script.google.com/macros/s/AKfycbzkT4I_iMLiBBKRZeKdSEU2ohJVpfOFd4UA-tk2ss4p2YddFDbvU1OFPnjHcr0RaOHdUA/exec';
-
     const form = document.getElementById('contactForm');
     const statusEl = document.getElementById('cf-status');
     if (!form || !statusEl) return;
+    /* Where to post: set at build time by src/data/forms.mjs (the Google Apps
+       Script, or this site's own /api/contact) and carried on the form, so this
+       script is the same either way. */
+    const CONTACT_FORM_URL = form.dataset.endpoint || '';
     const button = form.querySelector('button[type="submit"]');
     const fields = form.querySelectorAll('.contact-fields .field, .cf-honeypot');
     let sending = false;

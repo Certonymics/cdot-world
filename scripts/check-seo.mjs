@@ -31,6 +31,9 @@
      9. Blog         - absent while switched off (no pages, no links, no sitemap or
                        llms.txt entries, footer shows "Coming soon"); complete while
                        on (index and articles built, listed, Article JSON-LD valid).
+    10. Contact form - posts to the endpoint src/data/forms.mjs chooses (Google or
+                       Cloudflare), the function and migration files exist, and the
+                       site's Content-Security-Policy allows that endpoint.
      7. Social image - brand/og.source.json says it was made from the CURRENT
                        tagline (otherwise: run `npm run og`).
 
@@ -42,6 +45,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { resolve, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { blogLive, sanity } from "../src/data/blog.mjs";
+import { contactBackend, contactEndpoint } from "../src/data/forms.mjs";
 import { company, sites, ORG_ID, tagline, registrationLine, addressLine, relatedSites } from "../src/data/company.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -358,6 +362,22 @@ if (home) {
       }
     }
   }
+}
+
+/* --- 10. the contact form: its endpoint, its files, and the CSP that must allow it */
+if (home) {
+  const ep = attr(home.html, /<form id="contactForm"[^>]*data-endpoint="([^"]*)"/);
+  check("10. Contact form", ep === contactEndpoint, `the contact form posts to "${ep}" but src/data/forms.mjs says "${contactBackend}" (${contactEndpoint}).`);
+  for (const f of ["functions/api/contact.js", "functions/_lib/contact.mjs", "migrations/0001_contact_entries.sql"])
+    check("10. Contact form", existsSync(resolve(root, f)), `${f} is missing; the Cloudflare contact form needs it.`);
+  /* The policy is written into dist/_headers by build-headers.mjs: whatever the
+     form posts to must be allowed by connect-src (or default-src), or every
+     submission is blocked by the browser and the visitor sees a failure. */
+  const csp = (read("_headers").match(/Content-Security-Policy:\s*([^\n]+)/) || [])[1] || "";
+  const directive = (name) => (csp.split(";").map((d) => d.trim()).find((d) => d.startsWith(name + " ")) || "").split(/\s+/).slice(1);
+  const allowed = directive("connect-src").length ? directive("connect-src") : directive("default-src");
+  const needed = ep.startsWith("/") ? "'self'" : new URL(ep).origin;
+  check("10. Contact form", allowed.includes(needed), `the form posts to ${ep}, but the Content-Security-Policy's connect-src does not allow ${needed} (it allows: ${allowed.join(" ")}).`);
 }
 
 /* --- 7. social image ------------------------------------------------------ */
