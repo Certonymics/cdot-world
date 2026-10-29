@@ -100,6 +100,7 @@ public/
   robots.txt
 functions/
   i/[handle].ts               Pages Function behind the chat invite link /i/<handle>
+  g/[token].ts                Pages Function behind the group link /g/<token>
 brand/palette.json            canonical brand definition
 scripts/
   check-brand.mjs             `npm run brand:check`
@@ -153,6 +154,27 @@ project with that custom domain attached.
 To try it locally, build and run `npx wrangler pages dev dist`, then request
 `/i/quiet-falcon` with an Android user agent (302 to Google Play) and with an
 iPhone or desktop one (the page).
+
+## The group link
+
+`https://cdot.world/g/<token>` is the link a group admin shares from the app
+(`<token>` is 32 lowercase hex characters, or a percent-encoded full room
+alias `#g-<token>:<server>` for a group on another homeserver). Whoever opens
+it in the app asks to join, and an admin of the group decides. A reset in the
+app makes a new link, and the old one stops working.
+
+- `functions/g/[token].ts` answers 404 to anything that is not a token or such
+  an alias. Every browser, Android included, gets the static
+  `src/pages/group.astro` page: a redirect straight to Google Play would skip
+  its "open this link again" step.
+- The page names no group: the site cannot read one, and the link alone must
+  not reveal it. It tells the reader to install cDot and open the link again.
+- The token is a secret of the group, so nothing carries it on: no install
+  referrer and no clipboard copy, because the app does not pick a group link
+  up after install yet. Add them here once it does.
+- `/g/*` is claimed in `apple-app-site-association` next to `/i/*`;
+  `assetlinks.json` already covers the whole domain. The page is `noindex` and
+  left out of the sitemap, like the invite page.
 
 ## Brand tokens
 
