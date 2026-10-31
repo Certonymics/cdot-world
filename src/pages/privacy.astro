@@ -1,0 +1,151 @@
+---
+/* The Privacy Notice: c.Email's privacy policy of 10 August 2026
+   (c.email/privacy-policy) with the product named cDot, and the cookie line
+   naming this site. The cDot app's KYC consent sheet links here. */
+import Layout from "../layouts/Layout.astro";
+
+const title = "Privacy policy — cDot";
+const description = "The cDot privacy policy: what data we collect and why we collect it.";
+---
+
+<Layout title={title} description={description}>
+  <section class="legal">
+    <div class="wrap">
+      <h1>Privacy policy</h1>
+
+      <section>
+        <h2>1. Introduction</h2>
+        <p>cDot was created by Certonymity Ltd (“Certonymity”, “we”, “our”, or “us”) to protect digital privacy with encrypted emails. This privacy policy explains how we collect, use, and safeguard your information when you use cDot.</p>
+        <p>We are committed to protecting your privacy and complying with data protection laws, as well as the requirements set forth by the Apple App Store and Google Play Store.</p>
+      </section>
+
+      <section>
+        <h2>2. Information we collect</h2>
+        <p>We collect information that you provide directly to us, including your email address and typed message when you contact us for support using our online form, or sign up to our waiting list to run a blockchain node. The legal basis for this is consent.</p>
+        <p>We may also collect pseudonymised device information and usage metrics to improve app performance and address errors. The legal basis for this is our legitimate interest to improve the quality of our services.</p>
+        <p>If you choose to use our end-to-end encryption feature, encrypted message content is stored only on your device. We never receive it and cannot decrypt it.</p>
+
+        <h3>2a. Our identity verification process</h3>
+        <p>To authenticate your email, we require you to verify your identity by scanning an existing identity document (ID), including the NFC chip, and completing a liveness check. This information is processed on your device only, and only once, for that purpose. It is never transmitted to us — we do not receive it, store it, or have any means of accessing it. Proofs derived from this information, which contain no identity details, are described in section 3.</p>
+        <p>As part of the same process, a template of your biometric data is also created and stored on your device only. This is so you can read For Your Eyes Only emails, which use a continuous presence check to ensure they are only decrypted when the intended recipient is looking at the screen. This template never leaves your device, and we have no access to it.</p>
+        <p>The legal basis for this process is consent.</p>
+      </section>
+
+      <section>
+        <h2>3. How we use this information</h2>
+        <p>We use the information we collect to:</p>
+        <ul>
+          <li>Provide core functionality, such as accessing and sending emails.</li>
+          <li>Enable end-to-end encryption for secure communications.</li>
+          <li>Enable our ‘For Your Eyes Only’ setting, which requires users to pass a continuous presence check to decrypt an email.</li>
+          <li>Maintain and improve cDot’s functionality, stability, and security.</li>
+          <li>Communicate with you.</li>
+          <li>Comply with legal obligations and enforce our terms and conditions.</li>
+        </ul>
+        <p>We publish only yes/no proofs derived from your ID — for example, that you are over 18 — to the C-layer. These contain no identity information and cannot be reversed to reveal your document or your name.</p>
+      </section>
+
+      <section>
+        <h2>4. Data retention</h2>
+        <p>We retain minimal user data and only for as long as necessary. Access tokens and cached metadata are stored locally and cleared upon logout.</p>
+      </section>
+
+      <section>
+        <h2>5. Third-party services</h2>
+        <p>We use the following third-party services:</p>
+        <ul>
+          <li><strong>Google and Outlook APIs</strong> (Gmail, Outlook Mail, OAuth 2.0): To access your Gmail or Outlook inbox and send/receive messages.</li>
+          <li><strong>Google Sheets</strong>: To record and store expressions of interest in running a C-layer node, as well as user email addresses and messages where the user has explicitly chosen to use our online contact form.</li>
+          <li><strong>Mixpanel</strong>: To collect product analytics and identify issues.</li>
+          <li><strong>Chatwoot</strong>: To provide dedicated customer support. Our help centre is built with Chatwoot but self-hosted.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>6. International transfers</h2>
+        <p>Some of our service providers are located outside the UK and European Economic Area. Where personal data is transferred internationally, we rely on UK adequacy regulations or the International Data Transfer Agreement / EU Standard Contractual Clauses, together with additional safeguards where required.</p>
+      </section>
+
+      <section>
+        <h2>7. Information sharing</h2>
+        <p>We do not sell or trade your personal information. We share non-sensitive data with the service providers listed above, who act only on our instructions and cannot use it for their own purposes. We do not otherwise transfer your personal information to third parties without your consent.</p>
+      </section>
+
+      <section>
+        <h2>8. Information security</h2>
+        <p>We implement extra measures to secure your information on your device through post-quantum secure encryption.</p>
+        <p>cDot has completed a Cloud Application Security Assessment (CASA), the App Defense Alliance framework required by Google for apps that access Gmail data. It verifies that our app meets a recognised baseline of application-security controls — including secure data handling, encryption in transit, and the ability to delete user data on request. Independent penetration tests and cryptographic reviews are planned, with the results to be published.</p>
+        <p>If we become aware of a personal data breach affecting your information, we will report it to the Information Commissioner's Office (ICO) without undue delay and, where feasible, within 72 hours of becoming aware of it. Where a breach is likely to result in a high risk to your rights and freedoms, we will also notify you directly without undue delay, and will tell you what happened, which data was involved, what we are doing in response, and what steps you can take to protect yourself.</p>
+        <p>Because of how cDot is designed, the personal data we hold is deliberately limited. Your private decryption key, your message content, your biometric template, and the information contained on your identity document are stored only on your device and are never held on our servers. A breach of our systems would not expose them.</p>
+      </section>
+
+      <section>
+        <h2>9. End-to-end encryption</h2>
+        <p>cDot uses end-to-end encryption to protect your email communications. Encrypted emails are readable only by the sender and the intended recipients. We do not store or have access to your private encryption keys or emails.</p>
+      </section>
+
+      <section>
+        <h2>10. App permissions</h2>
+        <p>Use of authentication and end-to-end encryption is optional and controlled per message. You can revoke cDot’s access to your email account, camera, and biometrics at any time. Deleting the cDot app will delete all information held on your device.</p>
+      </section>
+
+      <section>
+        <h2>11. Data deletion</h2>
+
+        <h3>11a. Delete your data in the app</h3>
+        <p>cDot does not create a separate backend account for you. You connect an existing Google or Microsoft email account with OAuth, and your app data is primarily stored locally on your device. It does store your public encryption and verification keys on the C-layer blockchain.</p>
+        <p>To delete your local app data and revoke on-chain records, open cDot and go to Settings &gt; Delete account. This removes local account data from your device and starts revocation of cDot-managed records associated with the account.</p>
+
+        <h3>11b. Request deletion without the app</h3>
+        <p>If you no longer have access to the app, you can request deletion of any cDot-managed data associated with your email address by contacting us at <a href="mailto:delete-account@certonymity.com">delete-account@certonymity.com</a>. Please include:</p>
+        <ul>
+          <li>The email address you used for cDot.</li>
+          <li>A short note saying that you want your cDot data deleted.</li>
+        </ul>
+        <p>We may ask you to verify control of the email address before processing the request.</p>
+
+        <h3>11c. Data on the C-layer</h3>
+        <p>Records published to the C-layer cannot be deleted, because the blockchain is append-only. When you delete your account, we revoke the link between your identifier and your public keys, so the record can no longer be resolved to you or used to encrypt mail to you. The historical entry remains on-chain but is no longer usable.</p>
+
+        <h3>11d. Data controlled by email providers</h3>
+        <p>cDot cannot delete your Google, Gmail, Microsoft, or Outlook account. To delete data held by those providers, please use the deletion tools provided by the relevant provider.</p>
+      </section>
+
+      <section>
+        <h2>12. Changes to this privacy policy</h2>
+        <p>We may update this privacy policy at any time. We will notify you within cDot of any significant changes and update the date below.</p>
+      </section>
+
+      <section>
+        <h2>13. Business transfers and service closure</h2>
+        <p>If Certonymity is involved in a merger, acquisition, reorganisation, or sale of assets, personal data we hold may be transferred as part of that transaction. Any recipient will remain bound by this privacy policy, or by a policy that is at least as protective of your data, until we give you notice of any change. We will notify you within cDot before any such transfer takes effect.</p>
+        <p>If we decide to discontinue cDot, we will give you at least 30 days’ notice within the app, and by email where we hold an address for you. During that period you will be able to continue reading your existing encrypted messages and to export or delete your data. At the end of the notice period we will delete the personal data we hold, except where we are required to retain it by law. Your email account is unaffected in either case: it remains with your existing provider and is not ours to transfer. Public keys and attestations published to the C-layer do not contain your identity information and may persist on the blockchain independently of us.</p>
+      </section>
+
+      <section>
+        <h2>14. Your rights</h2>
+        <p>You have the right to: access the personal data we hold about you; have inaccurate data corrected; have your data erased; restrict or object to our processing; receive your data in a portable format; and withdraw consent where we rely on it. Because most of your data is stored only on your device, you can exercise many of these rights directly in the app. To make a request, contact us at <a href="mailto:support@certonymity.com">support@certonymity.com</a>. We will respond within one month, and usually much sooner.</p>
+        <p>If you are unhappy with how we have handled your data, you can complain to us via the details below, to the Information Commissioner's Office (ICO) at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a>, or to your local supervisory authority if you are in the EU.</p>
+      </section>
+
+      <section>
+        <h2>15. Website cookies</h2>
+        <p>The domain <a href="https://cdot.world/">https://cdot.world/</a> sets no cookies and collects no personal data from visitors.</p>
+      </section>
+
+      <section>
+        <h2>16. Contact information</h2>
+        <p>Certonymity Ltd is the data controller responsible for your personal data. We are registered in England and Wales with our registered office at:</p>
+        <address>
+          Certonymity Ltd<br />
+          86–87 Campden Street<br />
+          London<br />
+          W8 7EN
+        </address>
+        <p>If you have any questions about this privacy policy, or wish to exercise any of your rights, please contact us at <a href="mailto:info@certonymity.com">info@certonymity.com</a>.</p>
+      </section>
+
+      <p class="legal-date">Last updated: 10 August 2026</p>
+    </div>
+  </section>
+</Layout>
