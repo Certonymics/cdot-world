@@ -86,6 +86,7 @@ src/
     llms.txt.ts               generates /llms.txt (chains, company, related sites: all from data/)
     sitemap.xml.ts            generates /sitemap.xml from the pages that exist
     404.astro                 not-found page; noindex, no canonical
+    privacy.astro             the Privacy Notice: c.Email's privacy policy, naming cDot; the app's KYC consent links here
   components/
     Header.astro              logo lockup + tagline + nav + mobile menu script
     Footer.astro              logo, contact email, c.Email link, copyright
