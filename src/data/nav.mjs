@@ -34,7 +34,7 @@ export const navGroups = [
       page("architecture"),
       page("governance"),
       { label: "Whitepaper", href: undefined },
-      page("press"),
+      page("roadmap"),
     ],
   },
   {
@@ -43,6 +43,7 @@ export const navGroups = [
       page("sdk"),
       { label: "Docs", href: sites.docs.url, external: true },
       { label: "Code", href: undefined },
+      page("changelog"),
     ],
   },
 ];

@@ -89,7 +89,7 @@ src/
     privacy.astro             the Privacy Notice: c.Email's privacy policy, naming cDot; the app's KYC consent links here
   components/
     Header.astro              logo lockup + tagline + nav + mobile menu script
-    Footer.astro              logo, Team / Blog / Privacy / Terms / Contact links, legal small print
+    Footer.astro              logo, Team / Press / Blog / Privacy / Terms / Contact links, legal small print
     LogoSymbol.astro          inline <symbol id="cdot-logo"> sprite
   styles/
     tokens.css                BRAND TOKENS — see below

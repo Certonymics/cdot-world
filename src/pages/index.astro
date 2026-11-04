@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { chains, chipsOf, joinList, STATUS } from "../data/network.mjs";
+import NetworkMap from "../components/NetworkMap.astro";
+import Chains from "../components/Chains.astro";
 import { company, tagline } from "../data/company.mjs";
 import { faq, pageHtml } from "../data/faq.mjs";
 
@@ -92,66 +93,9 @@ const ogDescription =
       </form>
       <p class="node-status" id="clayer-status" role="status" aria-live="polite"></p>
     </div>
-    <div class="maplive">
-      <div class="mapcard">
-        <div class="mapvp" id="mapvp">
-          <!-- Constant-size dotted-land texture. Deliberately OUTSIDE #maplayer so
-               it is never CSS-scaled: it is redrawn for the current view instead,
-               which is what stops the dots growing and blurring as you zoom. -->
-          <canvas class="landcv" id="landcv" aria-hidden="true"></canvas>
-          <!-- Only the nodes are transformed. -->
-          <div class="maplayer" id="maplayer"></div>
-          <div class="mapbadge"><span class="dot"></span>Real-time</div>
-          <!-- Minimap navigator: appears once you zoom in. -->
-          <div class="minimap" id="minimap" data-nopan hidden aria-label="Map navigator - drag to pan">
-            <canvas id="minicv"></canvas>
-            <div class="minirect" id="minirect"></div>
-          </div>
-          <!-- Text is set by the map script, which knows the platform modifier.
-               Kept out of the markup so JS-disabled visitors are not told the
-               map is interactive when it isn't. -->
-          <div class="maphint" id="maphint" hidden></div>
-          <div class="mapzoom" data-nopan>
-            <button id="mz-in" aria-label="Zoom in">+</button>
-            <button id="mz-out" aria-label="Zoom out">&minus;</button>
-            <button id="mz-fit" aria-label="Reset zoom">&#x26F6;</button>
-          </div>
-          <!-- Node details, shown when a node is selected. -->
-          <div class="nodepanel" id="nodepanel" data-nopan hidden>
-            <button class="np-close" id="np-close" aria-label="Clear selection">&times;</button>
-            <p class="np-label">Location</p><p class="np-value" id="np-loc"></p>
-            <p class="np-label">Version</p><p class="np-value" id="np-ver"></p>
-          </div>
-        </div>
-      </div>
-      <p class="mapcount" id="mapcount">Connecting to the C-Layer&hellip;</p>
-      <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
-    </div>
+    <NetworkMap />
 
-    <h2 class="h2-sub">One network, three specialised chains</h2>
-    <p class="lead">Coming soon: the full family of three purpose-built blockchains, each engineered for what it does best: decentralised identity, stablecoin settlement, and trading, operating as one trusted network.</p>
-    <!-- Below 860px this becomes a horizontal snap-scroll row (see global.css).
-         tabindex + label because the cards hold no focusable elements, so the
-         scroll container itself has to be reachable for a keyboard user to see
-         past the first card. -->
-    <!-- Rendered from src/data/network.mjs, the one place the chains' facts are
-         written down: the same data feeds the JSON-LD in Layout.astro and
-         /llms.txt, so a spec or a launch status is changed once. -->
-    <div class="chains" tabindex="0" role="group" aria-label={`The three cDot chains: ${joinList(chains.map((c) => c.name))}`}>
-      {chains.map((c) => (
-        <div class="chain">
-          <div class="chain-head">
-            <span class="chain-id">{c.name}</span>
-            {c.status === "soon" && <span class="chain-soon">{STATUS.soon}</span>}
-          </div>
-          <h3>{c.title}</h3>
-          <p>{c.summary}</p>
-          <div class="specs">
-            {chipsOf(c).map((chip) => <span>{chip}</span>)}
-          </div>
-        </div>
-      ))}
-    </div>
+    <Chains />
   </div>
 </section>
 
@@ -175,10 +119,17 @@ const ogDescription =
   </div>
 </section>
 
-<!-- Live C-Layer map - implementation and rationale in public/assets/map.js.
-     Served from public/ rather than inlined to keep the page's prose dominant
-     in its markup; `defer` so the elements it queries have parsed. -->
-<script src="/assets/map.js" defer></script>
+<div class="divider"></div>
+
+<!-- Closing calls to action: the two ways to join in. Both pages are in the header's Join menu. -->
+<section class="closing-ctas">
+  <div class="wrap">
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="/nodes/">Run a node</a>
+      <a class="btn btn-ghost" href="/community/">Join the community</a>
+    </div>
+  </div>
+</section>
 
 <!-- Form handler for the C-Layer node signup. It posts to a Google Apps Script
      deployment - the one cdot.app and c.email-website also use, so a signup from

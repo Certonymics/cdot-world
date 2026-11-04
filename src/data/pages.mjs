@@ -23,7 +23,7 @@ export const textPages = [
     heading: "Terms and conditions",
     title: "Terms and conditions — cDot",
     description:
-      "The terms and conditions for using cDot: licence, identity verification, third-party dependencies, vulnerability disclosure, governing law and how to contact us.",
+      "The terms and conditions for using cdot.world: use of the site, its information, intellectual property, vulnerability disclosure and governing law.",
     updated: "4 November 2026.",
   },
 ];
@@ -86,12 +86,12 @@ export const sectionPages = [
     live: false,
   },
   {
-    slug: "press",
+    slug: "roadmap",
     group: "Learn",
-    heading: "Press",
-    title: "Press — cDot",
+    heading: "Roadmap",
+    title: "Roadmap — cDot",
     description:
-      "Press and media resources for cDot: brand assets, key facts and contact details for journalists.",
+      "The cDot network roadmap: what has launched, what is being built now and what comes next across the C-Layer, P-Layer and T-Layer.",
     live: false,
   },
   {
@@ -101,6 +101,15 @@ export const sectionPages = [
     title: "SDK — cDot",
     description:
       "The cDot SDK: build apps on secure identity, communication and payments using the cDot network.",
+    live: false,
+  },
+  {
+    slug: "changelog",
+    group: "Build",
+    heading: "Changelog",
+    title: "Changelog — cDot",
+    description:
+      "What has changed in the cDot network, node software and SDK: release notes and version history for node runners and developers.",
     live: false,
   },
 ];

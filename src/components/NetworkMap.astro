@@ -1,0 +1,46 @@
+---
+/* The live C-Layer map: the card, its controls and the node count, plus the script that
+   drives it. Used on the home page and the Architecture page. The map's implementation and
+   rationale are in public/assets/map.js. Only one can be on a page: the script looks its
+   elements up by id. */
+---
+<div class="maplive">
+  <div class="mapcard">
+    <div class="mapvp" id="mapvp">
+      <!-- Constant-size dotted-land texture. Deliberately OUTSIDE #maplayer so
+           it is never CSS-scaled: it is redrawn for the current view instead,
+           which is what stops the dots growing and blurring as you zoom. -->
+      <canvas class="landcv" id="landcv" aria-hidden="true"></canvas>
+      <!-- Only the nodes are transformed. -->
+      <div class="maplayer" id="maplayer"></div>
+      <div class="mapbadge"><span class="dot"></span>Real-time</div>
+      <!-- Minimap navigator: appears once you zoom in. -->
+      <div class="minimap" id="minimap" data-nopan hidden aria-label="Map navigator - drag to pan">
+        <canvas id="minicv"></canvas>
+        <div class="minirect" id="minirect"></div>
+      </div>
+      <!-- Text is set by the map script, which knows the platform modifier.
+           Kept out of the markup so JS-disabled visitors are not told the
+           map is interactive when it isn't. -->
+      <div class="maphint" id="maphint" hidden></div>
+      <div class="mapzoom" data-nopan>
+        <button id="mz-in" aria-label="Zoom in">+</button>
+        <button id="mz-out" aria-label="Zoom out">&minus;</button>
+        <button id="mz-fit" aria-label="Reset zoom">&#x26F6;</button>
+      </div>
+      <!-- Node details, shown when a node is selected. -->
+      <div class="nodepanel" id="nodepanel" data-nopan hidden>
+        <button class="np-close" id="np-close" aria-label="Clear selection">&times;</button>
+        <p class="np-label">Location</p><p class="np-value" id="np-loc"></p>
+        <p class="np-label">Version</p><p class="np-value" id="np-ver"></p>
+      </div>
+    </div>
+  </div>
+  <p class="mapcount" id="mapcount">Connecting to the C-Layer&hellip;</p>
+  <noscript><p class="mapcount">Live map requires JavaScript. The C-Layer is a network of independent community-run nodes worldwide; live node data: https://map.c-layer.certonym.org/api/data</p></noscript>
+</div>
+
+<!-- Live C-Layer map - implementation and rationale in public/assets/map.js.
+     Served from public/ rather than inlined to keep the page's prose dominant
+     in its markup; `defer` so the elements it queries have parsed. -->
+<script src="/assets/map.js" defer></script>

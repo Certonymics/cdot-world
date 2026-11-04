@@ -1,70 +1,60 @@
 ---
-/* Terms and conditions. The copy is Certonymity's, supplied as written; only the
-   info@ address comes from company.mjs. */
+/* Terms for this website (cdot.world). Adapted from Certonymity's terms for the cDot
+   app, which cover identity verification, wallets and the like and so stay on the app's
+   own site. Only the info@ address comes from company.mjs. */
 import LegalPage from "../layouts/LegalPage.astro";
 import { textPage } from "../data/pages.mjs";
-import { company } from "../data/company.mjs";
+import { company, sites } from "../data/company.mjs";
 const page = textPage("terms");
 ---
 <LegalPage {...page}>
   <h2>1. Introduction</h2>
-  <p>cDot is created and made available by Certonymity Ltd (“Certonymity”, “we”, “our”, “us”). It gives you a secure identity, and lets you use that identity for secure identity proofs, email, chat, payments, asset storage and an AI Assistant. These terms cover your use of cDot. These terms and conditions outline the rules and regulations for the use of cDot.</p>
+  <p>This website, cdot.world, is run by Certonymity Ltd (“Certonymity”, “we”, “our”, “us”). It provides information about the cDot network, the organisation behind it, and how to take part in it. These terms and conditions outline the rules and regulations for the use of this website.</p>
+  <p>The cDot app is a separate product with its own terms, which apply to your use of the app{sites.app.live ? <> (see <a href={`${sites.app.url}terms/`} target="_blank" rel="noopener noreferrer">cdot.app/terms</a>)</> : ""}. Other services on the network, such as running a node or using the developer tools, may have their own terms, which will be published when they launch.</p>
 
   <h2>2. Acceptance of terms</h2>
-  <p>By accessing or using cDot, you agree to be bound by these terms. If any provision of these terms is found to be invalid or unenforceable, that provision will be modified to the minimum extent necessary or severed, and the remaining provisions will continue in full force. Our failure to enforce any provision of these terms does not waive our right to enforce it later. These terms constitute the entire agreement between you and us regarding cDot and supersede any prior statements or representations.</p>
+  <p>By accessing or using this website, you agree to be bound by these terms. If you do not agree with them, please do not use the website. If any provision of these terms is found to be invalid or unenforceable, that provision will be modified to the minimum extent necessary or severed, and the remaining provisions will continue in full force. Our failure to enforce any provision of these terms does not waive our right to enforce it later. These terms constitute the entire agreement between you and us regarding this website and supersede any prior statements or representations.</p>
 
   <h2>3. Use licence</h2>
-  <p>Permission is granted to use cDot for personal and commercial purposes, subject to the following restrictions:</p>
+  <p>Permission is granted to use this website for personal and commercial purposes, subject to the following restrictions:</p>
   <ul>
-    <li>You must not use the service for any unlawful purpose or in any way that violates applicable laws or regulations.</li>
-    <li>You must not attempt to gain unauthorised access to any part of the service or its related systems or networks.</li>
-    <li>You must not use the service to transmit any harmful, offensive, or illegal content.</li>
+    <li>You must not use the website for any unlawful purpose or in any way that violates applicable laws or regulations.</li>
+    <li>You must not attempt to gain unauthorised access to any part of the website or its related systems or networks.</li>
+    <li>You must not use the website, including its contact and signup forms, to transmit any harmful, offensive, or illegal content.</li>
+    <li>You must not interfere with or disrupt the website or the public services it uses, such as the live network map.</li>
   </ul>
 
-  <h2>4. Intellectual property</h2>
-  <p>cDot, including its content, features, design, branding, and functionality, remains the sole property of Certonymity. Where we make our source code publicly available under an open-source licence, that licence governs your rights to use, copy, modify, and distribute that code, and nothing in these terms limits the rights granted to you under it. The applicable licence terms are published with the code.</p>
+  <h2>4. Information on this website</h2>
+  <p>The content of this website is provided for general information only. It is not legal, financial, investment or other professional advice, and nothing on it is an offer, invitation or solicitation to buy, sell or hold any token or other financial instrument.</p>
+  <p>We try to keep the information accurate and up to date, but we do not warrant that it is complete or error-free. Descriptions of features, products, networks and timelines that are not yet available, including the roadmap, are statements of intent and not commitments. They may change. Any reference to rewards for running a node describes how the network is designed to work and is not a promise of any return.</p>
+
+  <h2>5. Intellectual property</h2>
+  <p>This website, including its content, design, branding, and functionality, remains the property of Certonymity. Where we make our source code publicly available under an open-source licence, that licence governs your rights to use, copy, modify, and distribute that code, and nothing in these terms limits the rights granted to you under it. The applicable licence terms are published with the code.</p>
   <p>The open-source licence covers source code only. It does not grant you any right to use the cDot or Certonymity names, logos, or other trade marks, whether in a modified version of the software or otherwise, except as permitted by applicable trade mark law.</p>
 
-  <h2>5. Limitations</h2>
-  <p>cDot is provided on an ‘as is’ and ‘as available’ basis. To the maximum extent permitted by applicable law, Certonymity shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use cDot. If you are a consumer, you have statutory rights that these terms do not affect.</p>
+  <h2>6. Third-party links and services</h2>
+  <p>This website links to other websites and services, such as our documentation, that we do not control. We are not responsible for their content or practices, and a link is not an endorsement. The live network map shows data reported by independent, community-run nodes. It is provided as-is, and we cannot guarantee that it is complete or current.</p>
 
-  <h2>6. Your identity</h2>
-  <p>Some features on cDot require you to verify your identity first. This step is not mandatory, but skipping it limits what you can do within cDot (for example, sending encrypted messages or opening a wallet). When you verify your identity, you must use your own, genuine identity document, and give us accurate information. It is against these terms to impersonate anyone or use cDot to pretend to be someone else.</p>
+  <h2>7. Limitations</h2>
+  <p>This website is provided on an ‘as is’ and ‘as available’ basis. To the maximum extent permitted by applicable law, Certonymity shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use this website, or from relying on the information on it. We are not liable for any failure or delay caused by events beyond our reasonable control, including failures of third-party services. Nothing in these terms excludes or limits liability that cannot be excluded or limited by law, including liability for fraud or for death or personal injury caused by negligence. If you are a consumer, you have statutory rights that these terms do not affect.</p>
 
-  <h2>7. Third-party dependencies</h2>
-  <p>cDot has been designed specifically to work with your existing email address as a privacy and security layer. This means that core functionalities, such as sending and receiving emails, depend on your existing email provider and their terms. We are not liable for any failure or delay in performance caused by events beyond our reasonable control, including failures of third-party services.</p>
-  <p>Subject to the paragraph above, our total liability to you for all claims arising out of or in connection with these terms, whether in contract, tort (including negligence), or otherwise, is limited in aggregate to the total fees you have paid us in the 12 months before the claim arose.</p>
-  <p>cDot is technical infrastructure, not a bank. Your wallet is provided by a licensed partner and is governed by their terms, which you accept before opening one. We don’t hold your money or your keys.</p>
-
-  <h2>8. Your responsibilities</h2>
-  <p>cDot does not view the content of your emails or messages, for which you remain solely responsible, and cannot unlock them for you in the event that you lose access to your device and have no backup.</p>
-
-  <h2>9. Termination and suspension</h2>
-  <p>Users may stop using cDot at any time. cDot reserves the right to suspend users for breaches of our terms, if required to do so by law, or if your use poses a risk to the security or integrity of the service or to other users. Neither termination nor suspension affects your email account, which remains with your existing provider. The terms of this agreement survive termination.</p>
-
-  <h2>10. Vulnerability disclosure policy</h2>
-  <p>Security researchers are invited to report potential vulnerabilities discovered in the cDot apps via an encrypted email in cDot to <!--email_off--><a href="mailto:support@certonymity.com">support@certonymity.com</a><!--/email_off-->. It is against the terms of this policy to access or exfiltrate other users’ data, degrade the cDot service, attempt denial-of-service, attempt social engineering of staff or users, or to fail to provide 90 days’ notice before public disclosure. Users’ email providers are out of the scope of this policy.</p>
+  <h2>8. Vulnerability disclosure policy</h2>
+  <p>Security researchers are invited to report potential vulnerabilities discovered in the cDot apps and network via an encrypted email in cDot to <!--email_off--><a href="mailto:support@certonymity.com">support@certonymity.com</a><!--/email_off-->. It is against the terms of this policy to access or exfiltrate other users’ data, degrade the cDot service, attempt denial-of-service, attempt social engineering of staff or users, or to fail to provide 90 days’ notice before public disclosure. Users’ email providers are out of the scope of this policy.</p>
   <p>We will acknowledge your message within 72 hours and keep you informed on our findings. If you make a good-faith effort to comply with this policy during your research, we will consider your research authorised, we will not pursue or support legal action against you, and we will work with you to understand and resolve the issue quickly. If a third party brings legal action against you for research conducted in accordance with this policy, we will make it known that your actions were authorised. At this stage, there is no monetary reward for disclosures.</p>
 
-  <h2>11. Service availability and changes</h2>
-  <p>cDot reserves the right to modify, suspend, or discontinue features. If a change affects your ability to use cDot, we’ll tell you in the app, with at least 30 days’ notice where we can. We may need to act sooner for security or legal reasons.</p>
+  <h2>9. Changes to the website and these terms</h2>
+  <p>We reserve the right to modify, suspend, or discontinue any part of this website. We may update these terms and conditions at any time, and the date at the end of this page shows when they last changed. Continued use of the website after changes implies acceptance of the new terms and conditions.</p>
 
-  <h2>12. Changes to these terms and conditions</h2>
-  <p>We may update these terms and conditions at any time. Continued use of cDot after changes implies acceptance of the new terms and conditions. We will notify you of any significant changes within cDot.</p>
+  <h2>10. Assignment and business transfers</h2>
+  <p>We may transfer or assign our rights and obligations under these terms to another organisation, for example as part of a merger, acquisition, reorganisation, or sale of assets. Any such transfer will not reduce your rights under these terms. How your personal data is treated in that situation is set out in our <a href="/privacy/">privacy policy</a>. You may not transfer or assign your rights or obligations under these terms to another person without our prior written consent.</p>
 
-  <h2>13. Assignment and business transfers</h2>
-  <p>We may transfer or assign our rights and obligations under these terms to another organisation, for example as part of a merger, acquisition, reorganisation, or sale of assets. We will notify you within cDot if this happens, and any such transfer will not reduce your rights under these terms. How your personal data is treated in that situation is set out in our <a href="/privacy/">privacy policy</a>. You may not transfer or assign your rights or obligations under these terms to another person without our prior written consent. If you do not wish to continue using cDot following such a transfer, you may stop using the service at any time.</p>
-
-  <h2>14. Governing law and jurisdiction</h2>
+  <h2>11. Governing law and jurisdiction</h2>
   <p>These terms are governed by the laws of England and Wales. Disputes will be subject to the exclusive jurisdiction of the courts of England and Wales. If you are a consumer resident elsewhere in the UK or EU, nothing here removes your right to bring proceedings in your local courts.</p>
 
-  <h2>15. Export control and sanctions</h2>
-  <p>cDot incorporates cryptographic functionality that may be subject to export control laws. You must not use, export, or re-export cDot in breach of any applicable export control or sanctions laws. By using cDot, you confirm that you are not subject to relevant trade sanctions.</p>
-
-  <h2>16. Complaints and dispute resolution</h2>
+  <h2>12. Complaints and dispute resolution</h2>
   <p>If you have a complaint, please contact us using the details below and we will try to resolve it within 30 days. This does not affect your right to bring legal proceedings.</p>
 
-  <h2>17. Contact information</h2>
+  <h2>13. Contact information</h2>
   <p>If you have any questions about these terms and conditions, please contact us at <!--email_off--><a href={`mailto:${company.email}`}>{company.email}</a><!--/email_off-->, or at:</p>
   <address>
     Certonymity Ltd<br />

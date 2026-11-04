@@ -211,6 +211,9 @@
     margin-top:22px;max-width:720px;font-size:clamp(15.5px,3.4vw,17.5px);color:var(--ink-dim);
     text-wrap:balance;
   }
+  /* The closing CTAs at the foot of the home page: centred, with no heading above. */
+  .closing-ctas{padding:72px 0}
+  .closing-ctas .hero-ctas{margin-top:0;justify-content:center}
   .hero-ctas{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
   @media(max-width:480px){
     .hero-ctas{flex-direction:column;align-items:stretch}
@@ -727,6 +730,9 @@
   .foot-link{color:var(--ink-dim);text-decoration:none;transition:color .2s;
     display:inline-block;padding:5px 0;margin:-5px 0}
   .foot-link:hover{color:var(--cyan)}
+  /* The link row matches the header's menu names (14.5px). Scoped to the row: the
+     copyright link in the small print is also a .foot-link and keeps the small print's size. */
+  .foot-stack .foot-link{font-size:14.5px}
   /* Narrow: stack, and let the row gap do the spacing. */
   @media(max-width:560px){
     .foot{flex-direction:column;text-align:center}

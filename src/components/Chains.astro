@@ -1,0 +1,31 @@
+---
+/* "One network, three specialised chains": the heading, the standfirst and the three chain
+   cards. Rendered from src/data/network.mjs, the one place the chains' facts are written
+   down: the same data feeds the JSON-LD in Layout.astro and /llms.txt, so a spec or a
+   launch status is changed once. Used on the home page and the Architecture page. */
+import { chains, chipsOf, joinList, STATUS } from "../data/network.mjs";
+---
+<h2 class="h2-sub">One network, three specialised chains</h2>
+<p class="lead">Coming soon: the full family of three purpose-built blockchains, each engineered for what it does best: decentralised identity, stablecoin settlement, and trading, operating as one trusted network.</p>
+<!-- Below 860px this becomes a horizontal snap-scroll row (see global.css).
+     tabindex + label because the cards hold no focusable elements, so the
+     scroll container itself has to be reachable for a keyboard user to see
+     past the first card. -->
+<!-- Rendered from src/data/network.mjs, the one place the chains' facts are
+     written down: the same data feeds the JSON-LD in Layout.astro and
+     /llms.txt, so a spec or a launch status is changed once. -->
+<div class="chains" tabindex="0" role="group" aria-label={`The three cDot chains: ${joinList(chains.map((c) => c.name))}`}>
+  {chains.map((c) => (
+    <div class="chain">
+      <div class="chain-head">
+        <span class="chain-id">{c.name}</span>
+        {c.status === "soon" && <span class="chain-soon">{STATUS.soon}</span>}
+      </div>
+      <h3>{c.title}</h3>
+      <p>{c.summary}</p>
+      <div class="specs">
+        {chipsOf(c).map((chip) => <span>{chip}</span>)}
+      </div>
+    </div>
+  ))}
+</div>
