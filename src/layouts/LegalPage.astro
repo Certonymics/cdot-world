@@ -1,0 +1,27 @@
+---
+/* Shared frame for the text pages (privacy, and any terms to come): a bare page,
+   as on cdot.app - the heading at the top of the column, small section
+   headings, muted text, underlined links and the date at the end. For pages that
+   are reference text, not marketing. The copy comes in as a slot, as plain HTML. */
+import Layout from "./Layout.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  updated?: string;
+}
+const { title, description, heading, updated } = Astro.props;
+---
+<Layout title={title} description={description}>
+  <div class="legal-plain">
+    <div class="wrap">
+      <article class="legal-plain-col">
+        <h1>{heading}</h1>
+        <slot />
+        {updated && <p class="legal-plain-date">Last updated: {updated}</p>}
+      </article>
+    </div>
+  </div>
+</Layout>
+
