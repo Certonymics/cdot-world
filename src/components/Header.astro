@@ -1,5 +1,8 @@
 ---
 import { tagline } from "../data/company.mjs";
+import { navGroups } from "../data/nav.mjs";
+
+const here = Astro.url.pathname;
 ---
 <header>
   <div class="wrap nav">
@@ -7,13 +10,24 @@ import { tagline } from "../data/company.mjs";
       <svg class="logomark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
       <span class="tag">{tagline}</span>
     </a>
-    <!-- Absolute (/#section), not #section: on the 404 page a bare #section points at
-         an anchor that is not there. On the home page it is the same-page jump it always was. -->
-    <nav id="main-nav">
-      <a class="link" href="/#mission">Mission</a>
-      <a class="link" href="/#c-layer">Network</a>
-      <a class="link" href="/#faq">FAQ</a>
-      <a class="link" href="/#contact">Contact</a>
+    <!-- Three menus, from src/data/nav.mjs. (Contact is in the footer.) -->
+    <nav id="main-nav" aria-label="Main">
+      {navGroups.map((group, i) => (
+        <div class="nav-group">
+          <button class="nav-trigger" type="button" aria-expanded="false" aria-controls={`menu-${i}`}>{group.label}</button>
+          <ul class="nav-menu" id={`menu-${i}`}>
+            {group.items.map((item) => (
+              <li>
+                {item.href ? (
+                  <a href={item.href} {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} {...(item.href === here ? { "aria-current": "page" } : {})}>{item.label}</a>
+                ) : (
+                  <span class="nav-soon">{item.label}<small>Coming soon</small></span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
     <div class="nav-controls">
       <button class="burger" id="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
@@ -28,6 +42,30 @@ import { tagline } from "../data/company.mjs";
   /* --- mobile nav ------------------------------------------------------- */
   var btn = document.getElementById('burger-btn');
   var nav = document.getElementById('main-nav');
+  /* --- menus: click or keyboard opens one at a time; Escape or a click elsewhere
+     closes. (On a hover-capable screen the CSS also opens one on hover.) ---- */
+  var groups = nav ? nav.querySelectorAll('.nav-group') : [];
+  function setOpen(g, open){
+    g.classList.toggle('is-open', open);
+    g.querySelector('.nav-trigger').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function closeAll(except){ groups.forEach(function(g){ if (g !== except) setOpen(g, false); }); }
+  groups.forEach(function(g){
+    g.querySelector('.nav-trigger').addEventListener('click', function(){
+      var open = !g.classList.contains('is-open');
+      closeAll(g);
+      setOpen(g, open);
+    });
+  });
+  document.addEventListener('click', function(e){
+    if (!e.target.closest || !e.target.closest('.nav-group')) closeAll();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    var open = nav && nav.querySelector('.nav-group.is-open');
+    if (open) { closeAll(); open.querySelector('.nav-trigger').focus(); }
+  });
+
   if (btn && nav) {
     btn.addEventListener('click', function(){
       var open = nav.classList.toggle('is-open');
@@ -37,6 +75,7 @@ import { tagline } from "../data/company.mjs";
     /* Close on nav link tap so the menu doesn't hang open on mobile. */
     nav.querySelectorAll('a').forEach(function(a){
       a.addEventListener('click', function(){
+        closeAll();
         nav.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
         btn.classList.remove('is-open');

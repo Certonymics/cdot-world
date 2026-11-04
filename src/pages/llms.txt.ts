@@ -18,7 +18,7 @@ import { company, sites, addressLine } from "../data/company.mjs";
 import { faq, textBlocks } from "../data/faq.mjs";
 import { getArticles, formatDate } from "../lib/sanity.js";
 import { blogLive } from "../data/blog.mjs";
-import { textPages } from "../data/pages.mjs";
+import { textPages, sectionPages } from "../data/pages.mjs";
 
 /* Hard-wraps to the width the rest of the file uses, indenting continuation
    lines to sit under the text of a numbered entry. */
@@ -65,7 +65,7 @@ const blogPages = articles.length
 
 /* The text pages (privacy, terms), from src/data/pages.mjs: the same description the
    page carries in its meta tags. */
-const textPagesList = textPages
+const textPagesList = [...sectionPages.filter((pg) => pg.live), ...textPages]
   .map((pg) => wrap(`- [${pg.heading}](https://cdot.world/${pg.slug}/): ${pg.description}`, 100, "  "))
   .join("\n");
 
@@ -147,7 +147,7 @@ ${faqText}
 ## Pages
 
 - [cDot](https://cdot.world/): ${blogLive ? "the landing page" : "the single landing page"} - mission, the problem, the three
-  chains and their specifications, use cases, and contact.${blogPages ? "\n" + blogPages : ""}
+  chains and their specifications, and use cases.${blogPages ? "\n" + blogPages : ""}
 ${textPagesList}
 
 ${relationships}

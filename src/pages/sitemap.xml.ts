@@ -9,14 +9,19 @@
 import { lastModified } from "../lib/lastmod.mjs";
 import { getArticles } from "../lib/sanity.js";
 import { blogLive } from "../data/blog.mjs";
+import { sectionPages } from "../data/pages.mjs";
 
 /* Pages that must not be listed (they are noindex). Everything else in
    src/pages/*.astro is a destination. */
 const EXCLUDED = new Set(["404", "invite", "group"]);
 
+/* Section pages that have no content yet (`live: false` in src/data/pages.mjs) are noindex, so
+   they are not listed until they are switched on. */
+const draft = new Set(sectionPages.filter((p) => !p.live).map((p) => p.slug));
+
 const pages = Object.keys(import.meta.glob("./*.astro"))
   .map((p) => p.replace(/^\.\//, "").replace(/\.astro$/, ""))
-  .filter((name) => !EXCLUDED.has(name))
+  .filter((name) => !EXCLUDED.has(name) && !draft.has(name))
   .sort();
 
 export async function GET({ site }: { site: URL }) {

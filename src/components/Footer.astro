@@ -6,16 +6,14 @@ import { blogLive, blogPath } from "../data/blog.mjs";
 const year = new Date().getFullYear();
 
 /* Footer entries. One with an `href` is a link (`external` opens it in a new tab); one without is a "Coming soon"
-   label, because there is nothing to link to yet. When an entry goes live, give it
-   an href. (Blog gets its href by itself when the Blog is switched on in
-   src/data/blog.mjs.) */
+   label, because there is nothing to link to yet. The Blog gets its href by itself
+   when it is switched on in src/data/blog.mjs. */
 const links = [
-  { id: "whitepaper", label: "Whitepaper" },
-  { id: "docs", label: "Docs", href: sites.docs.url, external: true },
+  { id: "team", label: "Team", href: "/team/" },
   { id: "blog", label: "Blog", href: blogLive ? blogPath : undefined },
-  { id: "community", label: "Community" },
   { id: "privacy", label: "Privacy", href: "/privacy/" },
   { id: "terms", label: "Terms", href: "/terms/" },
+  { id: "contact", label: "Contact", href: "/contact/" },
 ];
 ---
 <footer>

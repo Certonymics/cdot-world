@@ -28,6 +28,111 @@ export const textPages = [
   },
 ];
 
+/* ---------------------------------------------------------------------------
+   The section pages of the extended site (the ones in the header's Join / Learn /
+   Build menus, and Contact in the footer). Each is src/pages/<slug>.astro reading
+   its entry here.
+
+   `live: false` is a page that exists but has no content yet: it is served with
+   noindex, left out of sitemap.xml and llms.txt, and flagged "Coming soon" nowhere
+   else. Set `live: true` when the page has its content and it joins the sitemap
+   and llms.txt by itself. `group` is the header menu it sits under.
+--------------------------------------------------------------------------- */
+
+export const sectionPages = [
+  {
+    slug: "nodes",
+    group: "Join",
+    heading: "Run a node",
+    title: "Run a node — cDot",
+    description:
+      "Run a C-Layer node and help secure the cDot network: what a node does, how to join and what to expect.",
+    live: false,
+  },
+  {
+    slug: "community",
+    group: "Join",
+    heading: "Community",
+    title: "Community — cDot",
+    description:
+      "Join the cDot community: node runners, developers and supporters building the network together.",
+    live: false,
+  },
+  {
+    slug: "vision",
+    group: "Learn",
+    heading: "Vision",
+    title: "Vision — cDot",
+    description:
+      "The vision behind cDot: why the internet needs a missing layer for identity, privacy and payments, and the principles we build on.",
+    live: false,
+  },
+  {
+    slug: "architecture",
+    group: "Learn",
+    heading: "Architecture",
+    title: "Architecture — cDot",
+    description:
+      "How the cDot network is built: the C-Layer, P-Layer and T-Layer, and how the three chains work together.",
+    live: false,
+  },
+  {
+    slug: "governance",
+    group: "Learn",
+    heading: "Governance",
+    title: "Governance — cDot",
+    description:
+      "How the cDot network is governed: how decisions are made and how the community takes part.",
+    live: false,
+  },
+  {
+    slug: "press",
+    group: "Learn",
+    heading: "Press",
+    title: "Press — cDot",
+    description:
+      "Press and media resources for cDot: brand assets, key facts and contact details for journalists.",
+    live: false,
+  },
+  {
+    slug: "sdk",
+    group: "Build",
+    heading: "SDK",
+    title: "SDK — cDot",
+    description:
+      "The cDot SDK: build apps on secure identity, communication and payments using the cDot network.",
+    live: false,
+  },
+];
+
+/* Team: linked from the footer, not a header menu, so it has no group. */
+sectionPages.push({
+  slug: "team",
+  group: "",
+  heading: "Team",
+  title: "Team — cDot",
+  description:
+    "Meet the team behind cDot: the people at Certonymity building the network, the app and the tools around them.",
+  live: false,
+});
+
+/* Contact: a live page, linked from the footer. */
+sectionPages.push({
+  slug: "contact",
+  group: "",
+  heading: "Contact us",
+  title: "Contact — cDot",
+  description:
+    "Contact the cDot team: send us a message about the network, support, press or partnerships, or write to Certonymity Ltd.",
+  live: true,
+});
+
+export const sectionPage = (slug) => {
+  const page = sectionPages.find((p) => p.slug === slug);
+  if (!page) throw new Error(`src/data/pages.mjs has no section page "${slug}".`);
+  return page;
+};
+
 export const textPage = (slug) => {
   const page = textPages.find((p) => p.slug === slug);
   if (!page) throw new Error(`src/data/pages.mjs has no entry for "${slug}".`);

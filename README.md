@@ -89,7 +89,7 @@ src/
     privacy.astro             the Privacy Notice: c.Email's privacy policy, naming cDot; the app's KYC consent links here
   components/
     Header.astro              logo lockup + tagline + nav + mobile menu script
-    Footer.astro              logo, contact email, c.Email link, copyright
+    Footer.astro              logo, Team / Blog / Privacy / Terms / Contact links, legal small print
     LogoSymbol.astro          inline <symbol id="cdot-logo"> sprite
   styles/
     tokens.css                BRAND TOKENS — see below
@@ -119,6 +119,21 @@ brand/og.source.json          which tagline og.png was made from (checked by che
 
 To add a page, drop a `.astro` file in `src/pages/` and wrap it in `Layout`.
 Header and footer come along automatically.
+
+## The header menus and section pages
+
+The header's Join / Learn / Build menus are written once, in `src/data/nav.mjs`, and
+`Header.astro` renders them. Each menu item that is a page reads its label and URL from
+`src/data/pages.mjs` (`sectionPages`); the Whitepaper, "Get the app" and "Code" are "Coming soon" labels until they have somewhere to go.
+The Blog is in the footer, not the menus (see "The Blog").
+
+A section page is `src/pages/<slug>.astro` using `src/layouts/SectionPage.astro`. Until it
+has content it is `live: false` in `pages.mjs`: served with `noindex`, left out of
+`sitemap.xml` and `llms.txt`. Set `live: true` when it is ready and it joins both by itself
+(`npm run check:seo` fails if the sitemap and `llms.txt` disagree).
+
+To add a page: add its entry to `sectionPages`, create the page file, and add it to a group
+in `nav.mjs`.
 
 ## The chat invite link
 
@@ -297,7 +312,8 @@ than appended to the URL.
 
 ### Contact form
 
-The form POSTs to a Google Apps Script web app whose source is versioned at
+The form is on its own page, `/contact/` (`src/pages/contact.astro`, with its script and
+the address box); the node signup stays on the home page. The form POSTs to a Google Apps Script web app whose source is versioned at
 `scripts/contact-form.gs`; that file's header comment carries the full setup and
 redeploy procedure. It is a **separate deployment from c.Email's** identical-looking
 form, with its own script and spreadsheet, so editing one cannot break the other.
@@ -541,7 +557,7 @@ Four sites, one company:
 | **cdot.world** (this) | The cDot **network**: concept, mission, foundation, SDKs, the C-Layer | `WebSite` + `SoftwareApplication` `#cdot` and one node per chain |
 | cdot.app | The cDot **app**, the product built on the network. *Not live yet.* | `relatedLink` from our `WebPage`; its own graph says `isBasedOn` our `#cdot` |
 | c.email | The company's first product, built on the cDot framework | named in `llms.txt` |
-| docs.cdot.world | Documentation for node-runners and developers on the network | named in `llms.txt` (with its own `llms.txt` linked); the footer's Docs link |
+| docs.cdot.world | Documentation for node-runners and developers on the network | named in `llms.txt` (with its own `llms.txt` linked); the header's Build menu (Docs) |
 
 They are different things, so none is `sameAs` another (`sameAs` means "is the
 same entity" and a wrong one can merge entities that are not one). What ties them

@@ -1,0 +1,25 @@
+---
+/* Frame for a section page (the header's Join / Learn / Build menus, or a footer
+   link): the group name as an eyebrow where it has one, then the page's heading. Nothing else yet - each page's
+   content is added to its own file. A page that is not `live` in
+   src/data/pages.mjs is noindex. */
+import Layout from "./Layout.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  group: string;
+  live: boolean;
+}
+const { title, description, heading, group, live } = Astro.props;
+---
+<Layout title={title} description={description} noindex={!live}>
+  <div class="page-plain">
+    <div class="wrap">
+      {group && <p class="eyebrow">{group}</p>}
+      <h1>{heading}</h1>
+      <slot />
+    </div>
+  </div>
+</Layout>
