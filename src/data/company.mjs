@@ -34,7 +34,7 @@ export const company = {
   email: "info@certonymity.com",
   linkedin: "https://www.linkedin.com/company/certonymity/",
   address: {
-    street: "86-87 Campden Street",
+    street: "86–87 Campden Street",
     locality: "London",
     postcode: "W8 7EN",
     country: "GB",
@@ -92,5 +92,5 @@ export const sites = {
 /* Sibling sites that are products or the company - everything but this site. */
 export const relatedSites = [sites.app, sites.company, sites.cemail, sites.docs];
 
-/* "86-87 Campden Street, London W8 7EN, United Kingdom" */
+/* "86–87 Campden Street, London W8 7EN, United Kingdom" */
 export const addressLine = `${company.address.street}, ${company.address.locality} ${company.address.postcode}, ${company.address.countryName}`;

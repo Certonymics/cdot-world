@@ -26,6 +26,7 @@
                        shielded from Cloudflare's obfuscation (crawlers would
                        otherwise read "[email protected]").
      6. Relationships - llms.txt names every sibling site and its llms.txt.
+                       Every sitemap page is also listed in llms.txt.
      8. FAQ          - the accordion, the FAQPage JSON-LD and llms.txt carry the
                        same questions, in the same order, with real answers.
      9. Blog         - absent while switched off (no pages, no links, no sitemap or
@@ -295,6 +296,10 @@ if (home) {
     check("6. llms.txt", flat.includes(s.url), `llms.txt does not link ${s.name} (${s.url}).`);
     check("6. llms.txt", flat.includes(s.llms), `llms.txt does not link ${s.name}'s own llms.txt (${s.llms}).`);
   }
+  /* Every page the sitemap lists is in llms.txt's "Pages" list, so a new page cannot
+     be published without the language models being told about it. */
+  for (const m of read("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g))
+    check("6. llms.txt", flat.includes(m[1]), `${m[1]} is in the sitemap but not in llms.txt. Add it to src/data/pages.mjs (text pages) or src/pages/llms.txt.ts.`);
   check("6. llms.txt", /How the cDot sites and Certonymity relate/.test(l), "llms.txt lost its section explaining how the sites relate.");
   check("6. llms.txt", !/ Not yet released\./.test(flat) === sites.app.live,
     `sites.app.live is ${sites.app.live} but llms.txt ${sites.app.live ? "still says the app is not yet released" : "does not say the app is not yet released"}.`);
