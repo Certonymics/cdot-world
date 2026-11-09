@@ -43,6 +43,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { resolve, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { blogLive, sanity } from "../src/data/blog.mjs";
+import { companyProfileUrls, productProfileUrls } from "../src/data/socials.mjs";
 import { company, sites, ORG_ID, tagline, registrationLine, addressLine, relatedSites } from "../src/data/company.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -243,6 +244,13 @@ if (home) {
     check("4. JSON-LD", org.email === company.email, `Organization email is "${org.email}", expected ${company.email}.`);
     check("4. JSON-LD", org.address?.postalCode === company.address.postcode && org.address?.streetAddress === company.address.street,
       "Organization address does not match src/data/company.mjs.");
+    const wanted = [company.linkedin, ...companyProfileUrls];
+    check("4. JSON-LD", JSON.stringify(org.sameAs || []) === JSON.stringify(wanted),
+      `Organization.sameAs must be the LinkedIn page then the company's profiles (src/data/socials.mjs): ${wanted.join(", ")}.`);
+    const app = graph.find((n) => n["@type"] === "SoftwareApplication" && n["@id"] === "https://cdot.world/#cdot");
+    if (home && app)
+      check("4. JSON-LD", JSON.stringify(app.sameAs || []) === JSON.stringify(productProfileUrls),
+        `The cDot SoftwareApplication's sameAs must be the product's profiles (src/data/socials.mjs): ${productProfileUrls.join(", ")}.`);
     const siblings = [sites.self, sites.company, sites.app, sites.cemail].map((s) => s.url);
     for (const s of org.sameAs || [])
       check("4. JSON-LD", !siblings.some((u) => s.startsWith(u.replace(/\/$/, ""))),
@@ -304,6 +312,8 @@ if (home) {
      be published without the language models being told about it. */
   for (const m of read("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g))
     check("6. llms.txt", flat.includes(m[1]), `${m[1]} is in the sitemap but not in llms.txt. Add it to src/data/pages.mjs (text pages) or src/pages/llms.txt.ts.`);
+  for (const u of [company.linkedin, ...companyProfileUrls, ...productProfileUrls])
+    check("6. llms.txt", flat.includes(u), `llms.txt does not link the profile ${u} (the footer's socials, src/data/socials.mjs).`);
   check("6. llms.txt", /How the cDot sites and Certonymity relate/.test(l), "llms.txt lost its section explaining how the sites relate.");
   check("6. llms.txt", !/ Not yet released\./.test(flat) === sites.app.live,
     `sites.app.live is ${sites.app.live} but llms.txt ${sites.app.live ? "still says the app is not yet released" : "does not say the app is not yet released"}.`);

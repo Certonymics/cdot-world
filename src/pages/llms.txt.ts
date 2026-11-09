@@ -15,6 +15,7 @@
 
 import { chains, llmsEntry, llmsIntro } from "../data/network.mjs";
 import { company, sites, addressLine } from "../data/company.mjs";
+import { SOCIALS } from "../data/socials.mjs";
 import { faq, textBlocks } from "../data/faq.mjs";
 import { getArticles, formatDate } from "../lib/sanity.js";
 import { blogLive } from "../data/blog.mjs";
@@ -97,6 +98,7 @@ const relationships = [
   bullet(`[c.Email](${sites.cemail.url}): ${sites.cemail.role}. Its own llms.txt: ${sites.cemail.llms}`),
   bullet(`[cDot Docs](${sites.docs.url}): ${sites.docs.role}. Its own llms.txt: ${sites.docs.llms}`),
   bullet(`[Certonymity on LinkedIn](${company.linkedin}): company profile.`),
+  ...SOCIALS.filter((s) => s.href).map((s) => bullet(`[${s.owner === "company" ? "Certonymity" : "cDot"} on ${s.label}](${s.href}): official ${s.label} profile.`)),
   "",
   "## Company",
   "",

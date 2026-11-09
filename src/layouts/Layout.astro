@@ -9,6 +9,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { chains, soonChains, joinList, ldDescription, ldProperties } from "../data/network.mjs";
 import { company, sites, ORG_ID, tagline } from "../data/company.mjs";
+import { companyProfileUrls, productProfileUrls } from "../data/socials.mjs";
 import { faq, ldHtml } from "../data/faq.mjs";
 import { lastModified as getLastModified } from "../lib/lastmod.mjs";
 
@@ -107,8 +108,10 @@ const graph = [
        Deliberately NOT here: certonymity.com (that is `url` above), cdot.app (a
        different thing: the product, where this site is the network), and c.email
        (the company's first product). A wrong sameAs is worse than none, because
-       it can merge your entity with someone else's. */
-    sameAs: [company.linkedin],
+       it can merge your entity with someone else's. The company's profiles
+       (LinkedIn, GitHub) are here and the product's are on the cDot node below; both
+       come from src/data/socials.mjs, the footer's list, by each entry's `owner`. */
+    sameAs: [company.linkedin, ...companyProfileUrls],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "general enquiries",
@@ -135,6 +138,7 @@ const graph = [
     operatingSystem: "Any",
     provider: { "@id": ORG_ID },
     url: "https://cdot.world/",
+    sameAs: productProfileUrls,
     description:
       "cDot is the network for verified identity, encrypted communication, instant payments, and programmable money. " +
       "Built on the C-Layer, a blockchain for secure, decentralised identity run by independent nodes worldwide, " +

@@ -487,10 +487,13 @@ display headings, and Geist Mono for figures and technical values.
   tagline, strapline on the brand gradient. A designed replacement is welcome;
   keep it 1200x630 and the tags will pick it up (and set `tagline` in
   `brand/og.source.json` so `check:seo` knows what it says).
-- **`sameAs` is minimal.** The Organization lists only its LinkedIn page. Add X /
-  GitHub / community channels when they exist and are confirmed - a wrong `sameAs`
-  can merge your entity with someone else's, which is worse than none. No sibling
-  site belongs in it (see below); `check:seo` fails if one is added.
+- **`sameAs` is split by owner.** Each entry in `src/data/socials.mjs` (the footer icons)
+  has an `owner`. The Organization (Certonymity Ltd) gets its LinkedIn page plus the
+  `"company"` profiles (GitHub); the cDot `SoftwareApplication` node (home page) gets
+  the `"product"` ones (Instagram, X, YouTube, Discord, Telegram, Substack). /llms.txt
+  lists all of them, and `check:seo` fails if any of the three disagrees. A profile with
+  no `href` is "Coming soon" and is left out. No sibling site belongs in `sameAs` (see
+  below); `check:seo` fails if one is added to the Organization's.
 - **Map, mobile:** the node markers are 10x10px touch targets (WCAG 2.2 wants 24),
   all individually focusable; the 2048x1024 texture is decoded to ~8 MB on the
   device to produce a land/ocean mask that could ship pre-baked at a fraction of
