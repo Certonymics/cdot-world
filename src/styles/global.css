@@ -33,18 +33,13 @@
      height instead, where the tagline block (43px) sits inside the mark's 50px
      and the pair reads as one lockup. The hairline rule is the join. */
   .brand{display:flex;flex-direction:row;align-items:center;gap:14px;text-decoration:none;min-width:0}
-  .brand svg.logomark{height:50px;width:121px;display:block;flex-shrink:0}
-  @media(max-width:640px){.brand svg.logomark{height:36px;width:87px}}
-  /* max-width is what forces the wrap; text-wrap:balance then evens the three
-     lines to 93/90/82px instead of letting the last one straggle. Widening the
-     max-width does NOT drop it to two lines - balance holds the even form - so
-     this value only needs to be narrow enough to trigger wrapping at all. */
-  .brand .tag{
-    font-size:11px;font-weight:500;color:var(--brand-text);
-    letter-spacing:.06em;line-height:1.3;
-    max-width:132px;text-wrap:balance;
-    border-left:1px solid var(--line);padding-left:14px;
-  }
+  /* The lockup is one image: the mark, divider and tagline. */
+  .brand img.lockup{height:50px;width:auto;display:block;flex-shrink:0}
+  /* 45px, not the old mark's 36px: the tagline is part of the image, so its size
+     follows the height. 45px puts it at about 10px. */
+  @media(max-width:640px){.brand img.lockup{height:45px}}
+  /* On the narrowest phones the full size runs into the burger. */
+  @media(max-width:340px){.brand img.lockup{height:38px}}
   .nav a.link{color:var(--ink-dim);text-decoration:none;font-size:14.5px;margin-left:26px;transition:color .2s}
   .nav a.link:hover{color:var(--ink)}
   /* .nav is space-between, so adding a third child stopped distributing
@@ -119,7 +114,6 @@
        less room, so the tagline drops a step in size and the rule's breathing
        space halves. flex-direction is already row - only the metrics change. */
     .brand{gap:9px}
-    .brand .tag{font-size:11px;letter-spacing:.03em;max-width:116px;padding-left:9px}
     /* Burger visible, nav links hidden by default */
     .burger{display:flex}
     .nav nav{
@@ -251,6 +245,7 @@
      so every focusable thing answers the same way. */
   .btn:focus-visible,
   .nav a.link:focus-visible,
+  .foot-home:focus-visible,
   .foot-link:focus-visible,
   .burger:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
   /* Pressing cancels the hover lift, so the button reads as going down under the
@@ -684,24 +679,30 @@
   .addr a{color:var(--cyan);text-decoration:none;display:inline-block;padding:5px 0;margin:-5px 0}
   .addr a:hover{text-decoration:underline}
 
-  /* Footer */
-  footer{border-top:1px solid var(--line);padding:38px 0;background:var(--bg-0)}
-  .foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
-  .foot p{color:var(--ink-faint);font-size:13.5px}
-  /* Four siblings under space-between: the gaps between them come out equal
-     whatever each item's own width is, which is why none of these carry flex:1.
-     Giving them equal WIDTHS instead would centre each in its own column and
-     leave the gaps visibly uneven, since the mark and the address are nothing
-     like the same size. */
-  .foot-mark{height:32px;width:78px;display:block}
-  /* The small print: the quietest band at the very bottom, as on cdot.app. It
-     holds the company registration line, then the regulatory note. */
-  .foot-legal{
-    margin-top:22px;border-top:1px solid var(--line);padding-top:18px;
-    font-size:12px;line-height:1.65;color:var(--ink-dim);max-width:820px;
+  /* Footer, laid out as on cdot.app: the mark, the social icons and the links in
+     one row, the copyright underneath, then the regulatory note in its own band. */
+  footer{border-top:1px solid var(--line);padding:48px 0 40px;background:var(--bg-0)}
+  .foot{display:flex;align-items:center;flex-wrap:wrap;gap:28px 48px}
+  .foot-home{display:block;line-height:0;border-radius:50%}
+  .foot-mark{height:44px;width:44px;display:block}
+  /* Wide enough for one row: spread the mark, the icons and the links so the gaps
+     between the three are equal. Narrower, the row wraps and the icons stay beside
+     the mark, with the links on their own line. */
+  @media(min-width:1024px){.foot{justify-content:space-between}}
+  /* Level with the mark. The icon is small but the target stays 24px square
+     (WCAG 2.2). */
+  .foot-social{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+  .foot-link.foot-soc{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:0;margin:0}
+  .foot-soc svg{width:15px;height:15px;fill:currentColor}
+  .foot-copy{margin:32px 0 0;font-size:13.5px;color:var(--ink-faint)}
+  .foot-copy .foot-link{color:inherit}
+  .foot-copy .foot-link:hover{color:var(--cyan)}
+  /* The regulatory note: the quietest band at the very bottom, divided from the
+     copyright by a rule. */
+  .foot-note{
+    margin:22px 0 0;border-top:1px solid var(--line);padding-top:18px;
+    font-size:12px;line-height:1.65;color:var(--ink-faint);max-width:820px;
   }
-  .foot-legal p{margin:0}
-  .foot-legal p + p{margin-top:4px}
   .foot-stack{display:flex;flex-wrap:wrap;gap:4px 24px}
   /* Whitepaper: a placeholder, not a link. The tip shows on hover and on keyboard
      or touch focus. It sits above the word and does not move the layout. */
@@ -722,7 +723,7 @@
   /* Narrow: the links wrap into rows and an item can sit at the screen edge, so a
      label centred on the item would clip. Centre it on the whole row instead. */
   @media(max-width:560px){
-    .foot-stack{position:relative;justify-content:center}
+    .foot-stack{position:relative}
     .foot-soon{position:static}
     .soon-tip{left:50%;bottom:calc(100% + 8px)}
   }
@@ -735,10 +736,11 @@
   /* The link row matches the header's menu names (14.5px). Scoped to the row: the
      copyright link in the small print is also a .foot-link and keeps the small print's size. */
   .foot-stack .foot-link{font-size:14.5px}
-  /* Narrow: stack, and let the row gap do the spacing. */
-  @media(max-width:560px){
-    .foot{flex-direction:column;text-align:center}
-    .foot-legal{margin-left:auto;margin-right:auto;text-align:center}
+  /* Narrow: a tighter footer and link row. */
+  @media(max-width:640px){
+    footer{padding:40px 0 32px}
+    .foot-stack{gap:4px 20px}
+    .foot-copy{margin-top:28px}
   }
 
   /* Legal pages (src/layouts/LegalPage.astro): a bare column, as on cdot.app - the

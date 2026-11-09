@@ -4,7 +4,7 @@
    An item with an `href` is a link (`external` opens a new tab); one without is
    shown as "Coming soon". Pages are named by slug and read their label and URL
    from src/data/pages.mjs. The Whitepaper has no page yet, so it is a "Coming soon"
-   label; give it an href when it exists. "Get the app" and "Code" are labels too, until the app is live
+   label; give it an href when it exists. "Code" is a label too, until it is live
    and the code is public. (The Blog is in the footer, not here.)
 --------------------------------------------------------------------------- */
 
@@ -20,13 +20,10 @@ export const navGroups = [
   {
     label: "Join",
     items: [
-      /* A "Coming soon" label until the app is live; it becomes a link by itself when
-         `sites.app.live` is flipped in src/data/company.mjs. */
-      { label: "Get the app", href: sites.app.live ? sites.app.url : undefined, external: true },
       page("nodes"),
       /* No page or address yet, so it shows as "Coming soon". */
       { label: "Explorer", href: undefined },
-      { label: "Community", href: undefined },
+      { label: "Community", href: "https://discord.gg/yBP95phmb", external: true },
     ],
   },
   {

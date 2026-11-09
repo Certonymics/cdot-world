@@ -1,6 +1,7 @@
 ---
-import { company, sites, registrationLine } from "../data/company.mjs";
+import { company, sites } from "../data/company.mjs";
 import { blogLive, blogPath } from "../data/blog.mjs";
+import { SOCIALS } from "../data/socials.mjs";
 
 /* The year is the build's, so it moves on the first deploy of a new year. */
 const year = new Date().getFullYear();
@@ -20,8 +21,24 @@ const links = [
 <footer>
   <div class="wrap">
     <div class="foot">
-      <svg class="foot-mark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
-      <div class="foot-stack">
+      <a class="foot-home" href="/">
+        <img class="foot-mark" src="/assets/cdot-mark.svg" width="44" height="44" alt="cDot home" />
+      </a>
+      <!-- Social profiles, straight after the mark. One without an href shows as a
+           "Coming soon" label, like the links. -->
+      <nav class="foot-social" aria-label="Social media">
+        {SOCIALS.map((s) => s.href ? (
+          <a class="foot-link foot-soc" href={s.href} target="_blank" rel="me noopener noreferrer" aria-label={s.label}>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={s.d} /></svg>
+          </a>
+        ) : (
+          <span class="foot-link foot-soc foot-soon" tabindex="0" role="img" aria-label={s.label} aria-describedby={`soc-${s.label.toLowerCase()}-soon`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={s.d} /></svg>
+            <span class="soon-tip" id={`soc-${s.label.toLowerCase()}-soon`} role="tooltip">Coming soon</span>
+          </span>
+        ))}
+      </nav>
+      <nav class="foot-stack" aria-label="Footer">
         <!-- A label with no href is not a link: focusable so the "Coming soon" tip also
              shows for keyboard and touch users, not only on mouse hover. -->
         {links.map((item) => item.href ? (
@@ -32,12 +49,9 @@ const links = [
             <span class="soon-tip" id={`${item.id}-soon`} role="tooltip">Coming soon</span>
           </span>
         ))}
-      </div>
+      </nav>
     </div>
-    <div class="foot-legal">
-      <p>© {year} <a class="foot-link" href={sites.company.url} target="_blank" rel="noopener noreferrer">{company.legalName}</a></p>
-      <p>{registrationLine}</p>
-      <p>cDot is technical infrastructure. Any regulated activities, including banking and payments, are performed by licensed partners.</p>
-    </div>
+    <p class="foot-copy">© {year} <a class="foot-link" href={sites.company.url} target="_blank" rel="noopener noreferrer">{company.legalName}</a></p>
+    <p class="foot-note">cDot is technical infrastructure. Any regulated activities, including banking and payments, are performed by licensed partners.</p>
   </div>
 </footer>

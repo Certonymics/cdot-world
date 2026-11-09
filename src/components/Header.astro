@@ -7,8 +7,9 @@ const here = Astro.url.pathname;
 <header>
   <div class="wrap nav">
     <a class="brand" href="/">
-      <svg class="logomark" role="img" aria-label="cDot"><use href="#cdot-logo"/></svg>
-      <span class="tag">{tagline}</span>
+      <!-- The lockup (mark, divider and tagline) is one image, as on cdot.app; its text is
+           baked in, so redraw it if the tagline in company.mjs changes. -->
+      <img class="lockup" src="/assets/cdot-lockup.svg" width="168" height="50" alt={`cDot: ${tagline}`} />
     </a>
     <!-- Three menus, from src/data/nav.mjs. (Contact is in the footer.) -->
     <nav id="main-nav" aria-label="Main">

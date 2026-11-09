@@ -21,7 +21,7 @@
                        certonymity.com), its real url and Companies House number;
                        sameAs holds no sibling site (identity only); relatedLink
                        points at the app; dates are sane.
-     5. Company data - the footer, the contact page's box and llms.txt all carry the facts in
+     5. Company data - the contact page's box, the footer and llms.txt all carry the facts in
                        src/data/company.mjs; no stray email address; every email is
                        shielded from Cloudflare's obfuscation (crawlers would
                        otherwise read "[email protected]").
@@ -264,11 +264,11 @@ if (home) {
 /* --- 5. company data, and email shielding --------------------------------- */
 if (home) {
   const text = home.html.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
-  check("5. Company", text.includes(registrationLine), `the footer must say "${registrationLine}".`);
   /* The address is in the contact page's box (it used to be on the home page). */
   const contact = pages.find((p) => p.path === "/contact/");
   const contactText = (contact?.html || "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
   check("5. Company", !!contact, "/contact/ was not built.");
+  check("5. Company", contactText.includes(registrationLine), `the contact page must say "${registrationLine}".`);
   for (const part of [company.legalName, company.address.street, company.address.locality, company.address.postcode])
     check("5. Company", contactText.includes(part), `the contact page is missing "${part}" (src/data/company.mjs).`);
   check("5. Company", text.includes(`© ${new Date().getFullYear()}`), "the footer copyright year is not the current year; rebuild.");

@@ -2,7 +2,7 @@
 /* The contact page: the form (posting to the Google Apps Script in scripts/contact-form.gs),
    the company's address and email. It used to be the last section of the home page. */
 import Layout from "../layouts/Layout.astro";
-import { company } from "../data/company.mjs";
+import { company, registrationLine } from "../data/company.mjs";
 import { sectionPage } from "../data/pages.mjs";
 
 const { title, description } = sectionPage("contact");
@@ -32,9 +32,8 @@ const { title, description } = sectionPage("contact");
           <!--email_off--><a href={`mailto:${company.email}`}>{company.email}</a><!--/email_off--> instead.</p>
         </noscript>
         <div class="addr">
-          <p>cDot — built by Certonymity</p>
           <p><!--email_off--><a href={`mailto:${company.email}`}>{company.email}</a><!--/email_off--></p>
-          <p>{company.legalName}<br>{company.address.street}<br>{company.address.locality}<br>{company.address.postcode}</p>
+          <p>{company.legalName}<br>{company.address.street}<br>{company.address.locality}<br>{company.address.postcode}<br>{registrationLine}</p>
         </div>
       </div>
       <button class="btn btn-primary cf-submit" type="submit">Send message</button>

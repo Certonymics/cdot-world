@@ -124,7 +124,7 @@ Header and footer come along automatically.
 
 The header's Join / Learn / Build menus are written once, in `src/data/nav.mjs`, and
 `Header.astro` renders them. Each menu item that is a page reads its label and URL from
-`src/data/pages.mjs` (`sectionPages`); the Whitepaper, "Get the app" and "Code" are "Coming soon" labels until they have somewhere to go.
+`src/data/pages.mjs` (`sectionPages`); the Whitepaper and "Code" are "Coming soon" labels until they have somewhere to go.
 The Blog is in the footer, not the menus (see "The Blog").
 
 A section page is `src/pages/<slug>.astro` using `src/layouts/SectionPage.astro`. Until it
