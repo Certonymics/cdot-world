@@ -121,12 +121,16 @@ const ogDescription =
 
 <div class="divider"></div>
 
-<!-- Closing calls to action: the two ways to join in. Both pages are in the header's Join menu. -->
+<!-- Closing calls to action: the two ways to join in. "Run a node" is in the header's Join menu; the community has no page yet. -->
 <section class="closing-ctas">
   <div class="wrap">
     <div class="hero-ctas">
       <a class="btn btn-primary" href="/nodes/">Run a node</a>
-      <a class="btn btn-ghost" href="/community/">Join the community</a>
+      <!-- No community page yet: a placeholder with the "Coming soon" tip, as in the header menu. -->
+      <span class="btn btn-ghost foot-soon" tabindex="0" aria-describedby="community-soon">
+        Join the community
+        <span class="soon-tip" id="community-soon" role="tooltip">Coming soon</span>
+      </span>
     </div>
   </div>
 </section>

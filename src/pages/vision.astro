@@ -2,4 +2,17 @@
 import SectionPage from "../layouts/SectionPage.astro";
 import { sectionPage } from "../data/pages.mjs";
 ---
-<SectionPage {...sectionPage("vision")} />
+<!-- Placeholder: the copy of the cdot.app About page, until this page has its own. The
+     app's links to its feature pages are plain text here, as those pages are on cdot.app. -->
+<SectionPage {...sectionPage("vision")} headline="cDot is what the internet should have been: privacy-first, decentralised, and accountable.">
+  <p class="lead">cDot is the network for secure identity, communication and payments. Send secure emails and messages, pay via email, chat or wallet, and stay private online.</p>
+  <p class="lead">It has five core functionalities, all built on the same framework:</p>
+  <ul class="lead vision-list">
+    <li>Identity: Prove specific facts about yourself without exposing your personal data.</li>
+    <li>Chat: Post-quantum secure, plausibly deniable messaging.</li>
+    <li>Email: End-to-end encrypted email that works with existing Gmail and Outlook accounts.</li>
+    <li>Wallet: A stablecoin and crypto wallet integrated with email and chat.</li>
+    <li>Vault: Secure asset recovery based on biometrics instead of passwords or secret keys.</li>
+  </ul>
+  <p class="lead">cDot is also a network designed to solve the problems of privacy and security everywhere on the internet, from proving who you are to sending messages and moving money. The cDot framework is available for others to build on — bringing us one step closer to our vision of a secure, permissionless, community-driven internet.</p>
+</SectionPage>

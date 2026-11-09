@@ -50,15 +50,6 @@ export const sectionPages = [
     live: false,
   },
   {
-    slug: "community",
-    group: "Join",
-    heading: "Community",
-    title: "Community — cDot",
-    description:
-      "Join the cDot community: node runners, developers and supporters building the network together.",
-    live: false,
-  },
-  {
     slug: "vision",
     group: "Learn",
     heading: "Vision",
@@ -92,24 +83,6 @@ export const sectionPages = [
     title: "Roadmap — cDot",
     description:
       "The cDot network roadmap: what has launched, what is being built now and what comes next across the C-Layer, P-Layer and T-Layer.",
-    live: false,
-  },
-  {
-    slug: "sdk",
-    group: "Build",
-    heading: "SDK",
-    title: "SDK — cDot",
-    description:
-      "The cDot SDK: build apps on secure identity, communication and payments using the cDot network.",
-    live: false,
-  },
-  {
-    slug: "changelog",
-    group: "Build",
-    heading: "Changelog",
-    title: "Changelog — cDot",
-    description:
-      "What has changed in the cDot network, node software and SDK: release notes and version history for node runners and developers.",
     live: false,
   },
 ];

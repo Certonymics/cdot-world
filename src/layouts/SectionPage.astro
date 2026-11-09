@@ -11,14 +11,16 @@ interface Props {
   heading: string;
   group: string;
   live: boolean;
+  /* A page's own h1, where it is not the name the menus use. */
+  headline?: string;
 }
-const { title, description, heading, group, live } = Astro.props;
+const { title, description, heading, group, live, headline } = Astro.props;
 ---
 <Layout title={title} description={description} noindex={!live}>
   <div class="page-plain">
     <div class="wrap">
       {group && <p class="eyebrow">{group}</p>}
-      <h1>{heading}</h1>
+      <h1>{headline ?? heading}</h1>
       <slot />
     </div>
   </div>

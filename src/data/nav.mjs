@@ -24,7 +24,9 @@ export const navGroups = [
          `sites.app.live` is flipped in src/data/company.mjs. */
       { label: "Get the app", href: sites.app.live ? sites.app.url : undefined, external: true },
       page("nodes"),
-      page("community"),
+      /* No page or address yet, so it shows as "Coming soon". */
+      { label: "Explorer", href: undefined },
+      { label: "Community", href: undefined },
     ],
   },
   {
@@ -40,10 +42,10 @@ export const navGroups = [
   {
     label: "Build",
     items: [
-      page("sdk"),
+      { label: "SDK", href: undefined },
       { label: "Docs", href: sites.docs.url, external: true },
       { label: "Code", href: undefined },
-      page("changelog"),
+      { label: "Changelog", href: undefined },
     ],
   },
 ];

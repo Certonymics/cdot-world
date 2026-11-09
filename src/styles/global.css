@@ -98,8 +98,9 @@
   /* Section pages (src/layouts/SectionPage.astro): the group name and the heading, under the
      fixed header. */
   .page-plain{padding:150px 0 96px}
-  .page-plain h1{font-size:clamp(32px,6vw,48px);line-height:1.1;margin:0}
+  .page-plain h1{font-size:clamp(32px,6vw,48px);line-height:1.1;margin:0 0 24px}
   @media(max-width:640px){.page-plain{padding:110px 0 64px}}
+  .vision-list{list-style:disc;padding-left:22px;display:flex;flex-direction:column;gap:8px}
 
   /* Burger button — hidden on desktop */
   /* 44x44, drawn around the same 22x16 icon. It was 22x16 - the primary mobile
@@ -716,6 +717,7 @@
     transition:opacity .15s ease,transform .15s ease,visibility .15s;
   }
   .foot-soon:hover .soon-tip,.foot-soon:focus .soon-tip{opacity:1;visibility:visible;transform:translate(-50%,0)}
+  .closing-ctas .foot-soon{position:relative} /* the tip anchors to the button, not the footer row */
   @media (prefers-reduced-motion:reduce){.soon-tip{transition:none}}
   /* Narrow: the links wrap into rows and an item can sit at the screen edge, so a
      label centred on the item would clip. Centre it on the whole row instead. */
