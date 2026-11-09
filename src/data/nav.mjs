@@ -21,8 +21,7 @@ export const navGroups = [
     label: "Join",
     items: [
       page("nodes"),
-      /* No page or address yet, so it shows as "Coming soon". */
-      { label: "Explorer", href: undefined },
+      { label: "Explorer", href: "http://54.37.17.29/", external: true },
       { label: "Community", href: "https://discord.gg/yBP95phmb", external: true },
     ],
   },
