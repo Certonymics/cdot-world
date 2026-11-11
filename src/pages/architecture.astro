@@ -1,10 +1,12 @@
 ---
 import SectionPage from "../layouts/SectionPage.astro";
+import NodeSignup from "../components/NodeSignup.astro";
 import NetworkMap from "../components/NetworkMap.astro";
 import Chains from "../components/Chains.astro";
 import { sectionPage } from "../data/pages.mjs";
 ---
 <SectionPage {...sectionPage("architecture")}>
+  <NodeSignup />
   <NetworkMap />
   <Chains />
 </SectionPage>

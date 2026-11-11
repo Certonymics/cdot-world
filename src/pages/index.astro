@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import NodeSignup from "../components/NodeSignup.astro";
 import NetworkMap from "../components/NetworkMap.astro";
 import Chains from "../components/Chains.astro";
 import { company, tagline } from "../data/company.mjs";
@@ -69,30 +70,7 @@ const ogDescription =
      "one network" and then sat apart from the thing it was describing. -->
 <section id="c-layer">
   <div class="wrap">
-    <h2>The identity layer for the next generation of the internet</h2>
-    <!-- The last four words are joined with &nbsp; on purpose. At the full 780px
-         measure the sentence would otherwise end on a lone "CDOT tokens.", and
-         capping the width to avoid that made the paragraph visibly narrower than
-         every other one on the page. Binding the tail fixes the widow without
-         touching the measure. Re-check this if the copy changes. -->
-    <p class="lead">cDot is built on the C-Layer: the blockchain for secure, decentralised identity, with no single point of failure. Anyone can run a node — sign up to secure the network and earn points redeemable&nbsp;for&nbsp;CDOT&nbsp;tokens.</p>
-    <!-- Signup sits ABOVE the map. The map is evidence for the invitation, not a
-         preamble to it: a reader who is already sold should not have to scroll
-         past a world map to find the field. Its own copy line was folded into
-         the standfirst above rather than repeated here. -->
-    <div class="node-signup">
-      <form class="node-form" id="clayerForm" name="clayer-nodes" method="post">
-        <!-- A placeholder is not a label: it vanishes on first keystroke and many
-             screen readers skip it entirely. Visually hidden, still announced. -->
-        <label class="sr-only" for="clayer-email">Email address</label>
-        <input id="clayer-email" type="email" name="email" autocomplete="email"
-               placeholder="name@company.com" required>
-        <!-- Honeypot: hidden from people, filled in by bots. -->
-        <input class="cf-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button class="btn btn-primary" type="submit">Register your interest</button>
-      </form>
-      <p class="node-status" id="clayer-status" role="status" aria-live="polite"></p>
-    </div>
+    <NodeSignup />
     <NetworkMap />
 
     <Chains />
@@ -135,104 +113,5 @@ const ogDescription =
   </div>
 </section>
 
-<!-- Form handler for the C-Layer node signup. It posts to a Google Apps Script
-     deployment - the one cdot.app and c.email-website also use, so a signup from
-     any of the three lands in one sheet. (The contact form is on /contact/, with
-     its own script and deployment.)
-
-     NOTE for the signup: it began as a verbatim port from cdot.app and has since
-     diverged - the success path now resets the button label, and the fetch lives
-     in postJson() below. cdot.app still has the old inline version. Port these
-     changes there when it is next touched, so the three do not drift further. -->
-<script is:inline>
-(function(){
-  /* The transport (the contact page has its own copy of it).
-
-     No Content-Type header on purpose. Setting one makes this a preflighted
-     request, and Apps Script does not answer the OPTIONS probe, so the whole
-     submission fails before it starts. Sent as text/plain it is a "simple
-     request" and goes straight through; doPost reads the raw body regardless.
-
-     Without a timeout a stalled connection leaves the button disabled on its
-     "Sending..." label forever, with no way to retry.
-
-     Resolves { ok:true } only when the server explicitly confirmed, and
-     { ok:false, error } otherwise - so a caller can never report success the
-     server did not give. A network failure or timeout REJECTS, and callers catch
-     it. */
-  async function postJson(url, payload){
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(15000),
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json().catch(function(){ return null; });
-    if (!response.ok || !result || !result.ok) {
-      return { ok: false, error: result && result.error };
-    }
-    return { ok: true };
-  }
-
-  /* --- C-Layer node signup ------------------------------------------------ */
-  (function(){
-    /* The Apps Script web app that records signups. Public by design: it only
-       ever appends a row and exposes no way to read the sheet back, so shipping
-       it to the browser costs nothing worse than the odd junk row. A SEPARATE
-       deployment from the contact form (on /contact/). */
-    const CLAYER_SIGNUP_URL =
-      'https://script.google.com/macros/s/AKfycbzoWtxvKHs5oFSKra8olCmpMUGENdc9qlsNGvpeP9UCwYY8nMjMBafhFOvyDpqpkz0KvQ/exec';
-
-    const form = document.getElementById('clayerForm');
-    const statusEl = document.getElementById('clayer-status');
-    if (!form || !statusEl) return;
-    const button = form.querySelector('button[type="submit"]');
-    let sending = false;
-
-    function fail(message){
-      statusEl.textContent = message || 'Something went wrong. Please try again.';
-      statusEl.classList.add('is-error');
-      sending = false;
-      button.disabled = false;
-      button.textContent = 'Register your interest';
-    }
-
-    form.addEventListener('submit', async function(e){
-      e.preventDefault();
-      if (sending) return;
-
-      sending = true;
-      button.disabled = true;
-      button.textContent = 'Registering…';
-      statusEl.textContent = '';
-      statusEl.classList.remove('is-error');
-
-      const data = new FormData(form);
-      try {
-        const result = await postJson(CLAYER_SIGNUP_URL, {
-          email: data.get('email'),
-          website: data.get('website')
-        });
-        if (!result.ok) return fail(result.error);
-
-        /* The form goes away on success, so there is no live Register button left
-           under a thank-you message inviting a second submission. */
-        form.hidden = true;
-        statusEl.textContent = 'Thanks — we’ll be in touch!';
-        /* Only fail() used to put the label back, so a successful submission left
-           the button reading "Registering…" forever. Normally invisible, since
-           the form is hidden on the line above - but not always: `hidden` loses
-           to any display rule on .node-form, the two paint in the same frame so a
-           slow machine shows the stale label first, and a screen reader walking
-           back over the region still announces it. Reset it on both paths. */
-        sending = false;
-        button.disabled = false;
-        button.textContent = 'Register your interest';
-      } catch (err) {
-        fail();
-      }
-    });
-  })();
-})();
-</script>
 
 </Layout>
