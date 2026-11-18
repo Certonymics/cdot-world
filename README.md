@@ -148,9 +148,23 @@ path it says nothing worth indexing. Its inline script is hashed into the
 Content-Security-Policy by the build like every other.
 
 `wrangler pages deploy dist` picks up `functions/` from the repo root, so the
-existing `npm run deploy` is enough. Dev builds of the app claim
-`dev.cdot.world`, which should be a `dev` branch deployment of the same Pages
-project with that custom domain attached.
+existing `npm run deploy` is enough.
+
+Dev builds of the app claim `dev.cdot.world` instead. That host is a second
+custom domain on the same Pages project, serving the production deployment,
+because the `.well-known` files already list the dev app next to the prod one.
+A Redirect Rule on the `cdot.world` zone (Rules -> Redirect Rules, set in the
+dashboard, not in this repo) sends every other path on it to
+`https://dev.certonym.org/` with a 302:
+
+```
+(http.host eq "dev.cdot.world" and not starts_with(http.request.uri.path, "/.well-known/"))
+```
+
+The rule must keep `/.well-known/` out: Apple and Android refuse an app link
+file that arrives through a redirect, and dev links stop opening the app. A
+tapped `/i/*` or `/g/*` link opens a dev build without loading the page, so
+the redirect only reaches a phone without one.
 
 To try it locally, build and run `npx wrangler pages dev dist`, then request
 `/i/quiet-falcon` with an Android user agent (302 to Google Play) and with an
